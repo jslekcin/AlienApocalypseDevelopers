@@ -1,0 +1,95 @@
+'''
+# Combining pages of wall
+def combinePages():
+    print('combining')
+    global walls
+    book = []
+    walls2 = []
+    for page in walls:
+        if book == []:
+            book.append(page)
+        else:
+            h0 = book[0].rect.h
+            h  = page.rect.h
+            y0 = book[0].rect.y
+            y  = page.rect.y
+            if h0 == h and y0 == y:
+                book.append(page)
+            else:
+                combinedPages = Wall(book[0].rect.topleft, pygame.image.load('Images/Ground.png'), (pageSize*len(book),h0))
+                walls2.append(combinedPages)
+                book = []
+                book.append(page)
+                
+    combinedPages = Wall(book[0].rect.topleft, pygame.image.load('Images/Ground.png'), (pageSize*len(book),h0))
+    walls2.append(combinedPages)
+    walls = walls2
+    
+        '''
+        # Checks if there is floor below the player
+        for wall in walls:
+
+            #if bottomRect.colliderect(wall.rect):
+            #  Player.rect.left = wall.rect.right
+            #  if(Player.ySpeed > 0):
+            #    Player.ySpeed = 0
+
+            if belowRect.colliderect(wall.rect):
+                # Setting flush
+                Player.rect.bottom = wall.rect.top
+                # Stops movement
+                if Player.ySpeed > 0:
+                    Player.ySpeed = 0
+                # Slows player x movement
+                if Player.xSpeed > 0 and not pygame.key.get_pressed()[pygame.K_d]:
+                    Player.xSpeed -= Player.xFriction
+                if Player.xSpeed < 0 and not pygame.key.get_pressed()[pygame.K_a]:
+                    Player.xSpeed += Player.xFriction
+                # Jump
+                if pygame.key.get_pressed()[pygame.K_SPACE]:
+                    Player.ySpeed = -10
+                break
+        
+        #for wall in walls:
+            # Sets player flush with the wall
+        #    if rightRect.colliderect(wall.rect):
+        #        Player.rect.right = wall.rect.left
+        #        break
+
+        #for wall in walls:
+        #    if leftRect.colliderect(wall.rect):
+        #        Player.rect.left = wall.rect.right
+        #        break
+        for wall in walls:
+            if leftRect.colliderect(wall.rect):
+                Player.rect.left = wall.rect.right
+                if Player.xSpeed > 0:
+                    Player.xSpeed = 0
+                break
+
+        for wall in walls:
+            if rightRect.colliderect(wall.rect):
+                Player.rect.right = wall.rect.left
+                if Player.xSpeed > 0:
+                    Player.xSpeed = 0
+                break
+        
+        for wall in walls:
+            if topRect.colliderect(wall.rect):
+                if Player.ySpeed < 0:
+                    Player.ySpeed = 0
+                Player.rect.top = wall.rect.bottom
+                break
+
+        #for wall in walls:
+        #  if leftRect.colliderect(wall.rect):
+        #   if Player.xSpeed > 0:
+        #      Player.xSpeed = 0
+        #    Player.rect.left = wall.rect.right
+
+        #for wall in walls:
+        #  if rightRect.colliderect(wall.rect):
+        '''
+
+            
+'''
