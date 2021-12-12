@@ -326,7 +326,7 @@ c= 32
         Player.attackCooldown = self.attackSpeed * fps
 """
 Player.weapon = Gun()
-
+walls = []
 class Wall:
     def __init__(self, worldPos, image, size, imageIndex): 
         # Generates rect from given parameters
@@ -527,7 +527,7 @@ class RangedEnemyProjectile:
         screen.blit(self.image, adjustedRect)
 
 class PoisonShooterEnemy: # Jaeho
-    def init(self, worldPos, image, size): # Create the enemy
+    def __init__(self, worldPos, image, size): # Create the enemy
         # Generates rect from given parameters
         self.size = size
         self.image = pygame.transform.scale(image, self.size)
@@ -538,6 +538,12 @@ class PoisonShooterEnemy: # Jaeho
         self.speed  = 4
 
         self.shootingDirection = 0
+        
+        self.approachRange = 300
+        self.attackRange = 200
+        self.fleeRange = 100
+
+        self.counter = 0
         
     def update(self): # Change the enemies variables (like position)
         # Check that enemy is on screen
@@ -555,7 +561,7 @@ class PoisonShooterEnemy: # Jaeho
                     self.facingLeft = True
                 else:
                     self.facingLeft = False
-
+        
             # Move based on direction facing
             if self.facingLeft:
                 moveable = False
@@ -585,7 +591,7 @@ class PoisonShooterEnemy: # Jaeho
 
                 if moveable:
                     self.rect = self.rect.move(self.speed, 0)
-
+        
         elif distToPlayer < self.attackRange and distToPlayer >= self.fleeRange:
             # How often they attack
             self.counter += 1
@@ -600,12 +606,27 @@ class PoisonShooterEnemy: # Jaeho
                 angle = angle + random.randint(-40,40)
                 angle = math.radians(angle)
                 projectiles.append(PoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
+        floorCheck = (self.rect.centerx,self.rect.bottom + 5)
+        floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
+        move5 = True
+        move1 = True
+        for wall in walls:
+            if wall.rect.collidepoint(floorCheck):
+                move5 = False
+            if wall.rect.collidepoint(floorCheck2):
+                move1 = False
 
         if self.health <= 0:
             enemies.remove(self)
+
+        if move5 == True:
+            self.rect = self.rect.move(0,5)
+        elif move1 == True:
+            self.rect = self.rect.move(0,1)
         
     def render(self): # Show the enemy and visual effects
-        pass
+        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        screen.blit(self.image, adjustedRect)
         #Render Enemy
         #Render Poison blob
 
@@ -681,6 +702,9 @@ class ReaperEnemy: # Chris
             self.invisibility = 0
             self.cooldown -= 1
         
+        if self.health <= 0:
+            enemies.remove(self)
+
     def render(self): # Show the enemy and visual effects
         # Modifys the position based on the centered player position
         adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
@@ -690,7 +714,7 @@ class ReaperEnemy: # Chris
 
 
 # Walls(Pos, Image, Size)
-walls = []
+
 pageSize = 10
 # Creates pagse for the player platform
 for i in range(int(70/pageSize)):
@@ -752,7 +776,7 @@ def saveMap():
     file.close()
 
 # worldPos, image, sized d)
-enemies = [ReaperEnemy((600, -34), pygame.image.load('Images/Reaper.png'), (64,100))]
+enemies = [ReaperEnemy((806, 1039), pygame.image.load('Images/Reaper.png'), (64,100)),PoisonShooterEnemy((-476, 813),pygame.image.load('Images/enemy.png'), (64,100))]
 projectiles = []
 foreground = [Wall((200,-100), pygame.image.load('Images/bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images/bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images/tree.png'), (100,100), -1)]
 midground = [Wall((200,-100), pygame.image.load('Images/bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images/bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images/tree.png'), (100,100), -1)]
@@ -830,6 +854,9 @@ while 1:
         mousePos = pygame.mouse.get_pos()
         mousePosW = (mousePos[0] - Player.renderRect.centerx + Player.rect.centerx, mousePos[1] - Player.renderRect.centery + Player.rect.centery)
         
+        if pygame.mouse.get_pressed(3)[0]:
+            print(mousePosW)
+
         if generatingMap:
             if pygame.mouse.get_pressed(3)[0]:
                 tile = (math.floor(mousePosW[0]/25),math.floor(mousePosW[1]/25))
