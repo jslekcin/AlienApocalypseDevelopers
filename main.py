@@ -253,6 +253,25 @@ class Weapon:
 
     def render(self):
         pass
+class Sword(Weapon):
+    def __init__(self):
+        self.name = 'Sword'
+        self.damage = 8
+        self.left = False
+    def attack(self):
+        mousePos = pygame.mouse.get_pos()
+        if mousePos[0] < self.centerx:
+            self.left = True
+        else: 
+            self.left = False
+        
+        if self.left:
+            #do damage to enemies left of the player
+            for enemy in enemies:
+                if enemy.centerx > self.left - 30:
+                    print("hit")
+        elif self.left == False:
+            pass 
 
 class Gun(Weapon):
     def __init__(self):
