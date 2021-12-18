@@ -35,7 +35,7 @@ screen = pygame.display.set_mode(size)
 fps = 60
 
 black = (0,0,0)
-background = pygame.image.load('SurvivalGameMVP\Images\sky.png')
+background = pygame.image.load('Images\sky.png')
 background = pygame.transform.scale(background, size)
 gameState = 1
 
@@ -43,7 +43,7 @@ clock = pygame.time.Clock()
 # Classes
 class Player:
     # Loads image and creates a rect out of it
-    image = pygame.image.load("SurvivalGameMVP\Images\player.png") 
+    image = pygame.image.load("Images\player.png") 
     rect = image.get_rect()
     # Creates a static rect to display in the center of the screen
     renderRect = image.get_rect()
@@ -695,7 +695,7 @@ pageSize = 10
 # Creates pagse for the player platform
 for i in range(int(70/pageSize)):
     h = 1000
-    page = Wall((pageSize*i,h), pygame.image.load('SurvivalGameMVP\Images\Ground.png'), (pageSize,h), 0)
+    page = Wall((pageSize*i,h), pygame.image.load('Images\Ground.png'), (pageSize,h), 0)
     walls.append(page)
 
 '''
@@ -752,17 +752,17 @@ def saveMap():
     file.close()
 
 # worldPos, image, sized d)
-enemies = [ReaperEnemy((600, -34), pygame.image.load('SurvivalGameMVP\Images\Reaper.png'), (64,100))]
+enemies = [ReaperEnemy((600, -34), pygame.image.load('Images\Reaper.png'), (64,100))]
 projectiles = []
-foreground = [Wall((200,-100), pygame.image.load('SurvivalGameMVP\Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('SurvivalGameMVP\Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('SurvivalGameMVP\Images\Tree.png'), (100,100), -1)]
-midground = [Wall((200,-100), pygame.image.load('SurvivalGameMVP\Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('SurvivalGameMVP\Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('SurvivalGameMVP\Images\Tree.png'), (100,100), -1)]
+foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
+midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 
 generatingMap = not loadFile
 editPageNum = len(walls)-1
 editCooldown = 0
 
 tileSize = 25
-blockImages = [pygame.image.load('SurvivalGameMVP\Images\Ground.png'), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('SurvivalGameMVP\Images\stone.PNG')]
+blockImages = [pygame.image.load('Images\Ground.png'), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('Images\stone.PNG')]
 blockImages[1].fill((255,255,255))
 blockImages[2].fill((255,0,0))
 blockImages[3].fill((0,255,0))
@@ -773,7 +773,7 @@ blockImageIndex = 0
 
 if loadFile:
     walls = []
-    file = open("SurvivalGameMVP\map.txt", "r")
+    file = open("map.txt", "r")
     fileData = file.read().split('\n')
     file.close()
     for line in fileData:
