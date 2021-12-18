@@ -723,6 +723,23 @@ class ReaperEnemy: # Chris
         
         if self.health <= 0:
             enemies.remove(self)
+        floorCheck = (self.rect.centerx,self.rect.bottom + 5)
+        floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
+        move5 = True
+        move1 = True
+        for wall in walls:
+            if wall.rect.collidepoint(floorCheck):
+                move5 = False
+            if wall.rect.collidepoint(floorCheck2):
+                move1 = False
+
+        if self.health <= 0:
+            enemies.remove(self)
+
+        if move5 == True:
+            self.rect = self.rect.move(0,5)
+        elif move1 == True:
+            self.rect = self.rect.move(0,1)
 
     def render(self): # Show the enemy and visual effects
         # Modifys the position based on the centered player position
@@ -795,7 +812,7 @@ def saveMap():
     file.close()
 
 # worldPos, image, sized d)
-enemies = [ReaperEnemy((600, -34), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\enemy.png'), (64,100))]
+enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\enemy.png'), (64,100))]
 projectiles = []
 foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
