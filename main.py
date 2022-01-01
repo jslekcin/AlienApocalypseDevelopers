@@ -653,8 +653,9 @@ class PoisonShooterEnemy: # Jaeho
 class PoisonShooterEnemyProjectile:
     # When it hits somthing it will stay for a while
     def __init__(self, location, damage, speed, angle):
-        self.image = pygame.Surface((20,20))
-        pygame.draw.circle(self.image, (23,52,200), (10,10), 10)
+        #self.image = pygame.Surface((20,20))
+        #pygame.draw.circle(self.image, (23,52,200), (10,10), 10)
+        self.image = pygame.image.load("Images/Posion Projectile.PNG")
         self.rect = self.image.get_rect()
         self.rect.center = location
         self.damage = damage
@@ -812,7 +813,7 @@ def saveMap():
     file.close()
 
 # worldPos, image, sized d)
-enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\enemy.png'), (64,100))]
+enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100))]
 projectiles = []
 foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
