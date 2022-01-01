@@ -44,6 +44,7 @@ clock = pygame.time.Clock()
 class Player:
     # Loads image and creates a rect out of it
     image = pygame.image.load("Images\player.png") 
+    poisonImage = pygame.image.load("Images\Posioned Player.PNG")
     rect = image.get_rect()
     # Creates a static rect to display in the center of the screen
     renderRect = image.get_rect()
@@ -242,7 +243,10 @@ class Player:
         Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
     def render():
-        screen.blit(Player.image, Player.renderRect)
+        if Player.isPoisned == False:
+            screen.blit(Player.image, Player.renderRect)
+        elif Player.isPoisned:
+            screen.blit(Player.poisonImage, Player.renderRect)
         Player.weapon.render()
 
 class Weapon:
