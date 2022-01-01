@@ -61,6 +61,7 @@ class Player:
     sprintCooldown = False
     # Stats
     maxHealth = 100
+    isPoisned = False
     health = maxHealth
     # Equipment
     weapon = None
@@ -661,6 +662,7 @@ class PoisonShooterEnemyProjectile:
         self.dx = speed * math.cos(angle)
         self.dy = speed * math.sin(angle)
         self.timer = 10 * fps
+        self.poisonTimer = fps * 2
     def update(self):
         # Check if it hits anything
         hit = False
@@ -682,8 +684,16 @@ class PoisonShooterEnemyProjectile:
 
         if self.rect.colliderect(Player.rect):
             # Do damage if it does
-            Player.health -= self.damage * 2
+            Player.health -= 1
             projectiles.remove(self)
+            Player.isPoisned = True
+            self.poisonTimer = fps * 2
+        if Player.isPoisned == True:
+            self.poisonTimer -= 1
+            Player.health -= 0.05
+            print(self.poisonTimer)
+        if self.poisonTimer <= 0:
+            Player.isPoisned = False
 
     def render(self):
         # Modifys the position based on the centered player position
@@ -732,9 +742,6 @@ class ReaperEnemy: # Chris
                 move5 = False
             if wall.rect.collidepoint(floorCheck2):
                 move1 = False
-
-        if self.health <= 0:
-            enemies.remove(self)
 
         if move5 == True:
             self.rect = self.rect.move(0,5)
