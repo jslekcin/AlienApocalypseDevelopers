@@ -349,7 +349,34 @@ c= 32
 
         Player.attackCooldown = self.attackSpeed * fps
 """
-Player.weapon = Gun()
+
+class Bat(Weapon):
+    def __init__(self):
+        self.name = 'Bat'
+        self.damage = 10
+        self.range = 32 #irection we are facing and create a rect in that direction
+        self.attackSpeed = .5
+    def attack(self):
+        # Figure out which class Bat(Weapon):
+        attackBox = pygame.Rect(0, 0, self.range, 64)
+        if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
+            attackBox.topright = Player.rect.topleft
+        else:
+            attackBox.topleft = Player.rect.topright
+
+        # Debug show attack box
+        adjustedRect = attackBox.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        pygame.draw.rect(screen, (255,255,255), adjustedRect)
+
+        # See if it collides with enemies and if it does, damages it
+        for enemy in enemies:
+            if attackBox.colliderect(enemy.rect):
+                enemy.health -= self.damage
+                print("Bat has hit")
+
+        Player.attackCooldown = self.attackSpeed * fps
+
+Player.weapon = Bat()
 walls = []
 class Wall:
     def __init__(self, worldPos, image, size, imageIndex): 
