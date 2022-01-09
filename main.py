@@ -923,6 +923,9 @@ while 1:
             if pygame.key.get_pressed()[pygame.K_h]:
                 Player.health -= 20
         
+        if len(enemies) <= 0:
+            enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100))]
+
         # update
         Player.update()
         for wall in walls:
