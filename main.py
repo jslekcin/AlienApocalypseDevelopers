@@ -25,6 +25,8 @@ loadFile =  True
 # Ability to draw over other blocks, change pen size, Make bigger map, flight/ way to teleport back, optimize rendering 
 import sys, pygame, math, random
 
+from pygame.constants import K_2
+
 pygame.init()
 pygame.font.init()
 
@@ -73,9 +75,9 @@ class Player:
         w = .8 * Player.rect.w
         belowRect = pygame.Rect((Player.rect.left + s, Player.rect.bottom), (w, 2))
 
-        leftRect  = pygame.Rect((Player.rect.left - 2, Player.rect.top + s), (2, w))
+        leftRect  = pygame.Rect((Player.rect.left - 2, Player.rect.top + s), (2, w * 1.8))
 
-        rightRect = pygame.Rect((Player.rect.right, Player.rect.top + s), (2, w))
+        rightRect = pygame.Rect((Player.rect.right, Player.rect.top + s), (2, w * 1.8))
 
         topRect   = pygame.Rect((Player.rect.left + s, Player.rect.top - 2), (w, 2))
 
@@ -234,6 +236,12 @@ class Player:
         # Updates player y position then the velocity based on acceleration
         Player.ySpeed += Player.yAcceleration
 
+        #Weapon changing function
+        if pygame.key.get_pressed()[pygame.K_1]:
+            Player.weapon = Bat()
+        elif pygame.key.get_pressed()[pygame.K_2]:
+            Player.weapon = Gun()
+
         # Attack if player clicks
         if Player.attackCooldown > 0:
             Player.attackCooldown -= 1
@@ -349,7 +357,34 @@ c= 32
 
         Player.attackCooldown = self.attackSpeed * fps
 """
-Player.weapon = Gun()
+
+class Bat(Weapon):
+    def __init__(self):
+        self.name = 'Bat'
+        self.damage = 10
+        self.range = 32 #irection we are facing and create a rect in that direction
+        self.attackSpeed = .5
+    def attack(self):
+        # Figure out which class Bat(Weapon):
+        attackBox = pygame.Rect(0, 0, self.range, 64)
+        if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
+            attackBox.topright = Player.rect.topleft
+        else:
+            attackBox.topleft = Player.rect.topright
+
+        # Debug show attack box
+        adjustedRect = attackBox.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        pygame.draw.rect(screen, (255,255,255), adjustedRect)
+
+        # See if it collides with enemies and if it does, damages it
+        for enemy in enemies:
+            if attackBox.colliderect(enemy.rect):
+                enemy.health -= self.damage
+                print("Bat has hit")
+
+        Player.attackCooldown = self.attackSpeed * fps
+
+Player.weapon = Bat()
 walls = []
 class Wall:
     def __init__(self, worldPos, image, size, imageIndex): 
