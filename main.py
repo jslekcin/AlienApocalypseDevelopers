@@ -712,7 +712,7 @@ class PoisonShooterEnemyProjectile:
                 break
         if hit:
             # Change image if hit something
-            self.image = pygame.transform.scale(self.image, (30,30))
+            self.image = pygame.image.load("Images/posion puddle.PNG")
             #self.rect = self.image.get_rect()
             self.timer -= 1
             if self.timer <= 0:
@@ -731,7 +731,7 @@ class PoisonShooterEnemyProjectile:
         if Player.isPoisned == True:
             self.poisonTimer -= 1
             Player.health -= 0.05
-            print(self.poisonTimer)
+            #print(self.poisonTimer)
         if self.poisonTimer <= 0:
             Player.isPoisned = False
 
@@ -890,6 +890,7 @@ if loadFile:
         wall = Wall((int(line[0]),int(line[1])), blockImages[int(line[4])], (int(line[2]),int(line[3])), int(line[4]))
         walls.append(wall)
 
+doubleHealth = 10
 while 1:
     # The Great Clock #3
     clock.tick(fps) 
@@ -922,10 +923,13 @@ while 1:
                 gameState += 1
             if pygame.key.get_pressed()[pygame.K_h]:
                 Player.health -= 20
-        
+        #doubleHealth = 10
         if len(enemies) <= 0:
             enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100))]
-
+            doubleHealth = doubleHealth * 2
+            print("Health Doubled",doubleHealth)
+            for enemy in enemies:
+                enemy.health = doubleHealth
         # update
         Player.update()
         for wall in walls:
@@ -941,7 +945,8 @@ while 1:
         mousePosW = (mousePos[0] - Player.renderRect.centerx + Player.rect.centerx, mousePos[1] - Player.renderRect.centery + Player.rect.centery)
         
         if pygame.mouse.get_pressed(3)[0]:
-            print(mousePosW)
+            #print(mousePosW)
+            pass
 
         if generatingMap:
             if pygame.mouse.get_pressed(3)[0]:
