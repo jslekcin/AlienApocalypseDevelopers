@@ -891,6 +891,7 @@ if loadFile:
         walls.append(wall)
 
 doubleHealth = 10
+level = 1
 while 1:
     # The Great Clock #3
     clock.tick(fps) 
@@ -925,9 +926,10 @@ while 1:
                 Player.health -= 20
         #doubleHealth = 10
         if len(enemies) <= 0:
+            level += 1
             enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100))]
             doubleHealth = doubleHealth * 2
-            print("Health Doubled",doubleHealth)
+            #print("Level:", level)
             for enemy in enemies:
                 enemy.health = doubleHealth
         # update
@@ -1015,7 +1017,9 @@ while 1:
 
         
         weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
+        levelText = uiFont.render(str(level), True, (255,255,255))
         screen.blit(weaponText, (10, 10))
+        screen.blit(levelText, (400, 10))
 
         if generatingMap:
             screen.blit(pygame.transform.scale(blockImages[blockImageIndex], (25,25)), (220,220))
