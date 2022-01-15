@@ -26,6 +26,9 @@ while 1:
                 print("Start button was pressed")
             elif 100 <= mouse[0] <= 240 and 265 <= mouse[1] <= 315:
                 print("Quit button was pressed")
+                pygame.quit()
+                sys.exit
+                break
             elif 260 <= mouse[0] <= 400 and 265 <= mouse[1] <= 315:
                 print("Instruction button was pressed")
     
