@@ -712,7 +712,7 @@ class PoisonShooterEnemyProjectile:
                 break
         if hit:
             # Change image if hit something
-            self.image = pygame.image.load("Images/posion puddle.PNG")
+            self.image = pygame.image.load("Images/poison puddle.PNG")
             #self.rect = self.image.get_rect()
             self.timer -= 1
             if self.timer <= 0:
