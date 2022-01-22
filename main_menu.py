@@ -61,13 +61,23 @@ while 1:
         screen.blit(instructiontext2, (70,115))
 
         instructiontext3 = uiFont.render("SPACE = Jump   SHIFT = Sprint", True, (0,0,0))
-        screen.blit(instructiontext3, (70,185))
+        screen.blit(instructiontext3, (70,160))
 
         instructiontext4 = uiFont.render("1 = EQUIP BAT  2 =  EQUIP PISTOL", True, (0,0,0))
-        screen.blit(instructiontext4, (50,255))
+        screen.blit(instructiontext4, (50,205))
 
         instructiontext5 = uiFont.render("CLICK = Use Weapon", True, (0,0,0))
-        screen.blit(instructiontext5, (120,325))
+        screen.blit(instructiontext5, (120,250))
+        
+        instructiontext6 = uiFont.render("The reaper is only visible at close ranges.", True, (0,0,0))
+        screen.blit(instructiontext6, (5,295))
+
+        instructiontext7 = uiFont.render("The Posion Shooter shoots posion.", True, (0,0,0))
+        screen.blit(instructiontext7, (35, 340))
+
+        instructiontext8 = uiFont.render("Puddles are formed when posion lands.", True, (0,0,0))
+        screen.blit(instructiontext8, (10,360))
+
 
         pygame.draw.rect(screen, (238, 75, 43), (5,5,50,50))
     
