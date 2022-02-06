@@ -289,8 +289,10 @@ class Sword(Weapon):
 class Gun(Weapon):
     def __init__(self):
         self.name = 'Gun'
-        self.image_left = pygame.image.load("Images/Gun (left).png")
-        self.image_right = pygame.image.load("Images/Gun (right).png")
+        self.image_left = pygame.image.load("Images/gun (left).png")
+        self.image_left = pygame.transform.scale(self.image_left, (60,70))
+        self.image_right = pygame.image.load("Images/gun (right).png")
+        self.image_right = pygame.transform.scale(self.image_right, (60,70))
         
         self.damage = 10
         self.attackSpeed = 1
@@ -318,13 +320,14 @@ class Gun(Weapon):
         if dx < 0:
             angle += math.pi 
         if mousePos[0] >= Player.renderRect.centerx:
-            pass
-            #screen.blit(self.image_right, (Player.rect.centerx+50, Player.rect.centery))
+            #pass
+            screen.blit(self.image_right, (Player.renderRect.centerx+0, Player.renderRect.centery-30))
         elif mousePos[0] < Player.renderRect.centerx:
-            pass
-            #screen.blit(self.image_left, (Player.rect.centerx-50, Player.rect.centery))
+            #pass
+            screen.blit(self.image_left, (Player.renderRect.centerx-50, Player.renderRect.centery-35))
         pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
-        screen.blit(self.image_right, (Player.rect.centerx+50, Player.rect.centery))
+        #screen.blit(self.image_right, (Player.render))
+       
         
 class Bullet:
     def __init__(self, xSpeed, ySpeed):
