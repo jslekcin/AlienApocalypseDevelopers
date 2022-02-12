@@ -45,8 +45,8 @@ clock = pygame.time.Clock()
 # Classes
 class Player:
     # Loads image and creates a rect out of it
-    image = pygame.image.load("Images\player.png") 
-    poisonImage = pygame.image.load("Images\Posioned Player.PNG")
+    image = pygame.image.load("Images\Player.png") 
+    poisonImage = pygame.image.load("Images\Posioned Player.png")
     rect = image.get_rect()
     # Creates a static rect to display in the center of the screen
     renderRect = image.get_rect()
@@ -342,7 +342,7 @@ class Bullet:
         self.rect = self.rect.move(self.xSpeed, self.ySpeed)
         for enemy in enemies:
             if self.rect.colliderect(enemy.rect):
-                enemy.health -= 5
+                enemy.health -= 2.5
                 projectiles.remove(self)
                 return
     def render(self):
@@ -382,7 +382,7 @@ c= 32
 class Bat(Weapon):
     def __init__(self):
         self.name = 'Bat'
-        self.damage = 10
+        self.damage = 1.5
         self.range = 32 #irection we are facing and create a rect in that direction
         self.attackSpeed = .5
     def attack(self):
@@ -499,9 +499,9 @@ class RangedEnemy:
 
         # Movement Variables
         self.facingLeft = False
-        self.speed = 1
+        self.speed = .5
 
-        self.fleeRange = 200
+        self.fleeRange = 32
         self.attackRange = 400
         self.approachRange = 600
 
@@ -615,13 +615,13 @@ class PoisonShooterEnemy: # Jaeho
         
         self.damage = 5
         self.health = 7
-        self.speed  = 4
+        self.speed  = 2
 
         self.shootingDirection = 0
         
         self.approachRange = 300
         self.attackRange = 200
-        self.fleeRange = 100
+        self.fleeRange = 90
 
         self.counter = 0
         
@@ -723,7 +723,7 @@ class PoisonShooterEnemyProjectile:
         self.dx = speed * math.cos(angle)
         self.dy = speed * math.sin(angle)
         self.timer = 10 * fps
-        self.poisonTimer = fps * 2
+        self.poisonTimer = fps * 3
     def update(self):
         # Check if it hits anything
         hit = False
