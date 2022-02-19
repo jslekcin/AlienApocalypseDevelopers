@@ -78,6 +78,11 @@ while 1:
         instructiontext8 = uiFont.render("Puddles are formed when posion lands.", True, (0,0,0))
         screen.blit(instructiontext8, (10,360))
 
+        instructiontext8 = uiFont.render("The flying enemy is a close range enemy.", True, (0,0,0))
+        screen.blit(instructiontext8, (10,400))
+
+
+
 
         pygame.draw.rect(screen, (238, 75, 43), (5,5,50,50))
     

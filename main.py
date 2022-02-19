@@ -50,9 +50,9 @@ class Player:
     rect = image.get_rect()
     # Creates a static rect to display in the center of the screen
     renderRect = image.get_rect()
-    renderRect.center = (width/2, height/2)
+    renderRect.center = (width/2, height/2-5)
     # Create movement variables
-    xAcceleration = .1 # Running speed
+    xAcceleration = .07 # Running speed
     xFriction = .2     # How much we slow down
     yAcceleration = .4 # Gravity
     xSpeed = 0
@@ -75,16 +75,16 @@ class Player:
         w = .8 * Player.rect.w
         belowRect = pygame.Rect((Player.rect.left + s, Player.rect.bottom), (w, 2))
 
-        leftRect  = pygame.Rect((Player.rect.left - 2, Player.rect.top + s), (2, w * 1.8))
+        leftRect  = pygame.Rect((Player.rect.left - 2, Player.rect.top + s-10), (2, w * 1.8))
 
-        rightRect = pygame.Rect((Player.rect.right, Player.rect.top + s), (2, w * 1.8))
+        rightRect = pygame.Rect((Player.rect.right, Player.rect.top + s -10), (2, w * 1.8))
 
-        topRect   = pygame.Rect((Player.rect.left + s, Player.rect.top - 2), (w, 2))
+        topRect   = pygame.Rect((Player.rect.left + s, Player.rect.top - 10), (w, 2))
 
-        pygame.draw.rect(screen, (255,0,0), belowRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]))
-        pygame.draw.rect(screen, (255,0,0), leftRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]))
-        pygame.draw.rect(screen, (255,0,0), rightRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]))
-        pygame.draw.rect(screen, (255,0,0), topRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]))
+        pygame.draw.rect(screen, (255,0,0), belowRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
+        pygame.draw.rect(screen, (255,0,0), leftRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
+        pygame.draw.rect(screen, (255,0,0), rightRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
+        pygame.draw.rect(screen, (255,0,0), topRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
 
         # Gets whether or not we are sprinting
         sprinting = False
@@ -252,9 +252,9 @@ class Player:
 
     def render():
         if Player.isPoisned == False:
-            screen.blit(Player.image, Player.renderRect)
+            screen.blit(Player.image, (Player.renderRect[0], Player.renderRect[1]-10))
         elif Player.isPoisned:
-            screen.blit(Player.poisonImage, Player.renderRect)
+            screen.blit(Player.poisonImage, (Player.renderRect[0], Player.renderRect[1]-10))
         Player.weapon.render()
 
 class Weapon:
@@ -321,10 +321,10 @@ class Gun(Weapon):
             angle += math.pi 
         if mousePos[0] >= Player.renderRect.centerx:
             #pass
-            screen.blit(self.image_right, (Player.renderRect.centerx+0, Player.renderRect.centery-30))
+            screen.blit(self.image_right, (Player.renderRect.centerx+-10, Player.renderRect.centery-35))
         elif mousePos[0] < Player.renderRect.centerx:
             #pass
-            screen.blit(self.image_left, (Player.renderRect.centerx-50, Player.renderRect.centery-35))
+            screen.blit(self.image_left, (Player.renderRect.centerx-45, Player.renderRect.centery-40))
         pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
         #screen.blit(self.image_right, (Player.render))
        
