@@ -144,7 +144,6 @@ class Player:
                 if Player.xSpeed < 0 and not pygame.key.get_pressed()[pygame.K_a]:
                     Player.xSpeed += Player.xFriction
                 # Jump
-                if pygame.key.get_pressed()[pygame.K_SPACE]:
                     Player.ySpeed = -10
             if wall.rect.colliderect(leftRect):
                 leftC = True
@@ -161,6 +160,9 @@ class Player:
                 if upA:
                     Player.ySpeed = 0
                     Player.rect.top = wall.rect.bottom
+           
+            if Player.health <= 0:
+                pygame.quit()
 
         '''
         # Checks if there is floor below the player
