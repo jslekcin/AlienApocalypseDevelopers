@@ -1,4 +1,4 @@
-loadFile =  True
+loadFile = True
 # Design Tasks:
 #   UI Design (Figuring out what information needs to be shown and where)
 #   Sprite Design (Creating images for our objects)
@@ -25,10 +25,15 @@ loadFile =  True
 # Ability to draw over other blocks, change pen size, Make bigger map, flight/ way to teleport back, optimize rendering 
 import sys, pygame, math, random
 
+
 from pygame.constants import K_2
+from sympy import false
 
 pygame.init()
 pygame.font.init()
+pygame.mixer.init()
+
+from main_menu import mainMenuLoop
 
 uiFont = pygame.font.Font(None, 32)
 
@@ -161,7 +166,38 @@ class Player:
                 if upA:
                     Player.ySpeed = 0
                     Player.rect.top = wall.rect.bottom
-
+        """
+        for enemy in enemies:
+            # Standing on floor
+            if enemy.rect.colliderect(belowRect):
+                downC = True
+                if downA:
+                    Player.ySpeed = 0
+                    Player.rect.bottom = enemy.rect.top
+                # Slows player x movement
+                if Player.xSpeed > 0 and not pygame.key.get_pressed()[pygame.K_d]:
+                    Player.xSpeed -= Player.xFriction
+                if Player.xSpeed < 0 and not pygame.key.get_pressed()[pygame.K_a]:
+                    Player.xSpeed += Player.xFriction
+                # Jump
+                if pygame.key.get_pressed()[pygame.K_SPACE]:
+                    Player.ySpeed = -10
+            if enemy.rect.colliderect(leftRect):
+                leftC = True
+                if leftA:
+                    Player.xSpeed = 0
+                    Player.rect.left = enemy.rect.right
+            if enemy.rect.colliderect(rightRect):
+                rightC = True
+                if rightA:
+                    Player.xSpeed = 0
+                    Player.rect.right = enemy.rect.left
+            if enemy.rect.colliderect(topRect):
+                upC = True
+                if upA:
+                    Player.ySpeed = 0
+                    Player.rect.top = enemy.rect.bottom
+"""
         '''
         # Checks if there is floor below the player
         for wall in walls:
@@ -286,6 +322,7 @@ class Sword(Weapon):
         elif self.left == False:
             pass 
 
+
 class Gun(Weapon):
     def __init__(self):
         self.name = 'Gun'
@@ -293,6 +330,11 @@ class Gun(Weapon):
         self.attackSpeed = 1
         self.projectileSpeed = 15
     def attack(self):
+        #gunshot sound
+        pygame.mixer.music.load('sounds\gunshot.mp3')
+        pygame.mixer.music.set_volume(0.3)
+        pygame.mixer.music.play()
+
         mousePos = pygame.mouse.get_pos()
         dx = mousePos[0] - Player.renderRect.centerx
         dy = mousePos[1] - Player.renderRect.centery
@@ -330,33 +372,6 @@ class Bullet:
         # Renders wall using modified rect
         screen.blit(self.image, adjustedRect)
 
-"""
-c= 32
-        self.attackSpeed = .5
-    def attack(self):
-        # Figure out which class Bat(Weapon):
-    def __init__(self):
-        self.name = 'Bat'
-        self.damage = 10
-        self.range irection we are facing and create a rect in that direction
-        attackBox = pygame.Rect(0, 0, self.range, 64)
-        if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
-            attackBox.topright = Player.rect.topleft
-        else:
-            attackBox.topleft = Player.rect.topright
-
-        # Debug show attack box
-        adjustedRect = attackBox.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
-        pygame.draw.rect(screen, (255,255,255), adjustedRect)
-
-        # See if it collides with enemies and if it does, damages it
-        for enemy in enemies:
-            if attackBox.colliderect(enemy.rect):
-                enemy.health -= self.damage
-                print("Bat has hit")
-
-        Player.attackCooldown = self.attackSpeed * fps
-"""
 
 class Bat(Weapon):
     def __init__(self):
@@ -795,6 +810,128 @@ class ReaperEnemy: # Chris
         # Renders wall using modified rect
         screen.blit(self.image, adjustedRect)
 
+class FlyingAilenEnemy:
+    def __init__(self,worldPos,image,size):
+        self.rect = pygame.Rect(worldPos,size)
+        self.size = size
+        self.image = pygame.transform.scale(image, self.size)
+        self.damage = 5
+        self.speed = 2
+        self.health = 10
+        self.cooldown = 0
+        self.onCooldown = False
+        self.facingLeft = False
+        self.facingRight = False
+    def update(self):
+        if self.cooldown > 0:
+            self.onCooldown = True
+        elif self.cooldown <= 0:
+            self.onCooldown = False
+        distToPlayer = abs(Player.rect.x - self.rect.x)
+        if distToPlayer < 300 and distToPlayer > 32:
+            # Set the direction enemy is facing
+            if self.rect.x < Player.rect.x:
+                self.facingLeft = False
+                self.facingRight = True
+            elif self.rect.x > Player.rect.x:
+                self.facingLeft = True
+                self.facingRight = False
+            else:
+                self.facingRight = False
+                self.facingLeft = False
+        else:
+            # Set the direction enemy is facing
+            if self.rect.x < Player.rect.x:
+                self.facingLeft = False
+                self.facingRight = True
+            elif self.rect.x > Player.rect.x:
+                self.facingLeft = True
+                self.facingRight = False
+            else:
+                self.facingRight = False
+                self.facingLeft = False
+        #print info
+        if self.facingLeft:
+            print((self.rect[0],self.rect[1]),distToPlayer,"facing left")
+        else:
+            print((self.rect[0],self.rect[1]),distToPlayer,"facing right")
+        if self.facingLeft:
+                moveable = False
+                collideRect = pygame.Rect(self.rect.x - self.speed, self.rect.y, self.speed, self.rect.h)
+                for wall in walls:
+                    if wall.rect.collidepoint((self.rect.left - 1, self.rect.bottom + 1)):
+                        moveable = True
+                    if wall.rect.colliderect(collideRect):
+                        moveable = False
+                        break
+                if collideRect.colliderect(Player.rect):
+                    moveable = False
+
+                if self.onCooldown == False:
+                    self.rect = self.rect.move(-self.speed, 0)
+                elif self.onCooldown and distToPlayer <= 166:
+                    self.rect = self.rect.move(self.speed, 0)
+
+                """elif moveable and distToPlayer > 200:
+                    self.rect = (self.rect[0] - Player.rect[0] - 166, self.rect[1] - Player.rect[1] - 166)
+                    print("teleported")"""
+                    
+        elif self.facingRight:
+            moveable = False
+            collideRect = pygame.Rect(self.rect.right, self.rect.y, self.speed, self.rect.h)
+            for wall in walls:
+                if wall.rect.collidepoint((self.rect.right + 1, self.rect.bottom + 1)):
+                    moveable = True
+                if wall.rect.colliderect(collideRect):
+                    moveable = False
+                    break
+                if collideRect.colliderect(Player.rect):
+                    moveable = False
+
+                if self.onCooldown == False:
+                    self.rect = self.rect.move(self.speed, 0)
+                if self.onCooldown and distToPlayer <= 166:
+                    self.rect = self.rect.move(-self.speed, 0)
+                
+                """if moveable and self.onCooldown == False:
+                    self.rect = self.rect.move(self.speed, 0)
+                elif moveable and self.onCooldown and distToPlayer <= 250:
+                    self.rect = self.rect.move(-self.speed, 0)
+
+                elif moveable and self.onCooldown and distToPlayer > 250:
+                    self.rect = self.rect.move(self.speed, 0)"""
+        #Attacking
+        if distToPlayer < 60 and self.onCooldown == False:
+            print("Attacked")
+            Player.health -= self.damage
+            self.cooldown = fps
+        
+
+        if self.health <= 0:
+            enemies.remove(self)
+        floorCheck = (self.rect.centerx,self.rect.bottom + 5)
+        floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
+        move5 = True
+        move1 = True
+        for wall in walls:
+            if wall.rect.collidepoint(floorCheck):
+                move5 = False
+            if wall.rect.collidepoint(floorCheck2):
+                move1 = False
+
+        if move5 == True:
+            self.rect = self.rect.move(0,5)
+        elif move1 == True:
+            self.rect = self.rect.move(0,1)
+        self.cooldown -= 1
+
+        if self.rect[1] >= 1500:
+            self.rect[1] = 800
+        
+    def render(self):
+        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        screen.blit(self.image, adjustedRect)
+
 
 # Walls(Pos, Image, Size)
 
@@ -858,8 +995,8 @@ def saveMap():
     file.write(out)
     file.close()
 
-# worldPos, image, sized d)
-enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100))]
+# worldPos, image, sized )
+enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100)),FlyingAilenEnemy((-1126, 818),pygame.image.load('Images\Ailen.png'), (100,100))]
 projectiles = []
 foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
@@ -873,7 +1010,7 @@ blockImages = [pygame.image.load('Images\Ground.png'), pygame.Surface((25,25)), 
 blockImages[1].fill((255,255,255))
 blockImages[2].fill((255,0,0))
 blockImages[3].fill((0,255,0))
-blockImages[4].fill((0,0,255))
+blockImages[4].fill((0,0,255))  
 blockImages[5].fill((0,0,0))
 print(blockImages[1])
 blockImageIndex = 0
@@ -890,8 +1027,13 @@ if loadFile:
         wall = Wall((int(line[0]),int(line[1])), blockImages[int(line[4])], (int(line[2]),int(line[3])), int(line[4]))
         walls.append(wall)
 
+def enemyRespawn(enemies):
+    enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100))]
+    return enemies
+
 doubleHealth = 10
 level = 1
+
 while 1:
     # The Great Clock #3
     clock.tick(fps) 
@@ -905,14 +1047,16 @@ while 1:
     # Main Menu
     if gameState == 0:
         # input
-        for event in pygame.event.get(pygame.KEYDOWN):
-            if pygame.key.get_pressed()[pygame.K_g]:
-                gameState += 1
+        #for event in pygame.event.get(pygame.KEYDOWN):
+            #if pygame.key.get_pressed()[pygame.K_g]:
+                #gameState += 1
         # update
         # render
-        screen.fill(black)
+        #screen.fill(black)
         # print('TODO: Main Menu')
-        pygame.display.flip()
+        #pygame.display.flip()
+        mainMenuLoop(gameState)
+
 
     # Gameplay
     if gameState == 1: 
@@ -924,10 +1068,12 @@ while 1:
                 gameState += 1
             if pygame.key.get_pressed()[pygame.K_h]:
                 Player.health -= 20
+                
         #doubleHealth = 10
         if len(enemies) <= 0:
             level += 1
-            enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100))]
+            enemies = enemyRespawn(enemies)
+            #enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100))]
             doubleHealth = doubleHealth * 2
             #print("Level:", level)
             for enemy in enemies:
@@ -946,9 +1092,9 @@ while 1:
         mousePos = pygame.mouse.get_pos()
         mousePosW = (mousePos[0] - Player.renderRect.centerx + Player.rect.centerx, mousePos[1] - Player.renderRect.centery + Player.rect.centery)
         
-        if pygame.mouse.get_pressed(3)[0]:
-            #print(mousePosW)
-            pass
+        """if pygame.mouse.get_pressed(3)[0]:
+            print(mousePosW)"""
+            
 
         if generatingMap:
             if pygame.mouse.get_pressed(3)[0]:
@@ -1026,3 +1172,4 @@ while 1:
 
         # print('TODO: Gameplay')
         pygame.display.flip()
+        
