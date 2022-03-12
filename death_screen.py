@@ -23,12 +23,20 @@ while 1:
             if 100 <= mouse[0] <= 400 and 200 <= mouse[1] <= 250:
                 pygame.quit()
 
+
     QuitText = uiFont.render("QUIT", True, (255,255,255))
 
-    screen.blit(QuitText, (180, 215))
+    screen.blit(QuitText, (180, 160))
+    
+    
+    RetryText = uiFont.render("RETRY", True, (255,255,255))
 
+    screen.blit(RetryText, (160, 280))
+    
     #pygame.draw.rect(screen, (0,0,0),(0,0,75,50))
     DeathScreenText = uiFont.render("YOU DIED", True, (252,3,3))
     screen.blit(DeathScreenText, (125,45))
+
+    screen.blit('Images/death.jpg')
 
     pygame.display.flip()
