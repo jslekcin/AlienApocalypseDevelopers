@@ -6,7 +6,7 @@ loadFile = True
 #    - Player
 #    - Enemy (Basic Melee Enemy, Basic Ranged Enemy, Poison Shooter Enemy)
 #    - Projectiles (Player Projectile, Basic Ranged Enemy Projectile, Poison Shooter Enemy Projectile)
-#   Map Design (What the maps look like and also creating dynamic elements)
+#   Map Design (What the maps look like and also creating dynamic elements) 
 #   Gameplay Design (E nemies and Equipment)
 # @  - What do the enemies do? How?
 #       Walk towards player and attack them at close range
