@@ -63,7 +63,7 @@ class Player:
     xSpeed = 0
     ySpeed = 0
     # Sprinting Variables
-    maxStamina = 120
+    maxStamina = 10
     staminaRegen = .5
     stamina = maxStamina
     sprintCooldown = False
