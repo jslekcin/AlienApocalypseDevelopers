@@ -6,7 +6,7 @@ loadFile = True
 #    - Player
 #    - Enemy (Basic Melee Enemy, Basic Ranged Enemy, Poison Shooter Enemy)
 #    - Projectiles (Player Projectile, Basic Ranged Enemy Projectile, Poison Shooter Enemy Projectile)
-#   Map Design (What the maps look like and also creating dynamic elements) 
+#   Map Design (What the maps look like and also creating dynamic elements)
 #   Gameplay Design (E nemies and Equipment)
 # @  - What do the enemies do? How?
 #       Walk towards player and attack them at close range
@@ -19,7 +19,7 @@ loadFile = True
 #       Run at them or run away
 #    - What tools can you give players to do more interesting things?
 #       Shoot fireballs
-# @  - How does the player move around?
+# @  - How does the player move around? 
 
 
 # Ability to draw over other blocks, change pen size, Make bigger map, flight/ way to teleport back, optimize rendering 
@@ -27,7 +27,7 @@ import sys, pygame, math, random
 
 
 from pygame.constants import K_2
-#from sympy import false
+from sympy import false
 
 pygame.init()
 pygame.font.init()
@@ -50,20 +50,20 @@ clock = pygame.time.Clock()
 # Classes
 class Player:
     # Loads image and creates a rect out of it
-    image = pygame.image.load("Images\Player.png") 
-    poisonImage = pygame.image.load("Images\Posioned Player.png")
+    image = pygame.image.load("Images\player.png") 
+    poisonImage = pygame.image.load("Images\Posioned Player.PNG")
     rect = image.get_rect()
     # Creates a static rect to display in the center of the screen
     renderRect = image.get_rect()
-    renderRect.center = (width/2, height/2-5)
+    renderRect.center = (width/2, height/2)
     # Create movement variables
-    xAcceleration = .07 # Running speed
+    xAcceleration = .1 # Running speed
     xFriction = .2     # How much we slow down
     yAcceleration = .4 # Gravity
     xSpeed = 0
     ySpeed = 0
     # Sprinting Variables
-    maxStamina = 10
+    maxStamina = 120
     staminaRegen = .5
     stamina = maxStamina
     sprintCooldown = False
@@ -80,11 +80,11 @@ class Player:
         w = .8 * Player.rect.w
         belowRect = pygame.Rect((Player.rect.left + s, Player.rect.bottom), (w, 2))
 
-        leftRect  = pygame.Rect((Player.rect.left - 2, Player.rect.top + s-10), (2, w * 1.8))
+        leftRect  = pygame.Rect((Player.rect.left - 2, Player.rect.top + s - 10), (2, w * 1.8))
 
-        rightRect = pygame.Rect((Player.rect.right, Player.rect.top + s -10), (2, w * 1.8))
+        rightRect = pygame.Rect((Player.rect.right, Player.rect.top + s - 10), (2, w * 1.8))
 
-        topRect   = pygame.Rect((Player.rect.left + s, Player.rect.top - 10), (w, 2))
+        topRect   = pygame.Rect((Player.rect.left + s, Player.rect.top - 2), (w, 2))
 
         pygame.draw.rect(screen, (255,0,0), belowRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
         pygame.draw.rect(screen, (255,0,0), leftRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
@@ -288,9 +288,9 @@ class Player:
 
     def render():
         if Player.isPoisned == False:
-            screen.blit(Player.image, (Player.renderRect[0], Player.renderRect[1]-10))
+            screen.blit(Player.image, Player.renderRect)
         elif Player.isPoisned:
-            screen.blit(Player.poisonImage, (Player.renderRect[0], Player.renderRect[1]-10))
+            screen.blit(Player.poisonImage, Player.renderRect)
         Player.weapon.render()
 
 class Weapon:
@@ -326,11 +326,6 @@ class Sword(Weapon):
 class Gun(Weapon):
     def __init__(self):
         self.name = 'Gun'
-        self.image_left = pygame.image.load("Images/gun (left).png")
-        self.image_left = pygame.transform.scale(self.image_left, (60,70))
-        self.image_right = pygame.image.load("Images/gun (right).png")
-        self.image_right = pygame.transform.scale(self.image_right, (60,70))
-        
         self.damage = 10
         self.attackSpeed = 1
         self.projectileSpeed = 15
@@ -353,24 +348,8 @@ class Gun(Weapon):
         projectiles.append(Bullet(xSpeed, ySpeed))
         Player.attackCooldown = self.attackSpeed * fps
     def render(self):
-        mousePos = pygame.mouse.get_pos()
-        dx = mousePos[0] - Player.renderRect.centerx
-        dy = mousePos[1] - Player.renderRect.centery
-        if dx == 0:
-            dx = .001
-        angle = math.atan(dy/dx)
-        if dx < 0:
-            angle += math.pi 
-        if mousePos[0] >= Player.renderRect.centerx:
-            #pass
-            screen.blit(self.image_right, (Player.renderRect.centerx+-10, Player.renderRect.centery-35))
-        elif mousePos[0] < Player.renderRect.centerx:
-            #pass
-            screen.blit(self.image_left, (Player.renderRect.centerx-45, Player.renderRect.centery-40))
         pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
-        #screen.blit(self.image_right, (Player.render))
-       
-        
+
 class Bullet:
     def __init__(self, xSpeed, ySpeed):
         self.xSpeed = xSpeed
@@ -384,7 +363,7 @@ class Bullet:
         self.rect = self.rect.move(self.xSpeed, self.ySpeed)
         for enemy in enemies:
             if self.rect.colliderect(enemy.rect):
-                enemy.health -= 2.5
+                enemy.health -= 5
                 projectiles.remove(self)
                 return
     def render(self):
@@ -397,7 +376,7 @@ class Bullet:
 class Bat(Weapon):
     def __init__(self):
         self.name = 'Bat'
-        self.damage = 1.5
+        self.damage = 10
         self.range = 32 #irection we are facing and create a rect in that direction
         self.attackSpeed = .5
     def attack(self):
@@ -514,9 +493,9 @@ class RangedEnemy:
 
         # Movement Variables
         self.facingLeft = False
-        self.speed = .5
+        self.speed = 1
 
-        self.fleeRange = 32
+        self.fleeRange = 200
         self.attackRange = 400
         self.approachRange = 600
 
@@ -630,13 +609,13 @@ class PoisonShooterEnemy: # Jaeho
         
         self.damage = 5
         self.health = 7
-        self.speed  = 2
+        self.speed  = 4
 
         self.shootingDirection = 0
         
         self.approachRange = 300
         self.attackRange = 200
-        self.fleeRange = 90
+        self.fleeRange = 100
 
         self.counter = 0
         
@@ -738,7 +717,7 @@ class PoisonShooterEnemyProjectile:
         self.dx = speed * math.cos(angle)
         self.dy = speed * math.sin(angle)
         self.timer = 10 * fps
-        self.poisonTimer = fps * 3
+        self.poisonTimer = fps * 2
     def update(self):
         # Check if it hits anything
         hit = False
@@ -1193,4 +1172,3 @@ while 1:
 
         # print('TODO: Gameplay')
         pygame.display.flip()
-        
