@@ -149,6 +149,7 @@ class Player:
                 if Player.xSpeed < 0 and not pygame.key.get_pressed()[pygame.K_a]:
                     Player.xSpeed += Player.xFriction
                 # Jump
+                if pygame.key.get_pressed()[pygame.K_SPACE]:
                     Player.ySpeed = -10
             if wall.rect.colliderect(leftRect):
                 leftC = True
