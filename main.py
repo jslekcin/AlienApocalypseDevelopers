@@ -27,7 +27,7 @@ import sys, pygame, math, random
 
 
 from pygame.constants import K_2
-#aaaaaaaaaaaaaaaafrom sympy import false
+#from sympy import false
 
 pygame.init()
 pygame.font.init()
