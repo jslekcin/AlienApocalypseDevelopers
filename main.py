@@ -1,5 +1,5 @@
 loadFile = True
-# Design Tasks:
+# Design Tasks: 
 #   UI Design (Figuring out what information needs to be shown and where)
 #   Sprite Design (Creating images for our objects)
 #    - Weapons
