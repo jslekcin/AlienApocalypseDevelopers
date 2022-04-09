@@ -306,21 +306,33 @@ class Sword(Weapon):
     def __init__(self):
         self.name = 'Sword'
         self.damage = 8
-        self.left = False
+        self.attackSpeed = .3
+        self.image_left = pygame.image.load("Images/Sword(left).png")
+        self.image_left = pygame.transform.scale(self.image_left, (110,140))
+        self.image_right = pygame.image.load("Images/Sword(right).png")
+        self.image_right = pygame.transform.scale(self.image_right, (110,140))
     def attack(self):
+        hitBox = pygame.Rect(0, 0, 45, 64)
         mousePos = pygame.mouse.get_pos()
-        if mousePos[0] < self.centerx:
-            self.left = True
-        else: 
-            self.left = False
-        
-        if self.left:
+        if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
+            hitBox.topright = Player.rect.topleft
+        else:
+            hitBox.topleft = Player.rect.topright
             #do damage to enemies left of the player
-            for enemy in enemies:
-                if enemy.centerx > self.left - 30:
-                    print("hit")
-        elif self.left == False:
-            pass 
+        for enemy in enemies:
+            if hitBox.colliderect(enemy.rect):
+                enemy.health -= self.damage
+                print("hit")
+
+        Player.attackCooldown = self.attackSpeed * fps
+    def render(self):
+        mousePos = pygame.mouse.get_pos()
+        if mousePos[0] >= Player.renderRect.centerx:
+            #pass
+            screen.blit(self.image_right, (Player.renderRect.centerx-18, Player.renderRect.centery-75))
+        elif mousePos[0] < Player.renderRect.centerx:
+            #pass
+            screen.blit(self.image_left, (Player.renderRect.centerx-78, Player.renderRect.centery-80))
 
 
 class Gun(Weapon):
