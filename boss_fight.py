@@ -1,3 +1,5 @@
+loadFile = True
+
 import sys, pygame, math, random
 
 
@@ -16,7 +18,7 @@ screen = pygame.display.set_mode(size)
 fps = 60
 
 black = (0,0,0)
-background = pygame.image.load('Images\sky.png')
+background = pygame.image.load('Images/red_sky.png')
 background = pygame.transform.scale(background, size)
 gameState = 1
 
@@ -256,6 +258,50 @@ class Bullet:
         # Renders wall using modified rect
         screen.blit(self.image, adjustedRect)
 
+class LaserGun(Weapon):
+    def __init__(self):
+        self.name = 'LaserGatlingGun'
+        self.damage = 10
+        self.attackSpeed = 0.1
+        self.projectileSpeed = 15
+    def attack(self):
+
+        mousePos = pygame.mouse.get_pos()
+        dx = mousePos[0] - Player.renderRect.centerx
+        dy = mousePos[1] - Player.renderRect.centery
+        if dx == 0:
+            dx = .001
+        angle = math.atan(dy/dx)
+        if dx < 0:
+            angle += math.pi
+        xSpeed = self.projectileSpeed * math.cos(angle)
+        ySpeed = self.projectileSpeed * math.sin(angle)
+        projectiles.append(LaserBullet(xSpeed, ySpeed))
+        Player.attackCooldown = self.attackSpeed * fps
+    def render(self):
+        pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
+
+class LaserBullet:
+    def __init__(self, xSpeed, ySpeed):
+        self.xSpeed = xSpeed
+        self.ySpeed = ySpeed
+        self.image = pygame.Surface((10,10))
+        self.image.fill((70,70,70))
+        self.rect = self.image.get_rect()
+        self.rect.center = Player.rect.center
+        
+    def update(self):
+        self.rect = self.rect.move(self.xSpeed, self.ySpeed)
+        for enemy in enemies:
+            if self.rect.colliderect(enemy.rect):
+                enemy.health -= 5
+                projectiles.remove(self)
+                return
+    def render(self):
+        # Modifys the position based on the centered player position
+        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        # Renders wall using modified rect
+        screen.blit(self.image, adjustedRect)
 
 class Bat(Weapon):
     def __init__(self):
@@ -323,6 +369,35 @@ class UFO_Boss:
         adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
         screen.blit(self.image, adjustedRect)
 
+# worldPos, image, sized )
+enemies = []
+projectiles = []
+foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
+midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
+
+
+tileSize = 25
+blockImages = [pygame.image.load('Images\Ground.png'), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('Images\stone.PNG')]
+blockImages[1].fill((255,255,255))
+blockImages[2].fill((255,0,0))
+blockImages[3].fill((0,255,0))
+blockImages[4].fill((0,0,255))  
+blockImages[5].fill((0,0,0))
+print(blockImages[1])
+blockImageIndex = 0
+
+if loadFile:
+    walls = []
+    file = open("map.txt", "r")
+    fileData = file.read().split('\n')
+    file.close()
+    for line in fileData:
+        if line == '':
+            break
+        line = line.split()
+        wall = Wall((int(line[0]),int(line[1])), blockImages[int(line[4])], (int(line[2]),int(line[3])), int(line[4]))
+        walls.append(wall)
+
 clock = pygame.time.Clock()
 
 while 1:
@@ -332,6 +407,57 @@ while 1:
         pygame.quit()
         sys.exit
         break
+
+    screen.blit(background, (0,0))
+
+    # update
+    Player.update()
+    for wall in walls:
+        wall.update()
+
+    for projectile in projectiles:
+        projectile.update()
+
+    for enemy in enemies:
+        enemy.update()
+
+    # render
+    for wall in walls:
+        wall.render()
+
+    for decor in foreground:
+        decor.render()
+
+    for decor in midground:
+        decor.render()
+
+    for projectile in projectiles:
+        projectile.render()
+        
+    for enemy in enemies:
+        enemy.render()
+
+    Player.render()
+
+    # Draw Health Bar
+    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,5,200,30))
+    pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,5,Player.health / Player.maxHealth * 200,30))
+    hpText = uiFont.render(f'{Player.health} / 100', True, (255, 255, 255))
+    screen.blit(hpText, (250 - hpText.get_width() / 2,10))
+    # Draw Stamina Bar
+    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,35,200,30))
+    pygame.draw.rect(screen, (0,0,255), pygame.Rect(150,35,Player.stamina / Player.maxStamina * 200,30))
+    staminaText = uiFont.render(f'{Player.stamina} / {Player.maxStamina}', True, (255, 255, 255))
+    screen.blit(staminaText, (250 - staminaText.get_width() / 2,40))
+
+        
+    weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
+    #levelText = uiFont.render(str(level), True, (255,255,255))
+    screen.blit(weaponText, (10, 10))
+    #screen.blit(levelText, (400, 10))
+
+    # print('TODO: Gameplay')
+    pygame.display.flip()
         
    
 
