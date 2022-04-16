@@ -145,18 +145,18 @@ class Player:
         Player.ySpeed += Player.yAcceleration
 
         #Weapon changing function
-    if pygame.key.get_pressed()[pygame.K_1]:
-        Player.weapon = Bat()
-    elif pygame.key.get_pressed()[pygame.K_2]:
-        Player.weapon = Gun()
+        if pygame.key.get_pressed()[pygame.K_1]:
+            Player.weapon = Bat()
+        elif pygame.key.get_pressed()[pygame.K_2]:
+            Player.weapon = Gun()
 
-        # Attack if player clicks
-    if Player.attackCooldown > 0:
-         Player.attackCooldown -= 1
-    elif pygame.mouse.get_pressed(3)[0]:
-         Player.weapon.attack()
+            # Attack if player clicks
+        if Player.attackCooldown > 0:
+            Player.attackCooldown -= 1
+        elif pygame.mouse.get_pressed(3)[0]:
+            Player.weapon.attack()
 
-    Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
+        Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
     def render():
         if Player.isPoisned == False:
