@@ -165,7 +165,7 @@ class Player:
             screen.blit(Player.image, Player.renderRect)
         elif Player.isPoisned:
             screen.blit(Player.poisonImage, Player.renderRect)
-        Player.weapon.render()
+        #Player.weapon.render()
 
 class Weapon:
     def __init__(self):
@@ -324,8 +324,8 @@ class Bat(Weapon):
         # See if it collides with enemies and if it does, damages it
         for enemy in enemies:
             if attackBox.colliderect(enemy.rect):12
-                enemy.health -= self.damage
-                print("Bat has hit")
+            enemy.health -= self.damage
+            print("Bat has hit")
 
         Player.attackCooldown = self.attackSpeed * fps
 
@@ -360,7 +360,7 @@ class UFO_Boss:
     def __init__(self,worldPos,image,size):
         self.rect = pygame.Rect(worldPos,size)
         self.speed = 3
-        self.size = size
+        self.size = 210, 180 
         self.image = pygame.transform.scale(image, self.size)
         self.health = 50
         self.damage = 5
@@ -372,6 +372,7 @@ class UFO_Boss:
 # worldPos, image, sized )
 enemies = []
 projectiles = []
+boss = UFO_Boss((-360, 635), pygame.image.load('Images/UFO Boss.png'), (210, 180))
 foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 
@@ -410,6 +411,8 @@ while 1:
 
     screen.blit(background, (0,0))
 
+    boss.render()
+
     # update
     Player.update()
     for wall in walls:
@@ -439,6 +442,7 @@ while 1:
 
     Player.render()
 
+    
     # Draw Health Bar
     pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,5,200,30))
     pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,5,Player.health / Player.maxHealth * 200,30))
@@ -451,9 +455,9 @@ while 1:
     screen.blit(staminaText, (250 - staminaText.get_width() / 2,40))
 
         
-    weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
+   # weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
     #levelText = uiFont.render(str(level), True, (255,255,255))
-    screen.blit(weaponText, (10, 10))
+    #dscreen.blit(weaponText, (10, 10))
     #screen.blit(levelText, (400, 10))
 
     # print('TODO: Gameplay')
