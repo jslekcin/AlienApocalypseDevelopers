@@ -323,13 +323,13 @@ class Bat(Weapon):
 
         # See if it collides with enemies and if it does, damages it
         for enemy in enemies:
-            if attackBox.colliderect(enemy.rect):
+            if attackBox.colliderect(enemy.rect):12
                 enemy.health -= self.damage
                 print("Bat has hit")
 
         Player.attackCooldown = self.attackSpeed * fps
 
-Player.weapon = Bat()
+        Player.weapon = Bat()
 walls = []
 class Wall:
     def __init__(self, worldPos, image, size, imageIndex): 
@@ -458,7 +458,9 @@ while 1:
 
     # print('TODO: Gameplay')
     pygame.display.flip()
+    
         
+
    
 
 
