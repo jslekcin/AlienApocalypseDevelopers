@@ -338,15 +338,20 @@ class Sword(Weapon):
 class Gun(Weapon):
     def __init__(self):
         self.name = 'Gun'
-        self.damage = 10
+        self.image_left = pygame.image.load("Images/gun (left).png")
+        self.image_left = pygame.transform.scale(self.image_left, (60,70))
+        self.image_right = pygame.image.load("Images/gun (right).png")
+        self.image_right = pygame.transform.scale(self.image_right, (60,70))
+        self.damage = 12
         self.attackSpeed = 1
         self.projectileSpeed = 15
     def attack(self):
+        
         #gunshot sound
         pygame.mixer.music.load('sounds\gunshot.mp3')
         pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play()
-
+        
         mousePos = pygame.mouse.get_pos()
         dx = mousePos[0] - Player.renderRect.centerx
         dy = mousePos[1] - Player.renderRect.centery
@@ -360,6 +365,21 @@ class Gun(Weapon):
         projectiles.append(Bullet(xSpeed, ySpeed))
         Player.attackCooldown = self.attackSpeed * fps
     def render(self):
+        mousePos = pygame.mouse.get_pos()
+        dx = mousePos[0] - Player.renderRect.centerx
+        dy = mousePos[1] - Player.renderRect.centery
+        if dx == 0:
+            dx = .001
+        angle = math.atan(dy/dx)
+        if dx < 0:
+            angle += math.pi 
+        if mousePos[0] >= Player.renderRect.centerx:
+            #pass
+            screen.blit(self.image_right, (Player.renderRect.centerx+-10, Player.renderRect.centery-35))
+        elif mousePos[0] < Player.renderRect.centerx:
+            #pass
+            screen.blit(self.image_left, (Player.renderRect.centerx-45, Player.renderRect.centery-40))
+            
         pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
 
 class Bullet:
