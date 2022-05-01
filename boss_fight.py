@@ -364,6 +364,75 @@ class UFO_Boss:
         self.image = pygame.transform.scale(image, self.size)
         self.health = 50
         self.damage = 5
+        self.facingLeft = False
+        self.facingRight = False
+        
+
+        
+        distToPlayer = abs(Player.rect.x - self.rect.x)
+        if distToPlayer < 300 and distToPlayer > 32:
+            # Set the direction enemy is facing
+            if self.rect.x < Player.rect.x:
+                self.facingLeft = False
+                self.facingRight = True
+            elif self.rect.x > Player.rect.x:
+                self.facingLeft = True
+                self.facingRight = False
+            else:
+                self.facingRight = False
+                self.facingLeft = False
+        else:
+            # Set the direction enemy is facing
+            if self.rect.x < Player.rect.x:
+                self.facingLeft = False
+                self.facingRight = True
+            elif self.rect.x > Player.rect.x:
+                self.facingLeft = True
+                self.facingRight = False
+            else:
+                self.facingRight = False
+                self.facingLeft = False
+        #print info
+        if self.facingLeft:
+            print((self.rect[0],self.rect[1]),distToPlayer,"facing left")
+        else:
+            print((self.rect[0],self.rect[1]),distToPlayer,"facing right")
+        if self.facingLeft:
+                moveable = False
+                collideRect = pygame.Rect(self.rect.x - self.speed, self.rect.y, self.speed, self.rect.h)
+                for wall in walls:
+                    if wall.rect.collidepoint((self.rect.left - 1, self.rect.bottom + 1)):
+                        moveable = True
+                    if wall.rect.colliderect(collideRect):
+                        moveable = False
+                        break
+                if collideRect.colliderect(Player.rect):
+                    moveable = False
+
+                if self.onCooldown == False:
+                    self.rect = self.rect.move(-self.speed, 0)
+                elif self.onCooldown and distToPlayer <= 166:
+                    self.rect = self.rect.move(self.speed, 0)
+                    
+        elif self.facingRight:
+            moveable = False
+            collideRect = pygame.Rect(self.rect.right, self.rect.y, self.speed, self.rect.h)
+            for wall in walls:
+                if wall.rect.collidepoint((self.rect.right + 1, self.rect.bottom + 1)):
+                    moveable = True
+                if wall.rect.colliderect(collideRect):
+                    moveable = False
+                    break
+                if collideRect.colliderect(Player.rect):
+                    moveable = False
+
+                if self.onCooldown == False:
+                    self.rect = self.rect.move(self.speed, 0)
+                if self.onCooldown and distToPlayer <= 166:
+                    self.rect = self.rect.move(-self.speed, 0)
+                
+
+        
 
     def render(self):
         adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
