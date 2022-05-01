@@ -151,6 +151,10 @@ class Player:
             Player.weapon = Bat()
         elif pygame.key.get_pressed()[pygame.K_2]:
             Player.weapon = Gun()
+        elif pygame.key.get_pressed()[pygame.K_3]:
+            Player.weapon = Sword()
+        elif pygame.key.get_pressed()[pygame.K_4]:
+            Player.weapon = LaserGun()
 
             # Attack if player clicks
         if Player.attackCooldown > 0:
@@ -212,15 +216,20 @@ class Sword(Weapon):
 class Gun(Weapon):
     def __init__(self):
         self.name = 'Gun'
-        self.damage = 10
+        self.image_left = pygame.image.load("Images/gun (left).png")
+        self.image_left = pygame.transform.scale(self.image_left, (60,70))
+        self.image_right = pygame.image.load("Images/gun (right).png")
+        self.image_right = pygame.transform.scale(self.image_right, (60,70))
+        self.damage = 12
         self.attackSpeed = 1
         self.projectileSpeed = 15
     def attack(self):
+        
         #gunshot sound
         pygame.mixer.music.load('sounds\gunshot.mp3')
         pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play()
-
+        
         mousePos = pygame.mouse.get_pos()
         dx = mousePos[0] - Player.renderRect.centerx
         dy = mousePos[1] - Player.renderRect.centery
@@ -234,6 +243,21 @@ class Gun(Weapon):
         projectiles.append(Bullet(xSpeed, ySpeed))
         Player.attackCooldown = self.attackSpeed * fps
     def render(self):
+        mousePos = pygame.mouse.get_pos()
+        dx = mousePos[0] - Player.renderRect.centerx
+        dy = mousePos[1] - Player.renderRect.centery
+        if dx == 0:
+            dx = .001
+        angle = math.atan(dy/dx)
+        if dx < 0:
+            angle += math.pi 
+        if mousePos[0] >= Player.renderRect.centerx:
+            #pass
+            screen.blit(self.image_right, (Player.renderRect.centerx+-10, Player.renderRect.centery-35))
+        elif mousePos[0] < Player.renderRect.centerx:
+            #pass
+            screen.blit(self.image_left, (Player.renderRect.centerx-45, Player.renderRect.centery-40))
+            
         pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
 
 class Bullet:
@@ -261,9 +285,32 @@ class Bullet:
 class LaserGun(Weapon):
     def __init__(self):
         self.name = 'LaserGatlingGun'
-        self.damage = 10
+        mousePos = pygame.mouse.get_pos()
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        rel_x, rel_y = mouse_x - Player.renderRect.centerx-85, mouse_y - Player.renderRect.centerx-35
+        self.angle = math.atan(mousePos[1]/mousePos[0])
+        image_angle = math.atan2(rel_y, rel_x)
+        image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+        
+        #left
+        self.image_left = pygame.image.load("Images/LaserGatlingGun(left).png")
+        self.image_left = pygame.transform.scale(self.image_left, (120,140))
+        self.rotated_image_left = pygame.transform.rotate(self.image_left, int(image_angle))
+        self.rect_left = self.image_left.get_rect(center=(self.rotated_image_left[0], self.rotated_image_left[1]))
+        #self.rotated_image_left = pygame.transform.rotate(self.image_left, self.angle)
+        #self.rotated_rect_left = self.rotated_image_left.get_rect(center = self.image_left.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)
+        #right
+        self.image_right = pygame.image.load("Images/LaserGatlingGun(right).png")
+        self.image_right = pygame.transform.scale(self.image_right, (120,140))
+
+        self.rotated_image_right = pygame.transform.rotate(self.image_right, int(image_angle))
+        self.rect_right = self.image_right.get_rect(center=(self.rotated_image_right[0], self.rotated_image_right[1]))
+        #self.rotated_image_right = pygame.transform.rotate(self.image_right, self.angle)
+        #self.rotated_rect_right = self.rotated_image_right.get_rect(center = self.image_right.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)
+
+        self.damage = 12
         self.attackSpeed = 0.1
-        self.projectileSpeed = 15
+        self.projectileSpeed = 20
     def attack(self):
 
         mousePos = pygame.mouse.get_pos()
@@ -279,14 +326,51 @@ class LaserGun(Weapon):
         projectiles.append(LaserBullet(xSpeed, ySpeed))
         Player.attackCooldown = self.attackSpeed * fps
     def render(self):
-        pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
+        mousePos = pygame.mouse.get_pos()
+        dx = mousePos[0] - Player.renderRect.centerx
+        dy = mousePos[1] - Player.renderRect.centery
+        if dx == 0:
+            dx = .001
+        angle = math.atan(dy/dx)
+        if dx < 0:
+            angle += math.pi
+        #image_angle = math.atan(mousePos[1]/mousePos[0])
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        
+        #print(image_angle)
+        if mousePos[0] >= Player.renderRect.centerx:
+            #pass
+            """self.rotated_image_right = pygame.transform.rotate(self.image_right,image_angle)
+            self.rotated_rect_right = self.rotated_image_right.get_rect(center = self.image_right.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)"""
+            rel_x, rel_y = mouse_x - Player.renderRect.centerx-35, mouse_y - Player.renderRect.centerx-35
+            image_angle = math.atan2(rel_y, rel_x)
+            image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+
+            self.rotated_image_right = pygame.transform.rotate(self.image_right, int(image_angle))
+            self.rect_right = self.image_right.get_rect(center=(self.rotated_image_right[0], self.rotated_image_right[1]))
+            screen.blit(self.rotated_image_right, (Player.renderRect.centerx-35, Player.renderRect.centery-35))#10
+
+        elif mousePos[0] < Player.renderRect.centerx:
+            #pass
+            """self.rotated_image_left = pygame.transform.rotate(self.image_left,image_angle)
+            self.rotated_rect_left = self.rotated_image_left.get_rect(center = self.image_left.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)"""
+            rel_x, rel_y = mouse_x - Player.renderRect.centerx-85, mouse_y - Player.renderRect.centerx-35
+            image_angle = math.atan2(rel_y, rel_x)
+            image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+            
+            self.rotated_image_left = pygame.transform.rotate(self.image_left, int(image_angle))
+            self.rect_left = self.image_left.get_rect(center=(self.rotated_image_left[0], self.rotated_image_left[1]))
+            screen.blit(self.rotated_image_left, (Player.renderRect.centerx-85, Player.renderRect.centery-35))
+            
+        #pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
+
 
 class LaserBullet:
     def __init__(self, xSpeed, ySpeed):
         self.xSpeed = xSpeed
         self.ySpeed = ySpeed
         self.image = pygame.Surface((10,10))
-        self.image.fill((70,70,70))
+        self.image.fill((200,0,0))#70
         self.rect = self.image.get_rect()
         self.rect.center = Player.rect.center
         
