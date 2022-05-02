@@ -443,16 +443,24 @@ def render(self):
 class UFO_Boss:
     def __init__(self,worldPos,image,size):
         self.rect = pygame.Rect(worldPos,size)
-        self.speed = 3
+        self.speed = 1
         self.size = 210, 180 
         self.image = pygame.transform.scale(image, self.size)
         self.health = 50
         self.damage = 5
+        self.cooldown = 0
+        self.onCoolDown = False
         self.facingLeft = False
         self.facingRight = False
-        
 
-        
+    def render(self):
+        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        screen.blit(self.image, adjustedRect) 
+
+        if self.cooldown > 0:
+            self.onCooldown = True
+        elif self.cooldown <= 0:
+            self.onCooldown = False
         distToPlayer = abs(Player.rect.x - self.rect.x)
         if distToPlayer < 300 and distToPlayer > 32:
             # Set the direction enemy is facing
@@ -515,12 +523,6 @@ class UFO_Boss:
                 if self.onCooldown and distToPlayer <= 166:
                     self.rect = self.rect.move(-self.speed, 0)
                 
-
-        
-
-    def render(self):
-        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
-        screen.blit(self.image, adjustedRect)
 
 # worldPos, image, sized )
 enemies = []
