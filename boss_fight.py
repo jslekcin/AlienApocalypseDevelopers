@@ -437,20 +437,27 @@ class UFO_Boss:
     def __init__(self,worldPos,image,size):
         self.rect = pygame.Rect(worldPos,size)
         self.worldPos = worldPos
-        self.speed = 1
+        self.speed = random.randint(-5, 5)
         self.size = size
         self.image = pygame.transform.scale(image, self.size)
         self.health = 50
         self.damage = 5
+        self.position = [Player.renderRect.center[0]-160, Player.renderRect.center[1]-215]
         self.cooldown = 0
         
+    
     def render(self):
-        screen.blit(self.image, [Player.renderRect.center[0]-160, Player.renderRect.center[1]-215])
+        screen.blit(self.image, self.position)
+
+    def move(self):
+        #speed = random.randint(-5, 5)
+        if self.position[0] <= Player.renderRect.center[0]
+        self.position[0] -=self.speed
         
+        elif self.position[0] += self.speed
         
 
-
-
+        
 # worldPos, image, sized )
 enemies = []
 projectiles = []
@@ -523,6 +530,7 @@ while 1:
 
     Player.render()
 
+    boss.move()
     boss.render()
 
     # Draw Health Bar
