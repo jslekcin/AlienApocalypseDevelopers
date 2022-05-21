@@ -445,19 +445,33 @@ class UFO_Boss:
         self.position = [Player.renderRect.center[0]-160, Player.renderRect.center[1]-215]
         self.cooldown = 0
         
-    
+        if self.speed == 0:
+            self.speed = random.randint(-5, 5)
+
+
     def render(self):
         screen.blit(self.image, self.position)
 
     def move(self):
         #speed = random.randint(-5, 5)
-        if self.position[0] <= Player.renderRect.center[0]
-        self.position[0] -=self.speed
-        
-        elif self.position[0] += self.speed
-        
 
+        self.position[0] += self.speed
         
+        player_center = [-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]]
+
+        if self.position[0] >= player_center[0]+400:
+        
+            self.position[0] = player_center[0]+400
+
+            self.speed = -self.speed
+
+        if self.position[0] <=  player_center[0]-400:
+
+            self.position[0] = player_center[0]-400
+
+            self.speed = -self.speed
+
+
 # worldPos, image, sized )
 enemies = []
 projectiles = []
