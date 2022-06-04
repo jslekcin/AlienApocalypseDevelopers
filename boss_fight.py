@@ -471,6 +471,42 @@ class UFO_Boss:
 
             self.speed = -self.speed
 
+class UFO_laser:
+    def __init__(self, location, damage, speed, angle):
+        self.image = pygame.image.load("Images/beam.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = location
+        self.damage = damage
+        self.dx = speed * math.cos(angle)
+        self.dy = speed * math.sin(angle)
+        self.timer = 10 * fps
+        self.poisonTimer = fps * 2
+        self.attack = random.randint(1, 10)
+    
+    def update(self):
+        # Check if it hits anything
+        hit = False
+        for wall in walls:
+            if self.rect.colliderect(wall.rect):
+                hit = True
+                break
+        if hit:
+            # Change image if hit something
+            
+            #self.rect = self.image.get_rect()
+            self.timer -= 1
+            if self.timer <= 0:
+                projectiles.remove(self)
+        else:
+            # Moving the projectile
+            self.dy += .05
+            self.rect = self.rect.move(self.dx,self.dy)
+      
+        if Player.rect.center <= (-200, 0):
+            
+            def render(self):
+                screen.blit(self.image,[self.rect.center])
+
 
 # worldPos, image, sized )
 enemies = []
