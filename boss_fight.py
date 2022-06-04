@@ -434,28 +434,83 @@ class Wall:
         adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
         # Renders wall using modified rect
         screen.blit(self.image, adjustedRect)
-
-def render(self):
-        # Modifys the position based on the centered player position
-        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
-        healthRect = pygame.Rect(adjustedRect.x, adjustedRect.y - 10, self.health / self.maxHealth * adjustedRect.w, 10)
-        # Renders wall using modified rect
-        screen.blit(self.image, adjustedRect)
-        pygame.draw.rect(screen, (0,255,0), healthRect)
+        
 
 
 class UFO_Boss:
     def __init__(self,worldPos,image,size):
         self.rect = pygame.Rect(worldPos,size)
-        self.speed = 3
-        self.size = 210, 180 
+        self.worldPos = worldPos
+        self.speed = random.randint(-5, 5)
+        self.size = size
         self.image = pygame.transform.scale(image, self.size)
         self.health = 50
         self.damage = 5
+        self.position = [Player.renderRect.center[0]-160, Player.renderRect.center[1]-215]
+        self.cooldown = 0
+        
+        if self.speed == 0:
+            self.speed = random.randint(-5, 5)
+
 
     def render(self):
-        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
-        screen.blit(self.image, adjustedRect)
+        screen.blit(self.image, self.position)
+
+    def move(self):
+        #speed = random.randint(-5, 5)
+
+        self.position[0] += self.speed
+        
+        player_center = [-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]]
+
+        if self.position[0] >= player_center[0]+400:
+        
+            self.position[0] = player_center[0]+400
+
+            self.speed = -self.speed
+
+        if self.position[0] <=  player_center[0]-400:
+
+            self.position[0] = player_center[0]-400
+
+            self.speed = -self.speed
+
+class UFO_laser:
+    def __init__(self, location, damage, speed, angle):
+        self.image = pygame.image.load("Images/beam.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = location
+        self.damage = damage
+        self.dx = speed * math.cos(angle)
+        self.dy = speed * math.sin(angle)
+        self.timer = 10 * fps
+        self.poisonTimer = fps * 2
+        self.attack = random.randint(1, 10)
+    
+    def update(self):
+        # Check if it hits anything
+        hit = False
+        for wall in walls:
+            if self.rect.colliderect(wall.rect):
+                hit = True
+                break
+        if hit:
+            # Change image if hit something
+            
+            #self.rect = self.image.get_rect()
+            self.timer -= 1
+            if self.timer <= 0:
+                projectiles.remove(self)
+        else:
+            # Moving the projectile
+            self.dy += .05
+            self.rect = self.rect.move(self.dx,self.dy)
+      
+        if Player.rect.center <= (-200, 0):
+            
+            def render(self):
+                screen.blit(self.image,[self.rect.center])
+
 
 pageSize = 10
 # Creates pagse for the player platform
@@ -490,7 +545,7 @@ def saveMap():
 # worldPos, image, sized )
 enemies = []
 projectiles = []
-boss = UFO_Boss((-360, 635), pygame.image.load('Images/UFO Boss.png'), (210, 180))
+boss = UFO_Boss((-360, 650), pygame.image.load('Images/UFO.png'), (400, 200))
 foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 
@@ -532,6 +587,7 @@ while 1:
 
     screen.blit(background, (0,0))
 
+<<<<<<< HEAD
     boss.render()
 
     print(pygame.mouse.get_pos())
@@ -574,6 +630,8 @@ while 1:
             if pygame.key.get_pressed()[pygame.K_TAB]:
                 saveMap()
                 generatingMap = False
+=======
+>>>>>>> 728e330656cf0d661c77edb19860c44660258733
     
     # update
     Player.update()
@@ -605,7 +663,9 @@ while 1:
     Player.render()
     Player.weapon.render()
 
-    
+    boss.move()
+    boss.render()
+
     # Draw Health Bar
     pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,5,200,30))
     pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,5,Player.health / Player.maxHealth * 200,30))
