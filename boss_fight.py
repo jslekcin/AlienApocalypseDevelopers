@@ -1,5 +1,4 @@
 loadFile = True
-
 import sys, pygame, math, random
 
 
@@ -288,23 +287,34 @@ class LaserGun(Weapon):
         mousePos = pygame.mouse.get_pos()
         mouse_x, mouse_y = pygame.mouse.get_pos()
         rel_x, rel_y = mouse_x - Player.renderRect.centerx-85, mouse_y - Player.renderRect.centerx-35
-        self.angle = math.atan(mousePos[1]/mousePos[0])
-        image_angle = math.atan2(rel_y, rel_x)
-        image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+        self.angle = 0
+        self.scale = 1
+        self.image_angle = math.atan2(rel_y, rel_x)
+        self.image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+        self.center = (0,0)
+        self.renderImage = pygame.image.load("Images/LaserGatlingGunv2(left).png")
         
         #left
-        self.image_left = pygame.image.load("Images/LaserGatlingGun(left).png")
+        self.image_left = pygame.image.load("Images/LaserGatlingGunv2(left).png")
         self.image_left = pygame.transform.scale(self.image_left, (120,140))
-        self.rotated_image_left = pygame.transform.rotate(self.image_left, int(image_angle))
-        self.rect_left = self.image_left.get_rect(center=(self.rotated_image_left[0], self.rotated_image_left[1]))
-        #self.rotated_image_left = pygame.transform.rotate(self.image_left, self.angle)
-        #self.rotated_rect_left = self.rotated_image_left.get_rect(center = self.image_left.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)
+        self.renderImage = pygame.transform.rotozoom(self.image_left, self.angle, self.scale)
+        """self.new_rect = self.new_image_left.get_rect()
+        self.center=[self.new_rect_left.centerx,self.new_rect_left.centery]"""#center
+        
+        
         #right
-        self.image_right = pygame.image.load("Images/LaserGatlingGun(right).png")
+        
+        self.image_right = pygame.image.load("Images/LaserGatlingGunv2(right).png")
         self.image_right = pygame.transform.scale(self.image_right, (120,140))
+        self.renderImage = pygame.transform.rotozoom(self.image_right, self.angle, self.scale)
+        """self.new_rect_right = self.new_image_right.get_rect()
+        self.center=[self.new_rect_right.centerx,self.new_rect_right.centery]"""#center
+        
 
-        self.rotated_image_right = pygame.transform.rotate(self.image_right, int(image_angle))
-        self.rect_right = self.image_right.get_rect(center=(self.rotated_image_right[0], self.rotated_image_right[1]))
+        #self.rotated_image_right = pygame.transform.rotate(self.image_right, int(image_angle))
+        #self.rect_right = self.image_right.get_rect()#center=(self.rotated_image_right[0], self.rotated_image_right[1])\
+        #self.rect_right.center = [self.rotated_image_right[0], self.rotated_image_right[1]]
+
         #self.rotated_image_right = pygame.transform.rotate(self.image_right, self.angle)
         #self.rotated_rect_right = self.rotated_image_right.get_rect(center = self.image_right.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)
 
@@ -321,6 +331,7 @@ class LaserGun(Weapon):
         angle = math.atan(dy/dx)
         if dx < 0:
             angle += math.pi
+        
         xSpeed = self.projectileSpeed * math.cos(angle)
         ySpeed = self.projectileSpeed * math.sin(angle)
         projectiles.append(LaserBullet(xSpeed, ySpeed))
@@ -339,28 +350,20 @@ class LaserGun(Weapon):
         
         #print(image_angle)
         if mousePos[0] >= Player.renderRect.centerx:
-            #pass
-            """self.rotated_image_right = pygame.transform.rotate(self.image_right,image_angle)
-            self.rotated_rect_right = self.rotated_image_right.get_rect(center = self.image_right.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)"""
             rel_x, rel_y = mouse_x - Player.renderRect.centerx-35, mouse_y - Player.renderRect.centerx-35
-            image_angle = math.atan2(rel_y, rel_x)
-            image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+            self.image_angle = math.atan2(rel_y, rel_x)
+            self.image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
 
-            self.rotated_image_right = pygame.transform.rotate(self.image_right, int(image_angle))
-            self.rect_right = self.image_right.get_rect(center=(self.rotated_image_right[0], self.rotated_image_right[1]))
-            screen.blit(self.rotated_image_right, (Player.renderRect.centerx-35, Player.renderRect.centery-35))#10
+            self.renderImage = pygame.transform.rotozoom(self.image_right, self.image_angle, self.scale)
+            screen.blit(self.renderImage, (Player.renderRect.centerx-35, Player.renderRect.centery-35))#10
 
         elif mousePos[0] < Player.renderRect.centerx:
-            #pass
-            """self.rotated_image_left = pygame.transform.rotate(self.image_left,image_angle)
-            self.rotated_rect_left = self.rotated_image_left.get_rect(center = self.image_left.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)"""
             rel_x, rel_y = mouse_x - Player.renderRect.centerx-85, mouse_y - Player.renderRect.centerx-35
-            image_angle = math.atan2(rel_y, rel_x)
-            image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+            self.image_angle = math.atan2(rel_y, rel_x)
+            self.image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x) - 180
             
-            self.rotated_image_left = pygame.transform.rotate(self.image_left, int(image_angle))
-            self.rect_left = self.image_left.get_rect(center=(self.rotated_image_left[0], self.rotated_image_left[1]))
-            screen.blit(self.rotated_image_left, (Player.renderRect.centerx-85, Player.renderRect.centery-35))
+            self.renderImage = pygame.transform.rotozoom(self.image_left, self.image_angle, self.scale)
+            screen.blit(self.renderImage, (Player.renderRect.centerx-85, Player.renderRect.centery-35))
             
         #pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
 
@@ -373,6 +376,7 @@ class LaserBullet:
         self.image.fill((200,0,0))#70
         self.rect = self.image.get_rect()
         self.rect.center = Player.rect.center
+        
         
     def update(self):
         self.rect = self.rect.move(self.xSpeed, self.ySpeed)
@@ -413,7 +417,7 @@ class Bat(Weapon):
 
         Player.attackCooldown = self.attackSpeed * fps
 
-        Player.weapon = Bat()
+Player.weapon = Bat()
 walls = []
 class Wall:
     def __init__(self, worldPos, image, size, imageIndex): 
@@ -521,6 +525,36 @@ class UFO_laser:
 
 
 
+pageSize = 10
+# Creates pagse for the player platform
+for i in range(int(70/pageSize)):
+    h = 1000
+    page = Wall((pageSize*i,h), pygame.image.load('Images\Ground.png'), (pageSize,h), 0)
+    walls.append(page)
+
+
+def saveMap():
+    global walls
+    print('saving')
+
+    out = ''
+    for wall in walls:
+        out += str(wall.rect.x) + ' '
+        out += str(wall.rect.y) + ' '
+        out += str(wall.rect.w) + ' '
+        out += str(wall.rect.h) + ' '
+        out += str(wall.imageIndex) + ' '
+
+        out += '\n'
+        
+    out = out.rstrip('\n')
+        
+    print(out)
+    # Exporting to json file
+    file = open("bossMap.txt", "w")
+    file.write(out)
+    file.close()
+
 # worldPos, image, sized )
 enemies = []
 projectiles = []
@@ -528,6 +562,9 @@ boss = UFO_Boss((-360, 650), pygame.image.load('Images/UFO.png'), (400, 200))
 foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 
+generatingMap = not loadFile
+editPageNum = len(walls)-1
+editCooldown = 0
 
 tileSize = 25
 blockImages = [pygame.image.load('Images\Ground.png'), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('Images\stone.PNG')]
@@ -541,7 +578,7 @@ blockImageIndex = 0
 
 if loadFile:
     walls = []
-    file = open("map.txt", "r")
+    file = open("bossMap.txt", "r")
     fileData = file.read().split('\n')
     file.close()
     for line in fileData:
@@ -563,6 +600,51 @@ while 1:
 
     screen.blit(background, (0,0))
 
+<<<<<<< HEAD
+    boss.render()
+
+    print(pygame.mouse.get_pos())
+
+    mousePos = pygame.mouse.get_pos()
+    mousePosW = (mousePos[0] - Player.renderRect.centerx + Player.rect.centerx, mousePos[1] - Player.renderRect.centery + Player.rect.centery)
+
+    if generatingMap:
+            if pygame.mouse.get_pressed(3)[0]:
+                tile = (math.floor(mousePosW[0]/25),math.floor(mousePosW[1]/25))
+                emptySpot = True
+                for wall in walls:
+                    if wall.rect.topleft == (tile[0]*25,tile[1]*25):
+                        emptySpot = False
+                        break
+                if emptySpot == True:
+                    tile = Wall((tile[0]*25,tile[1]*25), blockImages[blockImageIndex], (25,25), blockImageIndex)
+                    walls.append(tile)
+
+            if pygame.mouse.get_pressed(3)[2]:
+                # 1) convert mousePosW into tile space
+                tilePos = (math.floor(mousePosW[0]/25),math.floor(mousePosW[1]/25))
+                # 2) find if there is a tile at selected position
+                for wall in walls:
+                    if wall.rect.topleft == (tilePos[0]*25,tilePos[1]*25):
+                        # 3) if there is remove it
+                        walls.remove(wall)
+                        break
+
+            if pygame.mouse.get_pressed(3)[1] or pygame.key.get_pressed()[pygame.K_c] and editCooldown == 0:
+                blockImageIndex += 1
+                if blockImageIndex >= len(blockImages):
+                    blockImageIndex = 0
+                print(blockImageIndex)
+                editCooldown = 10
+
+            if editCooldown > 0:
+                editCooldown -= 1
+
+            if pygame.key.get_pressed()[pygame.K_TAB]:
+                saveMap()
+                generatingMap = False
+=======
+>>>>>>> 728e330656cf0d661c77edb19860c44660258733
     
     # update
     Player.update()
@@ -587,11 +669,12 @@ while 1:
 
     for projectile in projectiles:
         projectile.render()
-        
+
     for enemy in enemies:
         enemy.render()
 
     Player.render()
+    Player.weapon.render()
 
     boss.shoot()
 

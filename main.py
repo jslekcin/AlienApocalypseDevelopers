@@ -883,10 +883,12 @@ class FlyingAilenEnemy:
                 self.facingRight = False
                 self.facingLeft = False
         #print info
+        """
         if self.facingLeft:
             print((self.rect[0],self.rect[1]),distToPlayer,"facing left")
         else:
             print((self.rect[0],self.rect[1]),distToPlayer,"facing right")
+            """
         if self.facingLeft:
                 moveable = False
                 collideRect = pygame.Rect(self.rect.x - self.speed, self.rect.y, self.speed, self.rect.h)
