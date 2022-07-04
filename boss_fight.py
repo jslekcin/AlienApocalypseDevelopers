@@ -1,5 +1,5 @@
 loadFile = True
-import sys, pygame, math, random
+import sys, pygame, math, random, time
 
 
 from pygame.constants import K_2
@@ -454,20 +454,27 @@ class UFO_Boss:
     def __init__(self,worldPos,image,size):
         self.rect = pygame.Rect(worldPos,size)
         self.worldPos = worldPos
-        self.speed = random.randint(-5, 5)
+        self.speed =   0
         self.size = size
         self.image = pygame.transform.scale(image, self.size)
         self.maxHealth = 50
         self.health = self.maxHealth
         self.damage = 5
         self.position = [Player.renderRect.center[0]-160, Player.renderRect.center[1]-215]
-        self.cooldown = 100
-        self.cooldown1 = 250
+        self.cooldown = -60
+        self.cooldown1 = -30
         self.projectiles = []
+        self.speedtime = -60
+        
         
         if self.speed == 0:
             self.speed = random.randint(-5, 5)
 
+        if self.speedtime > 85:
+            self.speed = random.randint(-5, 2)
+            self.speedtime = -60
+        else:
+            self.speedtime =+ 1
 
     def render(self):
         screen.blit(self.image, self.position)
@@ -494,37 +501,55 @@ class UFO_Boss:
 
 
     def shoot(self):
-        if self.cooldown > 75:
+        if self.cooldown > 85:
             position =[self.position[0]+165, self.position[1]+140]
-            self.projectiles.append(UFO_laser(position, 1, 3, 90,"Images/beam.png"))
+            self.projectiles.append(UFO_laser(position, 1, 3, 90,"Images/beam.png", "beam"))
 
             position =[self.position[0]+240, self.position[1]+120]
-            self.projectiles.append(UFO_laser(position, 1, 3, 0, "Images/beam.png"))
+            self.projectiles.append(UFO_laser(position, 1, 3, 0, "Images/beam.png", "beam"))
 
             position =[self.position[0]+80, self.position[1]+120]
-            self.projectiles.append(UFO_laser(position, 1, 3, 180, "Images/beam.png"))
+            self.projectiles.append(UFO_laser(position, 1, 3, -60, "Images/beam.png", "beam"))
 
 
             self.cooldown = 0
         else:
             self.cooldown += 1
         
-        if self.cooldown1 > 250:
+        if self.cooldown1 > 85:
            position =[self.position[0]+170, self.position[1]+45]
-           self.projectiles.append(UFO_laser(position, 1, 3, 90, "Images/bomb.png"))
+           self.projectiles.append(UFO_laser(position, 1, 3, 90, "Images/bomb.png", "bomb"))
            self.cooldown1 = 0
         else:
             self.cooldown1 += 1
 
         for laser in self.projectiles:
             laser.render()
-            laser.update(self.projectiles)
+            if laser.update(walls, self.projectiles):
+                print("▲ removing bomb")
+                laser.image = pygame.image.load("Images/explosion.png")
+                laser.dx = 0 
+                laser.dy = 0
+                laser.render()
+                self.projectiles.remove(laser)      
+        
+        for projectile in self.projectiles:
+            if projectile.rect.colliderect(Player.renderRect):
+                print("⊙ colliding")
+                if projectile.type == "beam":
+                    Player.health -= 15
+                    self.projectiles.remove(projectile)
 
-
-
+                if projectile.type == "bomb":
+                   
+                    Player.health -= 75
+                    #self.projectiles.remove(projectile)
+            
+                
 class UFO_laser:
-    def __init__(self, location, damage, speed, angle, image):
+    def __init__(self, location, damage, speed, angle, image, type):
         self.image = pygame.image.load(image)
+        self.type = type
         self.rect = self.image.get_rect()
         self.rect.center = location
         self.damage = damage
@@ -535,24 +560,27 @@ class UFO_laser:
         self.attack = random.randint(1, 10)
         
     
-    def update(self, projectiles):
+    def update(self, walls, projectiles):
         # Check if it hits anything
         hit = False
         for wall in walls:
-            if self.rect.colliderect(wall.rect):
+            if wall.rect.colliderect(self.rect):
+        
+                
                 hit = True
                 break
         if hit:
             # Change image if hit something
             
             #self.rect = self.image.get_rect()
-            self.timer -= 1
-            if self.timer <= 0:
-                projectiles.remove(self)
+            #self.timer -= 1
+            #if self.timer <= 0:
+            return hit 
         else:
             # Moving the projectile
             self.dy += .05
             self.rect = self.rect.move(self.dx,self.dy)
+
 
     def render(self):
         screen.blit(self.image, self.rect.center)
@@ -660,7 +688,7 @@ while 1:
 
     boss.render()
 
-    print(pygame.mouse.get_pos())
+    #print(pygame.mouse.get_pos())
 
     mousePos = pygame.mouse.get_pos()
     mousePosW = (mousePos[0] - Player.renderRect.centerx + Player.rect.centerx, mousePos[1] - Player.renderRect.centery + Player.rect.centery)
@@ -710,8 +738,8 @@ while 1:
     for wall in walls:
         wall.update()
 
-    for projectile in projectiles:
-        projectile.update()
+    #for projectile in projectiles:
+        #projectile.update(walls, projectiles)
 
     for enemy in enemies:
         enemy.update()
