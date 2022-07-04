@@ -21,6 +21,7 @@ background = pygame.image.load('Images/red_sky.png')
 background = pygame.transform.scale(background, size)
 gameState = 1
 
+
 class Player:
     # Loads image and creates a rect out of it
     image = pygame.image.load("Images\player.png") 
@@ -47,6 +48,7 @@ class Player:
     # Equipment
     weapon = None
     attackCooldown = 0
+    collected_laser_gun = False
 
     def update():
         s = .1 * Player.rect.w
@@ -152,7 +154,7 @@ class Player:
             Player.weapon = Gun()
         elif pygame.key.get_pressed()[pygame.K_3]:
             Player.weapon = Sword()
-        elif pygame.key.get_pressed()[pygame.K_4]:
+        elif pygame.key.get_pressed()[pygame.K_4] and Player.collected_laser_gun == True:
             Player.weapon = LaserGun()
 
             # Attack if player clicks
@@ -168,7 +170,7 @@ class Player:
             screen.blit(Player.image, Player.renderRect)
         elif Player.isPoisned:
             screen.blit(Player.poisonImage, Player.renderRect)
-        #Player.weapon.render()
+        Player.weapon.render()
 
 class Weapon:
     def __init__(self):
@@ -397,6 +399,8 @@ class Bat(Weapon):
         self.damage = 10
         self.range = 32 #irection we are facing and create a rect in that direction
         self.attackSpeed = .5
+        self.image = pygame.image.load("Images\Bat3.PNG")
+        self.image = pygame.transform.scale(self.image,(120,130))
     def attack(self):
         # Figure out which class Bat(Weapon):
         attackBox = pygame.Rect(0, 0, self.range, 64)
@@ -416,6 +420,15 @@ class Bat(Weapon):
             print("Bat has hit")
 
         Player.attackCooldown = self.attackSpeed * fps
+
+    def render(self):
+        mousePos = pygame.mouse.get_pos()
+        if mousePos[0] >= Player.renderRect.centerx:
+            #pass
+            screen.blit(self.image, (Player.renderRect.centerx-40, Player.renderRect.centery-80))
+        elif mousePos[0] < Player.renderRect.centerx:
+            #pass
+            screen.blit(self.image, (Player.renderRect.centerx-85, Player.renderRect.centery-80))
 
 Player.weapon = Bat()
 walls = []
@@ -444,7 +457,8 @@ class UFO_Boss:
         self.speed = random.randint(-5, 5)
         self.size = size
         self.image = pygame.transform.scale(image, self.size)
-        self.health = 50
+        self.maxHealth = 50
+        self.health = self.maxHealth
         self.damage = 5
         self.position = [Player.renderRect.center[0]-160, Player.renderRect.center[1]-215]
         self.cooldown = 0
@@ -511,6 +525,29 @@ class UFO_laser:
             def render(self):
                 screen.blit(self.image,[self.rect.center])
 
+class LaserGunItem:
+    def __init__(self,worldPos,image,size):
+        #Laser Gun item
+        self.pos = worldPos
+        self.size = size
+        self.rect = pygame.Rect(self.pos,self.size)
+        self.image = pygame.transform.scale(image, self.size)
+        #self.rect = self.image.get_rect()
+        
+    
+    def update(self):
+        #print(self.rect)
+        self.rect.center = self.pos
+        if self.rect.colliderect(Player.rect):
+            Player.collected_laser_gun = True
+
+    def render(self):
+        #adjust position based on players position
+        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        #render image
+        if Player.collected_laser_gun == False:
+            screen.blit(self.image, adjustedRect)
+
 
 pageSize = 10
 # Creates pagse for the player platform
@@ -546,6 +583,7 @@ def saveMap():
 enemies = []
 projectiles = []
 boss = UFO_Boss((-360, 650), pygame.image.load('Images/UFO.png'), (400, 200))
+item = LaserGunItem((-360, 850),pygame.image.load("Images/LaserGatlingGunv2(right).png"),(120,140))
 foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 
@@ -587,7 +625,6 @@ while 1:
 
     screen.blit(background, (0,0))
 
-<<<<<<< HEAD
     boss.render()
 
     print(pygame.mouse.get_pos())
@@ -630,11 +667,14 @@ while 1:
             if pygame.key.get_pressed()[pygame.K_TAB]:
                 saveMap()
                 generatingMap = False
-=======
->>>>>>> 728e330656cf0d661c77edb19860c44660258733
+
     
+
     # update
     Player.update()
+
+    item.update()
+
     for wall in walls:
         wall.update()
 
@@ -660,8 +700,10 @@ while 1:
     for enemy in enemies:
         enemy.render()
 
+    item.render()
+
     Player.render()
-    Player.weapon.render()
+    
 
     boss.move()
     boss.render()
@@ -676,11 +718,16 @@ while 1:
     pygame.draw.rect(screen, (0,0,255), pygame.Rect(150,35,Player.stamina / Player.maxStamina * 200,30))
     staminaText = uiFont.render(f'{Player.stamina} / {Player.maxStamina}', True, (255, 255, 255))
     screen.blit(staminaText, (250 - staminaText.get_width() / 2,40))
+    # Draw Boss Health
+    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,65,200,30))
+    pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,65,boss.health / boss.maxHealth * 200,30))
+    bossHealthText = uiFont.render(f'{boss.health} / {boss.maxHealth}', True, (255, 255, 255))
+    screen.blit(bossHealthText, (250 - bossHealthText.get_width() / 2,10))
 
         
-   # weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
+    weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
     #levelText = uiFont.render(str(level), True, (255,255,255))
-    #dscreen.blit(weaponText, (10, 10))
+    screen.blit(weaponText, (10, 10))
     #screen.blit(levelText, (400, 10))
 
     # print('TODO: Gameplay')
