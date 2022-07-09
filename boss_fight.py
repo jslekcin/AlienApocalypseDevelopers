@@ -560,7 +560,7 @@ class UFO_laser:
         self.attack = random.randint(1, 10)
         
     
-    def update(self, walls, projectiles):
+    def update(self, walls, boss_projectiles):
         # Check if it hits anything
         hit = False
         for wall in walls:
@@ -643,6 +643,7 @@ def saveMap():
 # worldPos, image, sized )
 enemies = []
 projectiles = []
+boss_projectiles = []
 boss = UFO_Boss((-360, 650), pygame.image.load('Images/UFO.png'), (400, 200))
 item = LaserGunItem((-360, 850),pygame.image.load("Images/LaserGatlingGunv2(right).png"),(120,140))
 foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
@@ -738,8 +739,11 @@ while 1:
     for wall in walls:
         wall.update()
 
-    #for projectile in projectiles:
-        #projectile.update(walls, projectiles)
+    for projectile in projectiles:
+        projectile.update()
+
+    for boss_projectile in boss_projectiles:
+        boss_projectile.update(walls,boss_projectiles)
 
     for enemy in enemies:
         enemy.update()
@@ -786,7 +790,7 @@ while 1:
     pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,65,200,30))
     pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,65,boss.health / boss.maxHealth * 200,30))
     bossHealthText = uiFont.render(f'{boss.health} / {boss.maxHealth}', True, (255, 255, 255))
-    screen.blit(bossHealthText, (250 - bossHealthText.get_width() / 2,10))
+    screen.blit(bossHealthText, (250 - bossHealthText.get_width() / 2,70))
 
         
     weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
