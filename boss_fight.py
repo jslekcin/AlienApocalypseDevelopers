@@ -14,6 +14,7 @@ uiFont = pygame.font.Font(None, 32)
 
 size = width, height = 500, 500 # TODO: Decide on final window size
 screen = pygame.display.set_mode(size) 
+
 fps = 60
 
 black = (0,0,0)
@@ -277,6 +278,18 @@ class Bullet:
                 enemy.health -= 5
                 projectiles.remove(self)
                 return
+        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        range_rect = pygame.Rect((0,0),(500,500))
+        range_rect.center = Player.renderRect.center
+        bullet_range = pygame.Rect.colliderect(adjustedRect,range_rect)
+
+        if bullet_range:
+            pass
+        else:
+            projectiles.remove(self)
+            
+        
+        
     def render(self):
         # Modifys the position based on the centered player position
         adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
@@ -320,8 +333,8 @@ class LaserGun(Weapon):
         #self.rotated_image_right = pygame.transform.rotate(self.image_right, self.angle)
         #self.rotated_rect_right = self.rotated_image_right.get_rect(center = self.image_right.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)
 
-        self.damage = 12
-        self.attackSpeed = 0.1
+        self.damage = 1
+        self.attackSpeed = 0.2
         self.projectileSpeed = 20
     def attack(self):
 
@@ -382,11 +395,24 @@ class LaserBullet:
         
     def update(self):
         self.rect = self.rect.move(self.xSpeed, self.ySpeed)
-        for enemy in enemies:
-            if self.rect.colliderect(enemy.rect):
-                enemy.health -= 5
-                projectiles.remove(self)
-                return
+        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        collide = pygame.Rect.colliderect(adjustedRect,boss.rect)
+        if collide:
+            boss.health -= 1
+            projectiles.remove(self)
+            return
+        range_rect = pygame.Rect((0,0),(500,500))
+        range_rect.center = Player.renderRect.center
+        #pygame.draw.rect(screen,(255,255,255),range_rect)
+
+        bullet_range = pygame.Rect.colliderect(adjustedRect,range_rect)
+
+        if bullet_range:
+            pass
+        else:
+            projectiles.remove(self)
+            
+
     def render(self):
         # Modifys the position based on the centered player position
         adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
@@ -452,15 +478,18 @@ class Wall:
 
 class UFO_Boss:
     def __init__(self,worldPos,image,size):
-        self.rect = pygame.Rect(worldPos,size)
+        #self.rect = pygame.Rect(worldPos,size)
+        
         self.worldPos = worldPos
         self.speed =   0
         self.size = size
         self.image = pygame.transform.scale(image, self.size)
+        self.rect = self.image.get_rect()
         self.maxHealth = 50
         self.health = self.maxHealth
         self.damage = 5
         self.position = [Player.renderRect.center[0]-160, Player.renderRect.center[1]-215]
+        self.rect.center = self.position
         self.cooldown = -60
         self.cooldown1 = -30
         self.projectiles = []
@@ -480,6 +509,8 @@ class UFO_Boss:
         screen.blit(self.image, self.position)
 
     def move(self):
+        #self.rect = self.image.get_rect()
+        
         #speed = random.randint(-5, 5)
 
         self.position[0] += self.speed
@@ -498,7 +529,13 @@ class UFO_Boss:
 
             self.speed = -self.speed
 
-
+    def update(self):
+        self.rect.x = self.position[0] + 65
+        self.rect.y = self.position[1] + 30
+        self.rect.w = 205
+        self.rect.h = 120
+        #pygame.draw.rect(screen,(255,255,255),self.rect)
+        #print(self.rect)
 
     def shoot(self):
         if self.cooldown > 85:
@@ -690,6 +727,8 @@ while 1:
     boss.render()
 
     #print(pygame.mouse.get_pos())
+    
+    #pygame.draw.rect(screen,(255,255,255),screen_rect)
 
     mousePos = pygame.mouse.get_pos()
     mousePosW = (mousePos[0] - Player.renderRect.centerx + Player.rect.centerx, mousePos[1] - Player.renderRect.centery + Player.rect.centery)
@@ -770,7 +809,7 @@ while 1:
     
 
     boss.shoot()
-
+    boss.update()
     boss.move()
     boss.render()
 
