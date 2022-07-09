@@ -531,14 +531,14 @@ class UFO_Boss:
                 laser.dx = 0 
                 laser.dy = 0
                 laser.render()
-                self.projectiles.remove(laser)      
+                #self.projectiles.remove(laser)      
         
         for projectile in self.projectiles:
             if projectile.rect.colliderect(Player.renderRect):
                 print("⊙ colliding")
                 if projectile.type == "beam":
                     Player.health -= 15
-                    self.projectiles.remove(projectile)
+                    #self.projectiles.remove(projectile)
 
                 if projectile.type == "bomb":
                    
