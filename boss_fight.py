@@ -575,12 +575,12 @@ class UFO_Boss:
                 print("⊙ colliding")
                 if projectile.type == "beam":
                     Player.health -= 15
-                    #self.projectiles.remove(projectile)
+                    self.projectiles.remove(projectile)
 
                 if projectile.type == "bomb":
                    
                     Player.health -= 75
-                    #self.projectiles.remove(projectile)
+                    self.projectiles.remove(projectile)
             
                 
 class UFO_laser:
@@ -781,8 +781,8 @@ while 1:
     for projectile in projectiles:
         projectile.update()
 
-    for boss_projectile in boss_projectiles:
-        boss_projectile.update(walls,boss_projectiles)
+    #for boss_projectile in boss_projectiles:
+        #boss_projectile.update(walls,boss_projectiles)
 
     for enemy in enemies:
         enemy.update()
