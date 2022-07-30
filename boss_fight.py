@@ -568,7 +568,7 @@ class UFO_Boss:
                 laser.dx = 0 
                 laser.dy = 0
                 laser.render()
-                #self.projectiles.remove(laser)      
+                self.projectiles.remove(laser)      
         
         for projectile in self.projectiles:
             if projectile.rect.colliderect(Player.renderRect):
