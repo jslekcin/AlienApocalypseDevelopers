@@ -781,8 +781,8 @@ while 1:
     for projectile in projectiles:
         projectile.update()
 
-    for boss_projectile in boss_projectiles:
-        boss_projectile.update(walls,boss_projectiles)
+    #for boss_projectile in boss_projectiles:
+        #boss_projectile.update(walls,boss_projectiles)
 
     for enemy in enemies:
         enemy.update()
