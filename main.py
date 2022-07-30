@@ -901,100 +901,64 @@ class ReaperEnemy: # Chris
 class FlyingAilenEnemy:
     def __init__(self,worldPos,image,size):
         self.rect = pygame.Rect(worldPos,size)
+        self.rect.center = (Player.rect.centerx+200,Player.rect.centery-200)
         self.size = size
         self.image = pygame.transform.scale(image, self.size)
         self.damage = 5
         self.speed = 2
         self.health = 10
-        self.cooldown = 0
-        self.onCooldown = False
-        self.facingLeft = False
-        self.facingRight = False
+        self.maxCooldown = 100
+        self.cooldown = self.maxCooldown
+        self.onCooldown = True
+        self.topright = (Player.rect.centerx+200,Player.rect.centery-200)
+        self.topleft = (Player.rect.centerx-200,Player.rect.centery-200)
+        self.rect.center = self.topleft
+        
+
+        self.projectileSpeed = 10
     def update(self):
-        if self.cooldown > 0:
-            self.onCooldown = True
-        elif self.cooldown <= 0:
-            self.onCooldown = False
-        distToPlayer = abs(Player.rect.x - self.rect.x)
-        if distToPlayer < 300 and distToPlayer > 32:
-            # Set the direction enemy is facing
-            if self.rect.x < Player.rect.x:
-                self.facingLeft = False
-                self.facingRight = True
-            elif self.rect.x > Player.rect.x:
-                self.facingLeft = True
-                self.facingRight = False
-            else:
-                self.facingRight = False
-                self.facingLeft = False
-        else:
-            # Set the direction enemy is facing
-            if self.rect.x < Player.rect.x:
-                self.facingLeft = False
-                self.facingRight = True
-            elif self.rect.x > Player.rect.x:
-                self.facingLeft = True
-                self.facingRight = False
-            else:
-                self.facingRight = False
-                self.facingLeft = False
-        #print info
-        """
-        if self.facingLeft:
-            print((self.rect[0],self.rect[1]),distToPlayer,"facing left")
-        else:
-            print((self.rect[0],self.rect[1]),distToPlayer,"facing right")
-            """
-        if self.facingLeft:
-                moveable = False
-                collideRect = pygame.Rect(self.rect.x - self.speed, self.rect.y, self.speed, self.rect.h)
-                for wall in walls:
-                    if wall.rect.collidepoint((self.rect.left - 1, self.rect.bottom + 1)):
-                        moveable = True
-                    if wall.rect.colliderect(collideRect):
-                        moveable = False
-                        break
-                if collideRect.colliderect(Player.rect):
-                    moveable = False
-
-                if self.onCooldown == False:
-                    self.rect = self.rect.move(-self.speed, 0)
-                elif self.onCooldown and distToPlayer <= 166:
-                    self.rect = self.rect.move(self.speed, 0)
-
-                """elif moveable and distToPlayer > 200:
-                    self.rect = (self.rect[0] - Player.rect[0] - 166, self.rect[1] - Player.rect[1] - 166)
-                    print("teleported")"""
-                    
-        elif self.facingRight:
-            moveable = False
-            collideRect = pygame.Rect(self.rect.right, self.rect.y, self.speed, self.rect.h)
-            for wall in walls:
-                if wall.rect.collidepoint((self.rect.right + 1, self.rect.bottom + 1)):
-                    moveable = True
-                if wall.rect.colliderect(collideRect):
-                    moveable = False
-                    break
-                if collideRect.colliderect(Player.rect):
-                    moveable = False
-
-                if self.onCooldown == False:
-                    self.rect = self.rect.move(self.speed, 0)
-                if self.onCooldown and distToPlayer <= 166:
-                    self.rect = self.rect.move(-self.speed, 0)
-                
-                """if moveable and self.onCooldown == False:
-                    self.rect = self.rect.move(self.speed, 0)
-                elif moveable and self.onCooldown and distToPlayer <= 250:
-                    self.rect = self.rect.move(-self.speed, 0)
-
-                elif moveable and self.onCooldown and distToPlayer > 250:
-                    self.rect = self.rect.move(self.speed, 0)"""
+        self.topright = (Player.rect.centerx+200,Player.rect.centery-200)
+        self.topleft = (Player.rect.centerx-200,Player.rect.centery-200)
         #Attacking
-        if distToPlayer < 60 and self.onCooldown == False:
+        
+        if self.onCooldown == False:
+            print("attack")
+
+            #fire projectile
+            dx = Player.rect.centerx - self.rect.x
+            dy = Player.rect.centery - self.rect.y
+            if dx == 0:
+                dx = .001
+            angle = math.atan(dy/dx)
+            if dx < 0:
+                angle += math.pi
+            xSpeed = self.projectileSpeed * math.cos(angle)
+            ySpeed = self.projectileSpeed * math.sin(angle)
+            center = self.rect.center
+            projectiles.append(FlyingEnemyProjectile(xSpeed,ySpeed,center))
+
+            #move positions
+            
+
+            #reset cooldown
+            self.onCooldown = True
+            self.cooldown = self.maxCooldown
+        else:
+            self.rect.center = self.topleft
+            self.cooldown -= 1
+        if self.cooldown <= 0:
+            self.onCooldown = False
+        
+        
+
+            #move closer to the player
+        
+
+            
+        """if self.onCooldown == False:
             print("Attacked")
             Player.health -= self.damage
-            self.cooldown = fps
+            self.cooldown = fps"""
         
 
         if self.health <= 0:
@@ -1002,7 +966,7 @@ class FlyingAilenEnemy:
             number = random.randint(1,10)
             if number == 1:
                 gems.append(Gem(self.rect.x,self.rect.bottom))
-        floorCheck = (self.rect.centerx,self.rect.bottom + 5)
+        """floorCheck = (self.rect.centerx,self.rect.bottom + 5)
         floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
         move5 = True
         move1 = True
@@ -1016,13 +980,32 @@ class FlyingAilenEnemy:
             self.rect = self.rect.move(0,5)
         elif move1 == True:
             self.rect = self.rect.move(0,1)
-        self.cooldown -= 1
+        self.cooldown -= 1"""
 
-        if self.rect[1] >= 1500:
-            self.rect[1] = 800
+        """if self.rect[1] >= 1500:
+            self.rect[1] = 800"""
         
     def render(self):
         adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        screen.blit(self.image, adjustedRect)
+
+class FlyingEnemyProjectile:
+    def __init__(self, xSpeed, ySpeed,center):
+        self.image = pygame.Surface((30,30))
+        self.image.fill((0,255,0))
+        self.rect = self.image.get_rect()
+        self.xSpeed = xSpeed
+        self.ySpeed = ySpeed
+        self.rect.center = center
+    def update(self):
+        self.rect = self.rect.move(self.xSpeed, self.ySpeed)
+        if self.rect.colliderect(Player.rect):
+            Player.health -= 5
+            projectiles.remove(self)
+    def render(self):
+         # Modifys the position based on the centered player position
+        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        # Renders wall using modified rect
         screen.blit(self.image, adjustedRect)
 
 class Gem:
@@ -1105,7 +1088,7 @@ def saveMap():
 # worldPos, image, sized )
 gems = []
 portal = Portal()
-enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100)),FlyingAilenEnemy((-1126, 818),pygame.image.load('Images\Ailen.png'), (100,100))]
+enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100)),FlyingAilenEnemy((367, 805),pygame.image.load('Images\Ailen.png'), (100,100))]
 projectiles = []
 foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
@@ -1187,6 +1170,9 @@ while 1:
             #print("Level:", level)
             """for enemy in enemies:
                 enemy.health = doubleHealth"""
+
+        #draw player renderrect
+        pygame.draw.rect(screen,(0,255,0),Player.renderRect)
         # update
         Player.update()
 
