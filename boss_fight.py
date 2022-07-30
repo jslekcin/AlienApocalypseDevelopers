@@ -559,12 +559,14 @@ class UFO_Boss:
            self.cooldown1 = 0
         else:
             self.cooldown1 += 1
-
+              
         for laser in self.projectiles:
             laser.render()
             if laser.update(walls, self.projectiles):
+                
                 print("▲ removing bomb")
                 laser.image = pygame.image.load("Images/explosion.png")
+                screen.blit(laser.image, laser.rect.center)
                 laser.dx = 0 
                 laser.dy = 0
                 laser.render()
