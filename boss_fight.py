@@ -583,6 +583,8 @@ class UFO_Boss:
                    
                     Player.health -= 75
                     self.projectiles.remove(projectile)
+
+    
             
                 
 class UFO_laser:
@@ -597,7 +599,9 @@ class UFO_laser:
         self.timer = 10 * fps
         self.poisonTimer = fps * 2
         self.attack = random.randint(1, 10)
-        self.timer = 60
+        self.explosion_timer = 50
+        self.timer = 45
+        self.exploded = False
     
     def update(self, walls, boss_projectiles):
         # Check if it hits anything
@@ -624,16 +628,19 @@ class UFO_laser:
         self.timer -= 1 
         return self.timer
 
-    def explode(self, image):
+    def explode(self):
+        self.explosion_timer -= 1
         self.dx = 0
         self.dy = 0
-        explosion_image = pygame.image.load(image)
-        explosion_image = pygame.transform.scale(explosion_image, [180, 180])
+        explosion_image = pygame.image.load("Images/explosion.png")
+        explosion_image = pygame.transform.scale(explosion_image, [230, 230])
         screen.blit(explosion_image, self.rect.center)
 
+    
     def render(self):
         screen.blit(self.image, self.rect.center)
-
+        if self.exploded == True:
+            self.explode()
 class LaserGunItem:
     def __init__(self,worldPos,image,size):
         #Laser Gun item
@@ -804,11 +811,12 @@ while 1:
 
     for decor in foreground:
         decor.render()
-
+          
     for decor in midground:
         decor.render()
 
     for projectile in projectiles:
+        
         projectile.render()
 
     for enemy in enemies:
@@ -816,13 +824,13 @@ while 1:
     
     for projectile in boss.projectiles:
         time_left = projectile.time_decrease()        
+        
         if time_left <= 0 and projectile.type == "laser":
             boss.projectiles.remove(projectile)
         if time_left <= 0 and projectile.type =="bomb":
-            #boss.projectiles.remove(projectile)
-            projectile.explode("Images/explosion.png")
-
-
+            projectile.exploded = True
+            if projectile.explosion_timer <=0:
+                boss.projectiles.remove(projectile)
 
     item.render()
 
