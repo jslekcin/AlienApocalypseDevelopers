@@ -597,7 +597,7 @@ class UFO_laser:
         self.timer = 10 * fps
         self.poisonTimer = fps * 2
         self.attack = random.randint(1, 10)
-        
+        self.timer = 60
     
     def update(self, walls, boss_projectiles):
         # Check if it hits anything
@@ -619,11 +619,20 @@ class UFO_laser:
             # Moving the projectile
             self.dy += .05
             self.rect = self.rect.move(self.dx,self.dy)
+    
+    def time_decrease(self):
+        self.timer -= 1 
+        return self.timer
 
+    def explode(self, image):
+        self.dx = 0
+        self.dy = 0
+        explosion_image = pygame.image.load(image)
+        explosion_image = pygame.transform.scale(explosion_image, [180, 180])
+        screen.blit(explosion_image, self.rect.center)
 
     def render(self):
         screen.blit(self.image, self.rect.center)
-
 
 class LaserGunItem:
     def __init__(self,worldPos,image,size):
@@ -785,7 +794,7 @@ while 1:
 
     #for boss_projectile in boss_projectiles:
         #boss_projectile.update(walls,boss_projectiles)
-
+    
     for enemy in enemies:
         enemy.update()
 
@@ -804,6 +813,16 @@ while 1:
 
     for enemy in enemies:
         enemy.render()
+    
+    for projectile in boss.projectiles:
+        time_left = projectile.time_decrease()        
+        if time_left <= 0 and projectile.type == "laser":
+            boss.projectiles.remove(projectile)
+        if time_left <= 0 and projectile.type =="bomb":
+            #boss.projectiles.remove(projectile)
+            projectile.explode("Images/explosion.png")
+
+
 
     item.render()
 
