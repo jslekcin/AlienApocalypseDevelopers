@@ -13,7 +13,7 @@ screen = pygame.display.set_mode(size)
 bg = pygame.image.load("images\Menu Screen.png")
 
 startButtonPressed = False
-def mainMenuLoop(gameState):
+def mainMenuLoop():
     while 1:
         for event in pygame.event.get(pygame.QUIT):
             pygame.quit()
@@ -26,14 +26,15 @@ def mainMenuLoop(gameState):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if 100 <= mouse[0] <= 400 and 200 <= mouse[1] <= 250:
                     print("Start button was pressed")
-                    startButtonPressed = True
+                    return "level1"
                 elif 100 <= mouse[0] <= 240 and 265 <= mouse[1] <= 315:
                     print("Quit button was pressed")
-                    #pygame.quit()
+                    pygame.quit()
                     #sys.exit
-                    break
+                    return "quit"
                 elif 260 <= mouse[0] <= 400 and 265 <= mouse[1] <= 315:
                     print("Instruction button was pressed")
+                    return "instructions"
 
         screen.blit(bg,(0,0))
         
@@ -53,10 +54,10 @@ def mainMenuLoop(gameState):
 
         screen.blit(TitleText, (145, 150))
 
-        if startButtonPressed == True:
-            gameState = 1
-
         pygame.display.flip()
+
+if __name__ == "__main__":
+    mainMenuLoop()
 
 
 

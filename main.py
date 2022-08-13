@@ -911,6 +911,8 @@ class FlyingAilenEnemy:
         self.onCooldown = True
         self.topright = (Player.rect.centerx+200,Player.rect.centery-200)
         self.topleft = (Player.rect.centerx-200,Player.rect.centery-200)
+        self.x = (Player.rect.centerx-200)
+        self.y = (Player.rect.centery-200)
         self.rect.center = self.topleft
         
 
@@ -936,14 +938,22 @@ class FlyingAilenEnemy:
             center = self.rect.center
             projectiles.append(FlyingEnemyProjectile(xSpeed,ySpeed,center))
 
-            #move positions
-            
 
+            #move positions
+            if self.rect.x == Player:
+                for i in range(0,200):
+                    self.rect.centerx = self.x
+                    self.x += 1
+            else:
+                for i in range(0,200):
+                    self.rect.centerx = self.x
+                    self.x -= 1
+                
             #reset cooldown
             self.onCooldown = True
             self.cooldown = self.maxCooldown
         else:
-            self.rect.center = self.topleft
+            self.rect.center = (self.x,self.y)
             self.cooldown -= 1
         if self.cooldown <= 0:
             self.onCooldown = False
