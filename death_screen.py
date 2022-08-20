@@ -2,7 +2,7 @@ import sys, pygame, math, random
 
 from pygame.constants import K_2
 
-def deathScreenLoop():
+def deathScreenLoop(prev_level):
     pygame.init()
     pygame.font.init()
 
@@ -19,8 +19,8 @@ def deathScreenLoop():
             break
         mouse = pygame.mouse.get_pos()
 
-        quitRect = pygame.Rect(170, 160, 170, 50)
-        retryRect = pygame.Rect(160, 280, 190, 50)
+        quitRect = pygame.Rect(160, 280, 170, 50)
+        retryRect = pygame.Rect(170, 160, 190, 50)
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -29,7 +29,9 @@ def deathScreenLoop():
                     return "quit"
 
                 if retryRect.collidepoint(event.pos):
-                    return "main_menu"
+                    if prev_level == "":
+                        prev_level = "tutorial"
+                    return prev_level
 
 
         death_image = pygame.image.load('Images/death.jpg')
@@ -43,12 +45,12 @@ def deathScreenLoop():
         pygame.draw.rect(screen,(255,255,255),quitRect)
         pygame.draw.rect(screen,(0,0,0),retryRect)
 
-        screen.blit(QuitText, (180, 160))
+        screen.blit(QuitText, (160, 280))
         
         
         RetryText = uiFont.render("RETRY", True, (255,255,255))
 
-        screen.blit(RetryText, (160, 280))
+        screen.blit(RetryText, (180, 160))
         
         #pygame.draw.rect(screen, (0,0,0),(0,0,75,50))
         DeathScreenText = uiFont.render("YOU DIED", True, (252,3,3))

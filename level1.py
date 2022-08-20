@@ -1,6 +1,9 @@
 import sys, pygame, math, random
 from pygame.constants import K_2
 
+from event_system import Event_system
+
+
 def level1():
     loadFile = True
 
@@ -271,6 +274,7 @@ def level1():
 
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
+            
 
         def render():
             if Player.isPoisned == False:
@@ -1262,6 +1266,10 @@ def level1():
                 portal.render()
 
             Player.render()
+
+            if Player.health <= 0:
+                pygame.event.post(pygame.event.Event(Event_system.On_Death))
+                return "level1"
             
             # Draw Health Bar
             pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,5,200,30))
@@ -1287,7 +1295,7 @@ def level1():
 
             # print('TODO: Gameplay')
 
-            print(mousePos)
+            #print(mousePos)
             pygame.display.flip()
 
 if __name__ == "__main__":
