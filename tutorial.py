@@ -289,7 +289,7 @@ def tutorialLoop():
 
 
 
-    generatingMap = not loadFile
+    generatingMap = loadFile
     editPageNum = len(walls)-1
     editCooldown = 0
 
