@@ -253,7 +253,7 @@ for i in range(int(70/pageSize)):
     page = Wall((pageSize*i,h), pygame.image.load('Images\Ground.png'), (pageSize,h), 0)
     walls.append(page)
 
-map = "chrisTutorial.txt"
+map = "map.txt"
 
 def saveMap():
     global walls
