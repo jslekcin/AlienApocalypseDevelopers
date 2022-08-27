@@ -173,6 +173,10 @@ def tutorialLoop():
                 if Player.health <= 0:
                     pygame.event.post(pygame.event.Event(Event_system.On_Death))
 
+                if pygame.key.get_pressed()[pygame.K_p] and Player.portalPlaced == False:
+                    Player.portalPlaced = True
+                    print("portal placed")
+
 
             def render():
                 if Player.isPoisned == False:
@@ -246,11 +250,115 @@ def tutorialLoop():
             # Renders wall using modified rect
             screen.blit(self.image, adjustedRect)
 
+    class tutorialPortal:
+        def __init__(self):
+            #self.image = pygame.image.load("Images/BossFightPortal.png")
+            self.image = pygame.Surface((100,25))
+            self.image.fill((255,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.bottom = Player.rect.bottom
+            self.rect[0] = Player.rect[0] - 150
 
-    enemies = []
+        def update(self):
+            if Player.portalPlaced == False:
+                self.rect.bottom = Player.rect.bottom
+                self.rect[0] = enemies[0].rect.x
+            elif Player.portalPlaced == True:
+                if self.rect.colliderect(Player.rect):
+                    print("collided")
+
+        def render(self):
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            screen.blit(self.image, adjustedRect)
+
+    class tutorialEnemy:
+        def __init__(self, worldPos, image, size):
+            # Generates rect from given parameters
+            self.size = size
+            self.image = pygame.transform.scale(image, self.size)
+            self.rect = pygame.Rect(worldPos,size)
+            
+            self.maxHealth = 100
+            self.health = self.maxHealth
+
+            # Movement Variables
+            self.facingLeft = False
+            self.speed = 2
+
+        def update(self):
+            # Check that enemy is on screen
+            if Player.rect.x - self.rect.x < 500 or Player.rect.x - self.rect.x > -500:
+                # Set the direction enemy is facing
+                if self.rect.x < Player.rect.x:
+                    self.facingLeft = False
+                else:
+                    self.facingLeft = True
+
+                # Move based on direction facing
+                if self.facingLeft:
+                    moveable = False
+                    collideRect = pygame.Rect(self.rect.x - self.speed, self.rect.y, self.speed, self.rect.h)
+                    for wall in walls:
+                        if wall.rect.collidepoint((self.rect.left - 1, self.rect.bottom + 1)):
+                            moveable = True
+                        if wall.rect.colliderect(collideRect):
+                            moveable = False
+                            break
+                    if collideRect.colliderect(Player.rect):
+                        moveable = False
+
+                    player_dist = abs(self.rect.centerx-Player.rect.centerx)
+                    if moveable and player_dist <= 250:
+                        self.rect = self.rect.move(-self.speed, 0)
+                else:
+                    moveable = False
+                    collideRect = pygame.Rect(self.rect.right, self.rect.y, self.speed, self.rect.h)
+                    for wall in walls:
+                        if wall.rect.collidepoint((self.rect.right + 1, self.rect.bottom + 1)):
+                            moveable = True
+                        if wall.rect.colliderect(collideRect):
+                            moveable = False
+                            break
+                        if collideRect.colliderect(Player.rect):
+                            moveable = False
+
+                    player_dist = abs(self.rect.centerx-Player.rect.centerx)
+                    if moveable and player_dist <= 250:
+                        self.rect = self.rect.move(self.speed, 0)
+
+            floorCheck = (self.rect.centerx,self.rect.bottom + 5)
+            floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
+            move5 = True
+            move1 = True
+            for wall in walls:
+                if wall.rect.collidepoint(floorCheck):
+                    move5 = False
+                if wall.rect.collidepoint(floorCheck2):
+                    move1 = False
+
+            if move5 == True:
+                self.rect = self.rect.move(0,5)
+            elif move1 == True:
+                self.rect = self.rect.move(0,1)
+
+            if self.health <= 0:
+                enemies.remove(self)
+                print("blob dead")
+                pygame.event.post(pygame.event.Event(Event_system.On_Blob_Death))
+
+        def render(self):
+            # Modifys the position based on the centered player position
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            healthRect = pygame.Rect(adjustedRect.x, adjustedRect.y - 10, self.health / self.maxHealth * adjustedRect.w, 10)
+            # Renders wall using modified rect
+            screen.blit(self.image, adjustedRect)
+            pygame.draw.rect(screen, (0,255,0), healthRect)
+
+
+    portal = tutorialPortal()
     # worldPos, image, sized )
     
-    enemies = []
+    enemies = [tutorialEnemy((1200,100),pygame.image.load('Images/tutorial blob.png'),(50,50))]
     projectiles = []
     #foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
     #midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
@@ -289,7 +397,7 @@ def tutorialLoop():
 
 
 
-    generatingMap = loadFile
+    generatingMap = not loadFile
     editPageNum = len(walls)-1
     editCooldown = 0
 
@@ -319,10 +427,15 @@ def tutorialLoop():
     while 1:
         clock.tick(fps) 
         
-        for event in pygame.event.get(pygame.QUIT):
-            pygame.quit()
-            sys.exit
-            break
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit
+                break
+            if event.type == Event_system.On_Blob_Death:
+                Player.portalPlaced = True
+
+
 
         screen.blit(background, (0,0))
 
@@ -371,6 +484,7 @@ def tutorialLoop():
 
             # update
         Player.update()
+        portal.update()
 
         for wall in walls:
             wall.update()
@@ -398,6 +512,9 @@ def tutorialLoop():
             enemy.render()
 
         Player.render()    
+
+        if Player.portalPlaced:
+                portal.render()
 
         # Draw Health Bar
         pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,5,200,30))
