@@ -20,7 +20,7 @@ def tutorialLoop():
     fps = 60
 
     black = (0,0,0)
-    background = pygame.image.load('Images\sky.png')
+    background = pygame.image.load('Images\grey_screen.png')
     background = pygame.transform.scale(background, size)
     gameState = 1
 
@@ -52,6 +52,7 @@ def tutorialLoop():
             weapon = None
             #alien_gems = 5
             attackCooldown = 0
+            maxSpeed = 6
             
 
             def update():
@@ -89,6 +90,7 @@ def tutorialLoop():
                 
                 # TODO: Use this formula for jumping not going side
                 # TODO: Fix so that 4th root does not make complex number
+                
 
                 # Checks if we have input to move right
                 if pygame.key.get_pressed()[pygame.K_d]:
@@ -98,6 +100,12 @@ def tutorialLoop():
                 if pygame.key.get_pressed()[pygame.K_a]:
                     Player.xSpeed -= Player.xAcceleration + sprinting * Player.xAcceleration
                 
+                if Player.xSpeed >= Player.maxSpeed:
+                    Player.xSpeed = Player.maxSpeed
+
+                if Player.xSpeed <= -Player.maxSpeed:
+                    Player.xSpeed  = -Player.maxSpeed
+
                 upA    = False
                 leftA  = False
                 rightA = False
@@ -263,7 +271,7 @@ def tutorialLoop():
         page = Wall((pageSize*i,h), pygame.image.load('Images\Ground.png'), (pageSize,h), 0)
         walls.append(page)
 
-    map = "tutorialMap.txt" #select map
+    map = "chrisTutorial.txt" #select map
 
     def saveMap():
         global walls
