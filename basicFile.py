@@ -34,6 +34,7 @@ class Player:
         yAcceleration = .4 # Gravity
         xSpeed = 0
         ySpeed = 0
+        maxSpeed = 6
         # Sprinting Variables
         maxStamina = 120
         staminaRegen = .5
@@ -93,6 +94,12 @@ class Player:
             # Checks if we have input to move left
             if pygame.key.get_pressed()[pygame.K_a]:
                 Player.xSpeed -= Player.xAcceleration + sprinting * Player.xAcceleration
+
+            if Player.xSpeed >= Player.maxSpeed:
+                Player.xSpeed = Player.maxSpeed
+
+            if Player.xSpeed <= -Player.maxSpeed:
+                Player.xSpeed  = -Player.maxSpeed
             
             upA    = False
             leftA  = False
@@ -253,7 +260,7 @@ for i in range(int(70/pageSize)):
     page = Wall((pageSize*i,h), pygame.image.load('Images\Ground.png'), (pageSize,h), 0)
     walls.append(page)
 
-map = "map.txt"
+map = "chrisTutorial.txt"
 
 def saveMap():
     global walls

@@ -42,6 +42,7 @@ class Player:
     staminaRegen = .5
     stamina = maxStamina
     sprintCooldown = False
+    maxSpeed = 6
     # Stats
     maxHealth = 100
     isPoisned = False
@@ -94,6 +95,12 @@ class Player:
         # Checks if we have input to move left
         if pygame.key.get_pressed()[pygame.K_a]:
             Player.xSpeed -= Player.xAcceleration + sprinting * Player.xAcceleration
+
+        if Player.xSpeed >= Player.maxSpeed:
+            Player.xSpeed = Player.maxSpeed
+
+        if Player.xSpeed <= -Player.maxSpeed:
+            Player.xSpeed  = -Player.maxSpeed
         
         upA    = False
         leftA  = False

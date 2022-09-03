@@ -43,6 +43,7 @@ def tutorialLoop():
             staminaRegen = .5
             stamina = maxStamina
             sprintCooldown = False
+            maxSpeed = 6
             # Stats
             maxHealth = 100
             isPoisned = False
@@ -52,7 +53,7 @@ def tutorialLoop():
             weapon = None
             #alien_gems = 5
             attackCooldown = 0
-            maxSpeed = 6
+            
             
 
             def update():
@@ -261,7 +262,7 @@ def tutorialLoop():
     class tutorialPortal:
         def __init__(self):
             #self.image = pygame.image.load("Images/BossFightPortal.png")
-            self.image = pygame.Surface((100,25))
+            self.image = pygame.Surface((50,150))
             self.image.fill((255,0,0))
             self.rect = self.image.get_rect()
             self.rect.bottom = Player.rect.bottom
@@ -270,10 +271,11 @@ def tutorialLoop():
         def update(self):
             if Player.portalPlaced == False:
                 self.rect.bottom = Player.rect.bottom
-                self.rect[0] = enemies[0].rect.x
+                self.rect.x,self.rect.y = 2550, 725
             elif Player.portalPlaced == True:
                 if self.rect.colliderect(Player.rect):
                     print("collided")
+                    pygame.event.post(pygame.event.Event(Event_system.On_Portal_Collision))
 
         def render(self):
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
@@ -291,7 +293,7 @@ def tutorialLoop():
 
             # Movement Variables
             self.facingLeft = False
-            self.speed = 2
+            self.speed = 1
 
         def update(self):
             # Check that enemy is on screen
@@ -366,7 +368,7 @@ def tutorialLoop():
     portal = tutorialPortal()
     # worldPos, image, sized )
     
-    enemies = [tutorialEnemy((1200,100),pygame.image.load('Images/tutorial blob.png'),(50,50))]
+    enemies = [tutorialEnemy((1470, 900),pygame.image.load('Images/tutorial blob.png'),(50,50))]
     projectiles = []
     #foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
     #midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
@@ -442,6 +444,8 @@ def tutorialLoop():
                 break
             if event.type == Event_system.On_Blob_Death:
                 Player.portalPlaced = True
+            if event.type == Event_system.On_Portal_Collision:
+                return("level1")
 
 
 
@@ -540,5 +544,9 @@ def tutorialLoop():
         #levelText = uiFont.render(str(level), True, (255,255,255))
         screen.blit(weaponText, (10, 10))
         #screen.blit(levelText, (400, 10))
+
+    
+        if pygame.mouse.get_pressed(3)[0]:
+            print(mousePosW)
 
         pygame.display.flip()
