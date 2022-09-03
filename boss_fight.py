@@ -582,7 +582,7 @@ class UFO_Boss:
                 if projectile.type == "bomb":
                    
                     Player.health -= 75
-                    self.projectiles.remove(projectile)
+                    #self.projectiles.remove(projectile)
 
     
             
