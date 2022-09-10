@@ -3,6 +3,7 @@ from pygame.constants import K_2
 
 from event_system import Event_system
 
+#Hello
 
 def tutorialLoop():
     loadFile = True
@@ -24,6 +25,15 @@ def tutorialLoop():
     background = pygame.transform.scale(background, size)
     gameState = 1
 
+    tutorial_text1 = uiFont.render("Press A or D to move.", False, (200, 200, 200))
+
+    tutorial_text2 = uiFont.render("Press SPACE to jump & SHIFT to sprint", False, (200, 200, 200))
+
+    tutorial_text3 = uiFont.render("Press 1-3 to select a weapon to use.", False, (200, 200, 200))
+
+    tutorial_text4 = uiFont.render("Click to use weapons.", False, (200, 200, 200))
+
+
     class Player:
             # Loads image and creates a rect out of it
             image = pygame.image.load("Images\player.png") 
@@ -43,7 +53,8 @@ def tutorialLoop():
             staminaRegen = .5
             stamina = maxStamina
             sprintCooldown = False
-            maxSpeed = 6
+            maxWalkSpeed = 6
+            maxRunSpeed = 12
             # Stats
             maxHealth = 100
             isPoisned = False
@@ -51,6 +62,7 @@ def tutorialLoop():
             portalPlaced = False
             # Equipment
             weapon = None
+            collected_bat = False
             #alien_gems = 5
             attackCooldown = 0
             
@@ -101,11 +113,21 @@ def tutorialLoop():
                 if pygame.key.get_pressed()[pygame.K_a]:
                     Player.xSpeed -= Player.xAcceleration + sprinting * Player.xAcceleration
                 
-                if Player.xSpeed >= Player.maxSpeed:
-                    Player.xSpeed = Player.maxSpeed
+                if sprinting == False:
+                    if Player.xSpeed >= Player.maxWalkSpeed:
+                        Player.xSpeed = Player.maxWalkSpeed
 
-                if Player.xSpeed <= -Player.maxSpeed:
-                    Player.xSpeed  = -Player.maxSpeed
+                    if Player.xSpeed <= -Player.maxWalkSpeed:
+                        Player.xSpeed  = -Player.maxWalkSpeed
+
+                else:
+                    if Player.xSpeed >= Player.maxRunSpeed:
+                        Player.xSpeed = Player.maxRunSpeed
+
+                    if Player.xSpeed <= -Player.maxRunSpeed:
+                        Player.xSpeed  = -Player.maxRunSpeed
+
+                
 
                 upA    = False
                 leftA  = False
@@ -162,9 +184,9 @@ def tutorialLoop():
                 Player.ySpeed += Player.yAcceleration
 
                 #Weapon changing function
-                if pygame.key.get_pressed()[pygame.K_1]:
-                    #Player.weapon = Bat()
-                    pass
+                if pygame.key.get_pressed()[pygame.K_1] and Player.collected_bat == True:
+                    Player.weapon = Bat()
+                    
 
                 # Attack if player clicks
                 if Player.attackCooldown > 0:
@@ -192,6 +214,7 @@ def tutorialLoop():
                     screen.blit(Player.image, Player.renderRect)
                 elif Player.isPoisned:
                     screen.blit(Player.poisonImage, Player.renderRect)
+                
                 Player.weapon.render()
 
     class Weapon:
@@ -199,7 +222,7 @@ def tutorialLoop():
                 self.name = 'None'
 
             def attack(self):
-                print("Attacking with weapon")
+                pass
 
             def render(self):
                 pass
@@ -240,7 +263,30 @@ def tutorialLoop():
                 #pass
                 screen.blit(self.image, (Player.renderRect.centerx-85, Player.renderRect.centery-80))
 
-    Player.weapon = Bat()
+    class BatItem:
+        def __init__(self,worldPos,image,size):
+            #Bat Item
+            self.pos = worldPos
+            self.size = size
+            self.rect = pygame.Rect(self.pos,self.size)
+            self.image = pygame.transform.scale(image, self.size)
+            #self.rect = self.image.get_rect()
+            
+
+        def update(self):
+            #print(self.rect)
+            self.rect.center = self.pos
+            if self.rect.colliderect(Player.rect):
+                Player.collected_bat = True
+
+        def render(self):
+            #adjust position based on players position
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            #render image
+            if Player.collected_bat == False:
+                screen.blit(self.image, adjustedRect)
+
+    Player.weapon = Weapon()
     walls = []
 
     class Wall:
@@ -370,6 +416,7 @@ def tutorialLoop():
     
     enemies = [tutorialEnemy((1470, 900),pygame.image.load('Images/tutorial blob.png'),(50,50))]
     projectiles = []
+    bat_item = BatItem((887, 960),pygame.image.load("Images/Bat3.png"),(102,119))
     #foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
     #midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 
@@ -444,6 +491,7 @@ def tutorialLoop():
                 break
             if event.type == Event_system.On_Blob_Death:
                 Player.portalPlaced = True
+                #portal text
             if event.type == Event_system.On_Portal_Collision:
                 return("level1")
 
@@ -497,6 +545,7 @@ def tutorialLoop():
             # update
         Player.update()
         portal.update()
+        bat_item.update()
 
         for wall in walls:
             wall.update()
@@ -506,6 +555,22 @@ def tutorialLoop():
 
         for enemy in enemies:
             enemy.update()
+        
+        adjustedRect = tutorial_text1.get_rect().move(60,1050).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        
+        screen.blit(tutorial_text1, (adjustedRect.left, adjustedRect.top))
+        
+        adjustedRect = tutorial_text2.get_rect().move(280, 800).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        
+        screen.blit(tutorial_text2, (adjustedRect.left, adjustedRect.top))
+       
+        adjustedRect = tutorial_text3.get_rect().move(700, 1075).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        
+        screen.blit(tutorial_text3, (adjustedRect.left, adjustedRect.top))
+       
+        adjustedRect = tutorial_text4.get_rect().move(1400, 900).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+       
+        screen.blit(tutorial_text4, (adjustedRect.left, adjustedRect.top))
         
         # render
         for wall in walls:
@@ -524,6 +589,8 @@ def tutorialLoop():
             enemy.render()
 
         Player.render()    
+        
+        bat_item.render()
 
         if Player.portalPlaced:
                 portal.render()

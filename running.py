@@ -6,7 +6,7 @@ import death_screen
 import intructions
 import tutorial
 
-level = "level1"
+level = "tutorial"
 prev_level = ""
 
 while level != "quit":
