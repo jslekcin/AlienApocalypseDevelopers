@@ -42,7 +42,8 @@ class Player:
     staminaRegen = .5
     stamina = maxStamina
     sprintCooldown = False
-    maxSpeed = 6
+    maxWalkSpeed = 6
+    maxRunSpeed = 12
     # Stats
     maxHealth = 100
     isPoisned = False
@@ -96,11 +97,19 @@ class Player:
         if pygame.key.get_pressed()[pygame.K_a]:
             Player.xSpeed -= Player.xAcceleration + sprinting * Player.xAcceleration
 
-        if Player.xSpeed >= Player.maxSpeed:
-            Player.xSpeed = Player.maxSpeed
+        if sprinting == False:
+                    if Player.xSpeed >= Player.maxWalkSpeed:
+                        Player.xSpeed = Player.maxWalkSpeed
 
-        if Player.xSpeed <= -Player.maxSpeed:
-            Player.xSpeed  = -Player.maxSpeed
+                    if Player.xSpeed <= -Player.maxWalkSpeed:
+                        Player.xSpeed  = -Player.maxWalkSpeed
+
+        else:
+            if Player.xSpeed >= Player.maxRunSpeed:
+                Player.xSpeed = Player.maxRunSpeed
+
+            if Player.xSpeed <= -Player.maxRunSpeed:
+                Player.xSpeed  = -Player.maxRunSpeed
         
         upA    = False
         leftA  = False

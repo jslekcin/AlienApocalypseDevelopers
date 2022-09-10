@@ -45,12 +45,14 @@ def level1():
         staminaRegen = .5
         stamina = maxStamina
         sprintCooldown = False
-        maxSpeed = 6
+        maxWalkSpeed = 6
+        maxRunSpeed = 12
         # Stats
         maxHealth = 100
-        isPoisned = False
+        isPoisoned = False
         health = maxHealth
         portalPlaced = False
+        poisonTimer = fps * 2
         # Equipment
         weapon = None
         alien_gems = 5
@@ -101,11 +103,19 @@ def level1():
             if pygame.key.get_pressed()[pygame.K_a]:
                 Player.xSpeed -= Player.xAcceleration + sprinting * Player.xAcceleration
 
-            if Player.xSpeed >= Player.maxSpeed:
-                Player.xSpeed = Player.maxSpeed
+            if sprinting == False:
+                    if Player.xSpeed >= Player.maxWalkSpeed:
+                        Player.xSpeed = Player.maxWalkSpeed
 
-            if Player.xSpeed <= -Player.maxSpeed:
-                Player.xSpeed  = -Player.maxSpeed
+                    if Player.xSpeed <= -Player.maxWalkSpeed:
+                        Player.xSpeed  = -Player.maxWalkSpeed
+
+            else:
+                if Player.xSpeed >= Player.maxRunSpeed:
+                    Player.xSpeed = Player.maxRunSpeed
+
+                if Player.xSpeed <= -Player.maxRunSpeed:
+                    Player.xSpeed  = -Player.maxRunSpeed
             
             upA    = False
             leftA  = False
@@ -154,106 +164,7 @@ def level1():
                     if upA:
                         Player.ySpeed = 0
                         Player.rect.top = wall.rect.bottom
-            """
-            for enemy in enemies:
-                # Standing on floor
-                if enemy.rect.colliderect(belowRect):
-                    downC = True
-                    if downA:
-                        Player.ySpeed = 0
-                        Player.rect.bottom = enemy.rect.top
-                    # Slows player x movement
-                    if Player.xSpeed > 0 and not pygame.key.get_pressed()[pygame.K_d]:
-                        Player.xSpeed -= Player.xFriction
-                    if Player.xSpeed < 0 and not pygame.key.get_pressed()[pygame.K_a]:
-                        Player.xSpeed += Player.xFriction
-                    # Jump
-                    if pygame.key.get_pressed()[pygame.K_SPACE]:
-                        Player.ySpeed = -10
-                if enemy.rect.colliderect(leftRect):
-                    leftC = True
-                    if leftA:
-                        Player.xSpeed = 0
-                        Player.rect.left = enemy.rect.right
-                if enemy.rect.colliderect(rightRect):
-                    rightC = True
-                    if rightA:
-                        Player.xSpeed = 0
-                        Player.rect.right = enemy.rect.left
-                if enemy.rect.colliderect(topRect):
-                    upC = True
-                    if upA:
-                        Player.ySpeed = 0
-                        Player.rect.top = enemy.rect.bottom
-    """
-            '''
-            # Checks if there is floor below the player
-            for wall in walls:
-
-                #if bottomRect.colliderect(wall.rect):
-                #  Player.rect.left = wall.rect.right
-                #  if(Player.ySpeed > 0):
-                #    Player.ySpeed = 0
-
-                if belowRect.colliderect(wall.rect):
-                    # Setting flush
-                    Player.rect.bottom = wall.rect.top
-                    # Stops movement
-                    if Player.ySpeed > 0:
-                        Player.ySpeed = 0
-                    # Slows player x movement
-                    if Player.xSpeed > 0 and not pygame.key.get_pressed()[pygame.K_d]:
-                        Player.xSpeed -= Player.xFriction
-                    if Player.xSpeed < 0 and not pygame.key.get_pressed()[pygame.K_a]:
-                        Player.xSpeed += Player.xFriction
-                    # Jump
-                    if pygame.key.get_pressed()[pygame.K_SPACE]:
-                        Player.ySpeed = -10
-                    break
             
-            #for wall in walls:
-                # Sets player flush with the wall
-            #    if rightRect.colliderect(wall.rect):
-            #        Player.rect.right = wall.rect.left
-            #        break
-
-            #for wall in walls:
-            #    if leftRect.colliderect(wall.rect):
-            #        Player.rect.left = wall.rect.right
-            #        break
-            for wall in walls:
-                if leftRect.colliderect(wall.rect):
-                    Player.rect.left = wall.rect.right
-                    if Player.xSpeed > 0:
-                        Player.xSpeed = 0
-                    break
-
-            for wall in walls:
-                if rightRect.colliderect(wall.rect):
-                    Player.rect.right = wall.rect.left
-                    if Player.xSpeed > 0:
-                        Player.xSpeed = 0
-                    break
-            
-            for wall in walls:
-                if topRect.colliderect(wall.rect):
-                    if Player.ySpeed < 0:
-                        Player.ySpeed = 0
-                    Player.rect.top = wall.rect.bottom
-                    break
-
-            #for wall in walls:
-            #  if leftRect.colliderect(wall.rect):
-            #   if Player.xSpeed > 0:
-            #      Player.xSpeed = 0
-            #    Player.rect.left = wall.rect.right
-
-            #for wall in walls:
-            #  if rightRect.colliderect(wall.rect):
-            '''
-
-                
-
 
             Player.rect = Player.rect.move(Player.xSpeed, Player.ySpeed)
 
@@ -274,6 +185,15 @@ def level1():
             elif pygame.mouse.get_pressed(3)[0]:
                 Player.weapon.attack()
 
+            if Player.isPoisoned == True:
+                print(Player.poisonTimer, Player.isPoisoned)
+                Player.poisonTimer -= 1
+                Player.health -= 0.05
+                #print(self.poisonTimer)
+                if Player.poisonTimer <= 0:
+                    Player.isPoisoned = False
+                
+
             if pygame.key.get_pressed()[pygame.K_p] and Player.alien_gems >= 5 and Player.portalPlaced == False:
                 Player.portalPlaced = True
                 print("portal placed")
@@ -281,12 +201,13 @@ def level1():
 
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
-            
+        def applyPoison():
+            Player.poisonTimer = fps * 2
 
         def render():
-            if Player.isPoisned == False:
+            if Player.isPoisoned == False:
                 screen.blit(Player.image, Player.renderRect)
-            elif Player.isPoisned:
+            elif Player.isPoisoned:
                 screen.blit(Player.poisonImage, Player.renderRect)
             Player.weapon.render()
 
@@ -812,16 +733,13 @@ def level1():
 
             if self.rect.colliderect(Player.rect):
                 # Do damage if it does
-                Player.health -= 1
+                print("Player hit")
+                if hit == False:
+                    Player.health -= 4
+                Player.isPoisoned = True
+                Player.applyPoison()
                 projectiles.remove(self)
-                Player.isPoisned = True
-                self.poisonTimer = fps * 2
-            if Player.isPoisned == True:
-                self.poisonTimer -= 1
-                Player.health -= 0.05
-                #print(self.poisonTimer)
-            if self.poisonTimer <= 0:
-                Player.isPoisned = False
+            
 
         def render(self):
             # Modifys the position based on the centered player position
@@ -1142,7 +1060,8 @@ def level1():
 
     while 1:
         # The Great Clock #3
-        clock.tick(fps) 
+        deltaTime = clock.tick(fps)
+
 
         # Inputs Processing Code
         for event in pygame.event.get(pygame.QUIT):
@@ -1174,7 +1093,7 @@ def level1():
                 if pygame.key.get_pressed()[pygame.K_g]:
                     gameState += 1
                 if pygame.key.get_pressed()[pygame.K_h]:
-                    Player.health -= 20
+                    Player.health = Player.maxHealth
                     
             #doubleHealth = 10
             if len(enemies) <= 0:
@@ -1281,7 +1200,7 @@ def level1():
             # Draw Health Bar
             pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,5,200,30))
             pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,5,Player.health / Player.maxHealth * 200,30))
-            hpText = uiFont.render(f'{Player.health} / 100', True, (255, 255, 255))
+            hpText = uiFont.render(f'{Player.health:0.2f} / 100', True, (255, 255, 255))
             screen.blit(hpText, (250 - hpText.get_width() / 2,10))
             # Draw Stamina Bar
             pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,35,200,30))
