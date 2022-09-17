@@ -341,7 +341,8 @@ def tutorialLoop():
 
             # Movement Variables
             self.facingLeft = False
-            self.speed = 1
+            self.speed = 2
+            self.timer = 0
 
         def update(self):
             # Check that enemy is on screen
@@ -404,14 +405,26 @@ def tutorialLoop():
                 print("blob dead")
                 pygame.event.post(pygame.event.Event(Event_system.On_Blob_Death))
                 
-                tutorial_text5 == uiFont.render("Enter the portal.", False, (0, 255, 0))
+                
+                
 
         def render(self):
             # Modifys the position based on the centered player position
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             healthRect = pygame.Rect(adjustedRect.x, adjustedRect.y - 10, self.health / self.maxHealth * adjustedRect.w, 10)
             # Renders wall using modified rect
-            screen.blit(self.image, adjustedRect)
+            
+            self.timer =+1
+
+            if self.timer <= 5:
+                Small_img = pygame.transform.scale(self.image,(50, 45))
+                screen.blit(Small_img, adjustedRect)
+            
+            if self.timer >= 10:
+                screen.blit(self.image, adjustedRect)
+                self.timer = 0
+    
+            
             pygame.draw.rect(screen, (0,255,0), healthRect)
 
 
@@ -496,6 +509,7 @@ def tutorialLoop():
             if event.type == Event_system.On_Blob_Death:
                 Player.portalPlaced = True
                 #portal text
+                tutorial_text5 = uiFont.render("Enter the portal.", False, (0, 255, 0))
             if event.type == Event_system.On_Portal_Collision:
                 return("level1")
 
@@ -576,7 +590,7 @@ def tutorialLoop():
        
         screen.blit(tutorial_text4, (adjustedRect.left, adjustedRect.top))
 
-        adjustedRect = tutorial_text5.get_rect().move(2200, 850).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        adjustedRect = tutorial_text5.get_rect().move(2250, 730).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
 
         screen.blit(tutorial_text5, (adjustedRect.left, adjustedRect.top))
         
