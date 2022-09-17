@@ -51,8 +51,11 @@ def level1():
         maxHealth = 100
         isPoisoned = False
         health = maxHealth
+        prev_health = health
+        regenTimer = fps * 10
         portalPlaced = False
         poisonTimer = fps * 2
+        poisonCounter = 0
         # Equipment
         weapon = None
         alien_gems = 5
@@ -60,6 +63,17 @@ def level1():
         
 
         def update():
+            if Player.health < Player.prev_health:
+                Player.regenTimer = fps * 10
+            
+            else: 
+                Player.regenTimer -= 1
+
+            if Player.regenTimer <= 0:
+                Player.health += 0.005 
+            if Player.health > Player.maxHealth:
+                Player.health = 100
+
             s = .1 * Player.rect.w
             w = .8 * Player.rect.w
             belowRect = pygame.Rect((Player.rect.left + s, Player.rect.bottom), (w, 2))
@@ -188,10 +202,11 @@ def level1():
             if Player.isPoisoned == True:
                 print(Player.poisonTimer, Player.isPoisoned)
                 Player.poisonTimer -= 1
-                Player.health -= 0.05
+                Player.health -= 0.015 * Player.poisonCounter
                 #print(self.poisonTimer)
                 if Player.poisonTimer <= 0:
                     Player.isPoisoned = False
+                    Player.poisonCounter = 0
                 
 
             if pygame.key.get_pressed()[pygame.K_p] and Player.alien_gems >= 5 and Player.portalPlaced == False:
@@ -200,6 +215,8 @@ def level1():
                 Player.alien_gems -= 5
 
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
+
+            Player.prev_health = Player.health
 
         def applyPoison():
             Player.poisonTimer = fps * 2
@@ -733,7 +750,8 @@ def level1():
 
             if self.rect.colliderect(Player.rect):
                 # Do damage if it does
-                print("Player hit")
+                Player.poisonCounter += 1
+                print("Player hit", Player.poisonCounter)
                 if hit == False:
                     Player.health -= 4
                 Player.isPoisoned = True
