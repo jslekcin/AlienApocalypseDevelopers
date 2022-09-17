@@ -33,6 +33,8 @@ def tutorialLoop():
 
     tutorial_text4 = uiFont.render("Click to use weapons.", False, (200, 200, 200))
 
+    tutorial_text5 = uiFont.render("Defeat the enemy to progress.", False, (255, 0, 0))
+
 
     class Player:
             # Loads image and creates a rect out of it
@@ -401,6 +403,8 @@ def tutorialLoop():
                 enemies.remove(self)
                 print("blob dead")
                 pygame.event.post(pygame.event.Event(Event_system.On_Blob_Death))
+                
+                tutorial_text5 == uiFont.render("Enter the portal.", False, (0, 255, 0))
 
         def render(self):
             # Modifys the position based on the centered player position
@@ -571,6 +575,10 @@ def tutorialLoop():
         adjustedRect = tutorial_text4.get_rect().move(1400, 900).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
        
         screen.blit(tutorial_text4, (adjustedRect.left, adjustedRect.top))
+
+        adjustedRect = tutorial_text5.get_rect().move(2200, 850).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+
+        screen.blit(tutorial_text5, (adjustedRect.left, adjustedRect.top))
         
         # render
         for wall in walls:
