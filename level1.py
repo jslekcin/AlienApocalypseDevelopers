@@ -200,7 +200,7 @@ def level1():
                 Player.weapon.attack()
 
             if Player.isPoisoned == True:
-                print(Player.poisonTimer, Player.isPoisoned)
+                #print(Player.poisonTimer, Player.isPoisoned)
                 Player.poisonTimer -= 1
                 Player.health -= 0.015 * Player.poisonCounter
                 #print(self.poisonTimer)
@@ -214,12 +214,16 @@ def level1():
                 print("portal placed")
                 Player.alien_gems -= 5
 
+
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
             Player.prev_health = Player.health
 
         def applyPoison():
             Player.poisonTimer = fps * 2
+
+        def applyDamage(damage):
+            Player.health -= damage
 
         def render():
             if Player.isPoisoned == False:
@@ -249,6 +253,29 @@ def level1():
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             screen.blit(self.image, adjustedRect)
 
+    class healthItem:
+        def __init__(self, worldPos):
+            self.image = pygame.Surface((30,30))
+            self.image.fill((222, 75, 151))
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = worldPos
+
+        def update(self):
+            #self.rect.center = Player.rect.center
+            #print(self.rect.x,self.rect.y,"updating")
+            
+            if self.rect.colliderect(Player.rect):
+                Player.health += 20
+                items.remove(self)
+                print("item collided")
+        
+        def render(self):
+            #print("rendering")
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            # Renders wall using modified rect
+            screen.blit(self.image, adjustedRect)
+
+                
 
     class Weapon:
         def __init__(self):
@@ -599,7 +626,7 @@ def level1():
             # Check if it hits anything
             if self.rect.colliderect(Player.rect):
                 # Do damage if it does
-                Player.health -= self.damage
+                Player.applyDamage(self.damage)
                 projectiles.remove(self)
 
         def render(self):
@@ -753,7 +780,7 @@ def level1():
                 Player.poisonCounter += 1
                 print("Player hit", Player.poisonCounter)
                 if hit == False:
-                    Player.health -= 4
+                    Player.applyDamage(4)
                 Player.isPoisoned = True
                 Player.applyPoison()
                 projectiles.remove(self)
@@ -784,7 +811,7 @@ def level1():
                 if distToPlayer < 50:
                     # Attack player
                     self.cooldown = 15 * fps
-                    Player.health -= self.damage
+                    Player.applyDamage(self.damage)
                 elif distToPlayer < 100:
                     self.invisibility = 100
                 elif distToPlayer < 200:# close 75
@@ -847,7 +874,7 @@ def level1():
             #Attacking
             
             if self.onCooldown == False:
-                print("attack")
+                #print("attack")
 
                 #fire projectile
                 dx = Player.rect.centerx - self.rect.x
@@ -950,7 +977,7 @@ def level1():
         def update(self):
             self.rect = self.rect.move(self.xSpeed, self.ySpeed)
             if self.rect.colliderect(Player.rect):
-                Player.health -= 5
+                Player.applyDamage(5)
                 projectiles.remove(self)
         def render(self):
             # Modifys the position based on the centered player position
@@ -982,40 +1009,10 @@ def level1():
         page = Wall((pageSize*i,h), pygame.image.load('Images\Ground.png'), (pageSize,h), 0)
         walls.append(page)
 
-    '''
-    for i in range(int(2700/5)):
-        h = 700
-        page = Wall((5*i,h), pygame.image.load('Images/Ground.png'), (5,h))
-        walls.append(page)
-    '''
-
     def saveMap():
         global walls
         print('saving')
-        '''
-        book = []
-        walls2 = []
-        for page in walls:
-            if book == []:
-                book.append(page)
-            else:
-                h0 = book[0].rect.h
-                h  = page.rect.h
-                y0 = book[0].rect.y
-                y  = page.rect.y
-                if h0 == h and y0 == y:
-                    book.append(page)
-                else:
-                    combinedPages = Wall(book[0].rect.topleft, pygame.image.load('Images/Ground.png'), (pageSize*len(book),h0))
-                    walls2.append(combinedPages)
-                    book = []
-                    book.append(page)
-                    
-        combinedPages = Wall(book[0].rect.topleft, pygame.image.load('Images/Ground.png'), (pageSize*len(book),h0))
-        walls2.append(combinedPages)
         
-        walls = walls2
-        '''
         # Preparing our data for saving
         out = ''
         for wall in walls:
@@ -1042,6 +1039,7 @@ def level1():
     projectiles = []
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
     midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
+    items = [healthItem((-1284, 919))]
 
     generatingMap = not loadFile
     editPageNum = len(walls)-1
@@ -1110,8 +1108,6 @@ def level1():
             for event in pygame.event.get(pygame.KEYDOWN):
                 if pygame.key.get_pressed()[pygame.K_g]:
                     gameState += 1
-                if pygame.key.get_pressed()[pygame.K_h]:
-                    Player.health = Player.maxHealth
                     
             #doubleHealth = 10
             if len(enemies) <= 0:
@@ -1142,6 +1138,9 @@ def level1():
 
             for enemy in enemies:
                 enemy.update()
+            
+            for item in items:
+                item.update()
             
             mousePos = pygame.mouse.get_pos()
             mousePosW = (mousePos[0] - Player.renderRect.centerx + Player.rect.centerx, mousePos[1] - Player.renderRect.centery + Player.rect.centery)
@@ -1193,6 +1192,9 @@ def level1():
             for decor in foreground:
                 decor.render()
 
+            for item in items:
+                item.render()
+
             for decor in midground:
                 decor.render()
 
@@ -1241,6 +1243,9 @@ def level1():
 
             #print(mousePos)
             pygame.display.flip()
+
+            if pygame.mouse.get_pressed(3)[0]:
+                print(mousePosW)
 
 if __name__ == "__main__":
     level1()
