@@ -3,7 +3,7 @@ def instructionsLoop():
     pygame.init()
     pygame.font.init()
 
-    size = width, height = 500, 500 
+    size = width, height = 750, 750 
 
     uiFont = pygame.font.Font(None, 80)
     screen = pygame.display.set_mode(size)

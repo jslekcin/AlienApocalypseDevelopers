@@ -16,7 +16,7 @@ def tutorialLoop():
 
     uiFont = pygame.font.Font(None, 32)
 
-    size = width, height = 500, 500 # TODO: Decide on final window size
+    size = width, height = 750, 750 # TODO: Decide on final window size
     screen = pygame.display.set_mode(size) 
     fps = 60
 
@@ -420,7 +420,7 @@ def tutorialLoop():
                 Small_img = pygame.transform.scale(self.image,(50, 45))
                 screen.blit(Small_img, adjustedRect)
             
-            if self.timer >= 10:
+            if self.timer >= 6:
                 screen.blit(self.image, adjustedRect)
                 self.timer = 0
     

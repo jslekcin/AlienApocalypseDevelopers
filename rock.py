@@ -18,7 +18,7 @@ screen = pygame.display.set_mode(size)
 fps = 60
 
 black = (0,0,0)
-background = pygame.image.load('Images/red_sky.png')
+background = pygame.image.load('Images/rock_sky.png')
 background = pygame.transform.scale(background, size)
 gameState = 1
 
@@ -492,7 +492,7 @@ class Wall:
         
 
 
-class UFO_Boss:
+class Rock_Boss:
     def __init__(self,worldPos,image,size):
         #self.rect = pygame.Rect(worldPos,size)
         
@@ -554,24 +554,43 @@ class UFO_Boss:
         #print(self.rect)
 
     def shoot(self):
-        if self.cooldown > 85:
+        if self.cooldown > 50:
             position =[self.position[0]+165, self.position[1]+140]
-            self.projectiles.append(UFO_laser(position, 1, 3, 90,"Images/beam.png", "beam"))
+            self.projectiles.append(Rock_projectile(position, 1, 3, 90,"Images/fireball.png", "fireball"))
 
             position =[self.position[0]+240, self.position[1]+120]
-            self.projectiles.append(UFO_laser(position, 1, 3, 0, "Images/beam.png", "beam"))
+            self.projectiles.append(Rock_projectile(position, 1, 3, 0, "Images/fireball.png", "fireball"))
 
             position =[self.position[0]+80, self.position[1]+120]
-            self.projectiles.append(UFO_laser(position, 1, 3, -60, "Images/beam.png", "beam"))
+            self.projectiles.append(Rock_projectile(position, 1, 3, -60, "Images/fireball.png", "fireball"))
+
+            position =[self.position[0]+80, self.position[1]+100]
+            self.projectiles.append(Rock_projectile(position, 1, 3, -60, "Images/fireball.png", "fireball"))
+
+            position =[self.position[0]+80, self.position[1]+140]
+            self.projectiles.append(Rock_projectile(position, 1, 3, -60, "Images/fireball.png", "fireball"))
+
+            position =[self.position[0]+240, self.position[1]+100]
+            self.projectiles.append(Rock_projectile(position, 1, 3, 0, "Images/fireball.png", "fireball"))
+
+            position =[self.position[0]+240, self.position[1]+140]
+            self.projectiles.append(Rock_projectile(position, 1, 3, 0, "Images/fireball.png", "fireball"))
+
+
+
+
+            
+
+            
 
 
             self.cooldown = 0
         else:
             self.cooldown += 1
         
-        if self.cooldown1 > 85:
+        if self.cooldown1 > 100000:
            position =[self.position[0]+170, self.position[1]+45]
-           self.projectiles.append(UFO_laser(position, 1, 3, 90, "Images/bomb.png", "bomb"))
+           self.projectiles.append(Rock_projectile(position, 1, 3, 90, "Images/meteor.png", "meteor"))
            self.cooldown1 = 0
         else:
             self.cooldown1 += 1
@@ -580,22 +599,22 @@ class UFO_Boss:
             laser.render()
             if laser.update(walls, self.projectiles):
                 
-                print("▲ removing bomb")
-                laser.image = pygame.image.load("Images/explosion.png")
+                
+                #laser.image = pygame.image.load("Images/explosion.png")
                 screen.blit(laser.image, laser.rect.center)
                 laser.dx = 0 
                 laser.dy = 0
                 laser.render()
-                self.projectiles.remove(laser)      
+                #self.projectiles.remove(fireball)      
         
         for projectile in self.projectiles:
             if projectile.rect.colliderect(Player.renderRect):
                 print("⊙ colliding")
-                if projectile.type == "beam":
+                if projectile.type == "fireball":
                     Player.health -= 15
-                    self.projectiles.remove(projectile)
+                    #self.projectiles.remove(projectile)
 
-                if projectile.type == "bomb":
+                if projectile.type == "meteor":
                    
                     Player.health -= 75
                     #self.projectiles.remove(projectile)
@@ -603,7 +622,7 @@ class UFO_Boss:
     
             
                 
-class UFO_laser:
+class Rock_projectile:
     def __init__(self, location, damage, speed, angle, image, type):
         self.image = pygame.image.load(image)
         self.type = type
@@ -657,29 +676,11 @@ class UFO_laser:
         screen.blit(self.image, self.rect.center)
         if self.exploded == True:
             self.explode()
-class LaserGunItem:
-    def __init__(self,worldPos,image,size):
-        #Laser Gun item
-        self.pos = worldPos
-        self.size = size
-        self.rect = pygame.Rect(self.pos,self.size)
-        self.image = pygame.transform.scale(image, self.size)
-        #self.rect = self.image.get_rect()
-        
-    
-    def update(self):
-        #print(self.rect)
-        self.rect.center = self.pos
-        if self.rect.colliderect(Player.rect):
-            Player.collected_laser_gun = True
 
     def render(self):
         #adjust position based on players position
         adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
         #render image
-        if Player.collected_laser_gun == False:
-            screen.blit(self.image, adjustedRect)
-
 
 pageSize = 10
 # Creates pagse for the player platform
@@ -707,7 +708,7 @@ def saveMap():
         
     print(out)
     # Exporting to json file
-    file = open("bossMap.txt", "w")
+    file = open("rock.txt", "w")
     file.write(out)
     file.close()
 
@@ -715,10 +716,9 @@ def saveMap():
 enemies = []
 projectiles = []
 boss_projectiles = []
-boss = UFO_Boss((-360, 650), pygame.image.load('Images/UFO.png'), (400, 200))
-item = LaserGunItem((-360, 850),pygame.image.load("Images/LaserGatlingGunv2(right).png"),(120,140))
-foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
-midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
+boss = Rock_Boss((-360, 650), pygame.image.load('Images/blob.png'), (45, 45))
+#foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
+#midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
 
 generatingMap = not loadFile
 editPageNum = len(walls)-1
@@ -736,7 +736,7 @@ blockImageIndex = 0
 
 if loadFile:
     walls = []
-    file = open("bossMap.txt", "r")
+    file = open("rock.txt", "r")
     fileData = file.read().split('\n')
     file.close()
     for line in fileData:
@@ -807,7 +807,7 @@ while 1:
     # update
     Player.update()
 
-    item.update()
+    
 
     for wall in walls:
         wall.update()
@@ -825,11 +825,11 @@ while 1:
     for wall in walls:
         wall.render()
 
-    for decor in foreground:
-        decor.render()
+    #for decor in foreground:
+        #decor.render()
           
-    for decor in midground:
-        decor.render()
+    #for decor in midground:
+        #decor.render()
 
     for projectile in projectiles:
         
@@ -841,14 +841,14 @@ while 1:
     for projectile in boss.projectiles:
         time_left = projectile.time_decrease()        
         
-        if time_left <= 0 and projectile.type == "laser":
+        if time_left <= 0 and projectile.type == "fireball":
             boss.projectiles.remove(projectile)
-        if time_left <= 0 and projectile.type =="bomb":
+        if time_left <= 0 and projectile.type =="meteor":
             projectile.exploded = True
             if projectile.explosion_timer <=0:
                 boss.projectiles.remove(projectile)
 
-    item.render()
+    
 
     Player.render()
     
@@ -871,8 +871,8 @@ while 1:
     staminaText = uiFont.render(f'{Player.stamina} / {Player.maxStamina}', True, (255, 255, 255))
     screen.blit(staminaText, (250 - staminaText.get_width() / 2,40))
     # Draw Boss Health
-    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,65,200,30))
-    pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,65,boss.health / boss.maxHealth * 200,30))
+    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,65,300,50))
+    pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,65,boss.health / boss.maxHealth * 300,50))
     bossHealthText = uiFont.render(f'{boss.health} / {boss.maxHealth}', True, (255, 255, 255))
     screen.blit(bossHealthText, (250 - bossHealthText.get_width() / 2,70))
 

@@ -11,7 +11,7 @@ pygame.mixer.init()
 
 uiFont = pygame.font.Font(None, 32)
 
-size = width, height = 500, 500 # TODO: Decide on final window size
+size = width, height = 750, 750 # TODO: Decide on final window size
 screen = pygame.display.set_mode(size) 
 fps = 60
 
@@ -269,7 +269,7 @@ for i in range(int(70/pageSize)):
     page = Wall((pageSize*i,h), pygame.image.load('Images\Ground.png'), (pageSize,h), 0)
     walls.append(page)
 
-map = "chrisTutorial.txt"
+map = "rock.txt"
 
 def saveMap():
     global walls

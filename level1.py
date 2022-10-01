@@ -15,7 +15,7 @@ def level1():
 
     uiFont = pygame.font.Font(None, 32)
 
-    size = width, height = 500, 500 # TODO: Decide on final window size
+    size = width, height = 750, 750 # TODO: Decide on final window size
     screen = pygame.display.set_mode(size) 
     fps = 60
 
