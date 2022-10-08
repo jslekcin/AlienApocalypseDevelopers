@@ -861,17 +861,17 @@ while 1:
     
 
     # Draw Health Bar
-    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,5,200,30))
+    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,5,200,50))
     pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,5,Player.health / Player.maxHealth * 200,30))
     hpText = uiFont.render(f'{Player.health} / 100', True, (255, 255, 255))
     screen.blit(hpText, (250 - hpText.get_width() / 2,10))
     # Draw Stamina Bar
-    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,35,200,30))
-    pygame.draw.rect(screen, (0,0,255), pygame.Rect(150,35,Player.stamina / Player.maxStamina * 200,30))
+    pygame.draw.rect(screen, (0,0,0), pygame.Rect(450,4,200,30))
+    pygame.draw.rect(screen, (0,0,255), pygame.Rect(150,4,Player.stamina / Player.maxStamina * 200,30))
     staminaText = uiFont.render(f'{Player.stamina} / {Player.maxStamina}', True, (255, 255, 255))
     screen.blit(staminaText, (250 - staminaText.get_width() / 2,40))
     # Draw Boss Health
-    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,65,300,50))
+    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,65,500,50))
     pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,65,boss.health / boss.maxHealth * 300,50))
     bossHealthText = uiFont.render(f'{boss.health} / {boss.maxHealth}', True, (255, 255, 255))
     screen.blit(bossHealthText, (250 - bossHealthText.get_width() / 2,70))
