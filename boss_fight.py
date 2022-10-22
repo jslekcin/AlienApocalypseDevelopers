@@ -182,6 +182,9 @@ class Player:
 
         Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
+    def applyDamage(damage):
+            Player.health -= damage
+
     def render():
         if Player.isPoisned == False:
             screen.blit(Player.image, Player.renderRect)
@@ -412,7 +415,10 @@ class LaserBullet:
     def update(self):
         self.rect = self.rect.move(self.xSpeed, self.ySpeed)
         adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
-        collide = pygame.Rect.colliderect(adjustedRect,boss.rect)
+
+        boss_adjustedRect = boss.rect.move(-Player.rect[0] + Player.renderRect[0] + 65, -Player.rect[1] + Player.renderRect[1] + 30)
+
+        collide = pygame.Rect.colliderect(adjustedRect,boss_adjustedRect)
         if collide:
             boss.health -= 1
             projectiles.remove(self)
@@ -497,39 +503,43 @@ class UFO_Boss:
         #self.rect = pygame.Rect(worldPos,size)
         
         self.worldPos = worldPos
-        self.speed =   0
+        self.speed = 7
         self.size = size
         self.image = pygame.transform.scale(image, self.size)
         self.rect = self.image.get_rect()
         self.maxHealth = 50
         self.health = self.maxHealth
         self.damage = 5
-        self.position = [Player.renderRect.center[0]-160, Player.renderRect.center[1]-215]
-        self.rect.center = self.position
+        #self.position = [Player.renderRect.center[0]-160, Player.renderRect.center[1]-215]
+        #self.rect.center = self.position
         self.cooldown = -60
         self.cooldown1 = -30
         self.projectiles = []
-        self.speedtime = -60
+        #self.speedtime = -60
+        self.rect.centerx = Player.rect.centerx
+        self.facingRight = True
         
         
-        if self.speed == 0:
+        """if self.speed == 0:
             self.speed = random.randint(-5, 5)
 
         if self.speedtime > 85:
             self.speed = random.randint(-5, 2)
             self.speedtime = -60
         else:
-            self.speedtime =+ 1
+            self.speedtime =+ 1"""
 
     def render(self):
-        screen.blit(self.image, self.position)
+        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        screen.blit(self.image, adjustedRect)
 
     def move(self):
         #self.rect = self.image.get_rect()
         
         #speed = random.randint(-5, 5)
+        
 
-        self.position[0] += self.speed
+        """self.position[0] += self.speed
         
         player_center = [-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]]
 
@@ -543,11 +553,58 @@ class UFO_Boss:
 
             self.position[0] = player_center[0]-400
 
-            self.speed = -self.speed
+            self.speed = -self.speed"""
+        
+        playerRightRect = pygame.Rect(Player.rect.x+100,Player.rect.centery-200,75,75)
+        playerRightRect.centerx, playerRightRect.centery = Player.renderRect.centerx + 400, Player.renderRect.centery - 170
+        
+
+        playerLeftRect = pygame.Rect(Player.rect.x+100,Player.rect.centery-200,75,75)
+        playerLeftRect.centerx, playerLeftRect.centery = Player.renderRect.centerx - 400, Player.renderRect.centery - 170
+               
+        
+        self.rect.x += self.speed
+
+        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0] + 65, -Player.rect[1] + Player.renderRect[1] + 30)
+        player_adjustedRect = Player.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+
+        
+        #pygame.draw.rect(screen,(0,255,0),adjustedRect)
+        #pygame.draw.rect(screen,(5,0,250),self.rect)
+        #pygame.draw.rect(screen,(0,255,0),Player.renderRect)
+        #pygame.draw.rect(screen,(255,255,255),Player.rect)
+        print(Player.rect.x,Player.rect.y)
+
+        #green = player render rect, blue = boss rect, red = boss adjusted rect, black = player left and right rect, white = player.rect
+
+        if self.facingRight:
+            pygame.draw.rect(screen,(0,0,0),playerRightRect)
+
+        else:
+            pygame.draw.rect(screen,(0,0,0),playerLeftRect) 
+
+
+        if adjustedRect.colliderect(playerRightRect) and self.facingRight:
+            self.speed = -1 * (abs(self.speed))
+            self.facingRight = False
+            
+            #print("right rect collided")
+        
+        if adjustedRect.colliderect(playerLeftRect) and self.facingRight == False:
+            self.speed = abs(self.speed)
+            self.facingRight = True
+            
+            #print("left rect collided")
+
+        """if adjustedRect.x > Player.renderRect.centerx + 50:
+            self.speed = -abs(self.speed)
+        
+        if adjustedRect.x < Player.renderRect.centerx - 50:
+            self.speed = abs(self.speed)"""
 
     def update(self):
-        self.rect.x = self.position[0] + 65
-        self.rect.y = self.position[1] + 30
+        #self.rect.centerx = Player.rect.centerx
+        self.rect.centery = Player.rect.centery - 200
         self.rect.w = 205
         self.rect.h = 120
         #pygame.draw.rect(screen,(255,255,255),self.rect)
@@ -555,13 +612,13 @@ class UFO_Boss:
 
     def shoot(self):
         if self.cooldown > 85:
-            position =[self.position[0]+165, self.position[1]+140]
+            position =[self.rect.x+165, self.rect.y+140]
             self.projectiles.append(UFO_laser(position, 1, 3, 90,"Images/beam.png", "beam"))
 
-            position =[self.position[0]+240, self.position[1]+120]
+            position =[self.rect.x+240, self.rect.y+120]
             self.projectiles.append(UFO_laser(position, 1, 3, 0, "Images/beam.png", "beam"))
 
-            position =[self.position[0]+80, self.position[1]+120]
+            position =[self.rect.x+80, self.rect.y+120]
             self.projectiles.append(UFO_laser(position, 1, 3, -60, "Images/beam.png", "beam"))
 
 
@@ -570,7 +627,7 @@ class UFO_Boss:
             self.cooldown += 1
         
         if self.cooldown1 > 85:
-           position =[self.position[0]+170, self.position[1]+45]
+           position = [self.rect.x+170, self.rect.y+45]
            self.projectiles.append(UFO_laser(position, 1, 3, 90, "Images/bomb.png", "bomb"))
            self.cooldown1 = 0
         else:
@@ -592,13 +649,13 @@ class UFO_Boss:
             if projectile.rect.colliderect(Player.renderRect):
                 print("⊙ colliding")
                 if projectile.type == "beam":
-                    Player.health -= 15
+                    Player.applyDamage(15)
                     self.projectiles.remove(projectile)
 
                 if projectile.type == "bomb":
                    
-                    Player.health -= 75
-                    #self.projectiles.remove(projectile)
+                    Player.applyDamage(75)
+                    self.projectiles.remove(projectile)
 
     
             
@@ -654,7 +711,8 @@ class UFO_laser:
 
     
     def render(self):
-        screen.blit(self.image, self.rect.center)
+        adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+        screen.blit(self.image, adjustedRect)
         if self.exploded == True:
             self.explode()
 class LaserGunItem:
@@ -853,7 +911,7 @@ while 1:
     Player.render()
     
 
-    boss.shoot()
+    #boss.shoot()
     boss.update()
     boss.move()
     boss.render()
