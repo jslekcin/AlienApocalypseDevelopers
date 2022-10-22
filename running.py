@@ -5,8 +5,9 @@ import main_menu
 import death_screen
 import intructions
 import tutorial
+import boss_fight
 
-level = "main_menu"
+level = "level1"
 prev_level = ""
 
 while level != "quit":
@@ -24,6 +25,9 @@ while level != "quit":
     
     if level == "tutorial":
         level = tutorial.tutorialLoop()
+    
+    if level == "boss_fight":
+        level = boss_fight.boss_fight_loop()
 
     for event in pygame.event.get():
             if event.type == Event_system.On_Death:

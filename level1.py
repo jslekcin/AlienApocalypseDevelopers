@@ -1,3 +1,4 @@
+from re import L
 import sys, pygame, math, random
 from pygame.constants import K_2
 
@@ -247,7 +248,7 @@ def level1():
             elif Player.portalPlaced == True:
                 if self.rect.colliderect(Player.rect):
                     print("collided")
-                    import boss_fight
+                    return "boss_fight"
 
         def render(self):
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
@@ -1073,17 +1074,32 @@ def level1():
 
     doubleHealth = 10
     level = 1
+    paused = False
 
     while 1:
+        """if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+            paused = not paused"""
+
+        
+
         # The Great Clock #3
         deltaTime = clock.tick(fps)
 
 
         # Inputs Processing Code
-        for event in pygame.event.get(pygame.QUIT):
-            pygame.quit()
-            sys.exit
-            break
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit
+                break
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    paused = not paused
+                
+
+        if paused:
+            continue
 
         # Main Menu
         if gameState == 0:
@@ -1125,7 +1141,8 @@ def level1():
             Player.update()
 
 
-            portal.update()
+            if portal.update() == "boss_fight":
+                return "boss_fight"
 
             for gem in gems:
                 gem.update()
@@ -1216,6 +1233,8 @@ def level1():
             if Player.health <= 0:
                 pygame.event.post(pygame.event.Event(Event_system.On_Death))
                 return "level1"
+
+            
             
             # Draw Health Bar
             pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,5,200,30))
