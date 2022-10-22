@@ -283,7 +283,7 @@ def level1():
             self.name = 'None'
 
         def attack(self):
-            print("Attacking with weapon")
+            pass
 
         def render(self):
             pass
@@ -377,14 +377,25 @@ def level1():
             self.image.fill((70,70,70))
             self.rect = self.image.get_rect()
             self.rect.center = Player.rect.center
+            self.deathTimer = 120
             
         def update(self):
             self.rect = self.rect.move(self.xSpeed, self.ySpeed)
+            for wall in walls:
+                if self.rect.colliderect(wall.rect):
+                    projectiles.remove(self)
+                    return
+
             for enemy in enemies:
                 if self.rect.colliderect(enemy.rect):
                     enemy.health -= 5
                     projectiles.remove(self)
                     return
+                
+            self.deathTimer -= 1
+            if self.deathTimer < 1:
+                projectiles.remove(self)
+                print("disappear")
         def render(self):
             # Modifys the position based on the centered player position
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
@@ -428,7 +439,7 @@ def level1():
                 #pass
                 screen.blit(self.image, (Player.renderRect.centerx-85, Player.renderRect.centery-80))
 
-    Player.weapon = Bat()
+    Player.weapon = Weapon()
     walls = []
     class Wall:
         def __init__(self, worldPos, image, size, imageIndex): 
@@ -1263,8 +1274,8 @@ def level1():
             #print(mousePos)
             pygame.display.flip()
 
-            if pygame.mouse.get_pressed(3)[0]:
-                print(mousePosW)
+            # if pygame.mouse.get_pressed(3)[0]:
+            #     print(mousePosW)
 
 if __name__ == "__main__":
     level1()
