@@ -199,7 +199,7 @@ def boss_fight_loop():
             self.name = 'None'
 
         def attack(self):
-            print("Attacking with weapon")
+            pass
 
         def render(self):
             pass
@@ -465,9 +465,9 @@ def boss_fight_loop():
 
             # See if it collides with enemies and if it does, damages it
             for enemy in enemies:
-                if attackBox.colliderect(enemy.rect):12
-                enemy.health -= self.damage
-                print("Bat has hit")
+                if attackBox.colliderect(enemy.rect):
+                    enemy.health -= self.damage
+                    print("Bat has hit")
 
             Player.attackCooldown = self.attackSpeed * fps
 
@@ -480,7 +480,7 @@ def boss_fight_loop():
                 #pass
                 screen.blit(self.image, (Player.renderRect.centerx-85, Player.renderRect.centery-80))
 
-    Player.weapon = Bat()
+    Player.weapon = Weapon()
     walls = []
     class Wall:
         def __init__(self, worldPos, image, size, imageIndex): 
