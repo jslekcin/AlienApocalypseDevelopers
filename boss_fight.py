@@ -291,22 +291,23 @@ def boss_fight_loop():
             self.image.fill((70,70,70))
             self.rect = self.image.get_rect()
             self.rect.center = Player.rect.center
+            self.deathTimer = 120
             
         def update(self):
             self.rect = self.rect.move(self.xSpeed, self.ySpeed)
+            for wall in walls:
+                if self.rect.colliderect(wall.rect):
+                    projectiles.remove(self)
+                    return
+
             for enemy in enemies:
                 if self.rect.colliderect(enemy.rect):
                     enemy.health -= 5
                     projectiles.remove(self)
                     return
-            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
-            range_rect = pygame.Rect((0,0),(500,500))
-            range_rect.center = Player.renderRect.center
-            bullet_range = pygame.Rect.colliderect(adjustedRect,range_rect)
-
-            if bullet_range:
-                pass
-            else:
+            
+            self.deathTimer -= 1
+            if self.deathTimer < 1:
                 projectiles.remove(self)
                 
             
