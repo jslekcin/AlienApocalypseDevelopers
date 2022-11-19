@@ -210,10 +210,10 @@ def level1():
                     Player.poisonCounter = 0
                 
 
-            if pygame.key.get_pressed()[pygame.K_p] and Player.alien_gems >= 5 and Player.portalPlaced == False:
+            """if pygame.key.get_pressed()[pygame.K_p] and Player.alien_gems >= 5 and Player.portalPlaced == False:
                 Player.portalPlaced = True
                 print("portal placed")
-                Player.alien_gems -= 5
+                Player.alien_gems -= 5"""
 
 
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
@@ -235,11 +235,10 @@ def level1():
 
     class Portal:
         def __init__(self):
-            self.image = pygame.image.load("Images/BossFightPortal.png")
-            self.image = pygame.transform.scale(self.image, (100,75))
+            self.image = self.assignImage()
             self.rect = self.image.get_rect()
-            self.rect.bottom = Player.rect.bottom
-            self.rect[0] = Player.rect[0] - 150
+            #self.rect.bottom = Player.rect.bottom
+            #self.rect[0] = Player.rect[0] - 150
 
         def update(self):
             if Player.portalPlaced == False:
@@ -248,11 +247,52 @@ def level1():
             elif Player.portalPlaced == True:
                 if self.rect.colliderect(Player.rect):
                     print("collided")
-                    return "boss_fight"
+                
+
+        def assignImage(self):
+            pass
 
         def render(self):
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             screen.blit(self.image, adjustedRect)
+
+    class UFO_Portal(Portal):
+        def __init__(self):
+            super().__init__()
+            self.rect = pygame.Rect(-744, 755, 460, 225)
+            self.activated = False
+
+        def update(self):
+            """if Player.portalPlaced == False:
+                self.rect.bottom = Player.rect.bottom
+                self.rect[0] = Player.rect[0] - 150
+            elif Player.portalPlaced == True:
+                if self.rect.colliderect(Player.rect):
+                    print("collided")"""
+        
+            if self.rect.colliderect(Player.rect):
+                if self.activated:
+                    return "boss_fight"
+                if pygame.key.get_pressed()[pygame.K_f] and Player.alien_gems >= 5 and self.activated == False:
+                        print("The Portal Has Been Summoned")
+                        self.image = self.assignImage()
+                        self.rect = self.image.get_rect()
+                        self.rect[0], self.rect[1] = -570, 790
+                        self.activated = True
+                        Player.alien_gems -= 5
+            
+        def assignImage(self):
+            image = pygame.image.load("Images/BossFightPortal2.png")
+            image = pygame.transform.scale(image, (115,35))
+            return image
+
+        def render(self):
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            if self.activated:
+                screen.blit(self.image, adjustedRect)
+                #pygame.draw.rect(screen, (0, 0, 0), adjustedRect)
+
+
 
     class healthItem:
         def __init__(self, worldPos):
@@ -1046,8 +1086,8 @@ def level1():
 
     # worldPos, image, sized )
     gems = []
-    portal = Portal()
-    enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100)),FlyingAilenEnemy((-1126, 818),pygame.image.load('Images\Ailen.png'), (100,100))]
+    ufoPortal = UFO_Portal()
+    enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-980, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100)),FlyingAilenEnemy((-1126, 818),pygame.image.load('Images\Ailen.png'), (100,100))]
     projectiles = []
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
     midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
@@ -1087,6 +1127,9 @@ def level1():
     level = 1
     paused = False
 
+    portalRect = pygame.Rect(-744, 755, 460, 225)
+    portalAdjustedRect = portalRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+
     while 1:
         """if pygame.key.get_pressed()[pygame.K_ESCAPE]:
             paused = not paused"""
@@ -1107,6 +1150,9 @@ def level1():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     paused = not paused
+                if event.key == pygame.K_p:
+                    Player.rect.center = 0,0
+                    Player.ySpeed, Player.xSpeed = 0, 0
                 
 
         if paused:
@@ -1135,6 +1181,7 @@ def level1():
             for event in pygame.event.get(pygame.KEYDOWN):
                 if pygame.key.get_pressed()[pygame.K_g]:
                     gameState += 1
+                
                     
             #doubleHealth = 10
             if len(enemies) <= 0:
@@ -1148,11 +1195,14 @@ def level1():
 
             #draw player renderrect
             pygame.draw.rect(screen,(0,255,0),Player.renderRect)
+
+            portalAdjustedRect = portalRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            #pygame.draw.rect(screen, (0,0,0),portalAdjustedRect)
             # update
             Player.update()
 
 
-            if portal.update() == "boss_fight":
+            if ufoPortal.update() == "boss_fight":
                 return "boss_fight"
 
             for gem in gems:
@@ -1175,7 +1225,8 @@ def level1():
             
             """if pygame.mouse.get_pressed(3)[0]:
                 print(mousePosW)"""
-                
+            
+
 
             if generatingMap:
                 if pygame.mouse.get_pressed(3)[0]:
@@ -1236,8 +1287,8 @@ def level1():
             for gem in gems:
                 gem.render()
 
-            if Player.portalPlaced:
-                portal.render()
+            #if Player.portalPlaced:
+            ufoPortal.render()
 
             Player.render()
 
@@ -1250,7 +1301,7 @@ def level1():
             # Draw Health Bar
             pygame.draw.rect(screen, (0,0,0), pygame.Rect(170,1,200,30))
             pygame.draw.rect(screen, (255,0,0), pygame.Rect(170,1,Player.health / Player.maxHealth * 200,30))
-            hpText = uiFont.render(f'{Player.health} / 100', True, (255, 255, 255))
+            hpText = uiFont.render(f'{Player.health:0.2f} / 100', True, (255, 255, 255))
             screen.blit(hpText, (250 - hpText.get_width() / 2,7))
             # Draw Stamina Bar
             pygame.draw.rect(screen, (0,0,0), pygame.Rect(372,1,200,30))
@@ -1274,8 +1325,8 @@ def level1():
             #print(mousePos)
             pygame.display.flip()
 
-            # if pygame.mouse.get_pressed(3)[0]:
-            #     print(mousePosW)
+            if pygame.mouse.get_pressed(3)[0]:
+                print(mousePosW)
 
 if __name__ == "__main__":
     level1()

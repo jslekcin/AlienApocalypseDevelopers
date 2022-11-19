@@ -582,12 +582,6 @@ def boss_fight_loop():
 
             #green = player render rect, blue = boss rect, red = boss adjusted rect, black = player left and right rect, white = player.rect
 
-            if self.facingRight:
-                pygame.draw.rect(screen,(0,0,0),playerRightRect)
-
-            else:
-                pygame.draw.rect(screen,(0,0,0),playerLeftRect) 
-
 
             if adjustedRect.colliderect(playerRightRect) and self.facingRight:
                 self.speed = -1 * (abs(self.speed))
