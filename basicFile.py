@@ -300,13 +300,17 @@ editPageNum = len(walls)-1
 editCooldown = 0
 
 tileSize = 25
-blockImages = [pygame.image.load('Images\Ground.png'), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('Images\stone.PNG')]
-blockImages[1].fill((255,255,255))
-blockImages[2].fill((255,0,0))
-blockImages[3].fill((0,255,0))
-blockImages[4].fill((0,0,255))  
-blockImages[5].fill((0,0,0))
-print(blockImages[1])
+blockImagesAll = [pygame.image.load('Images\Ground.png'), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('Images\stone.PNG'), pygame.image.load('Images/poison_grass.png')]
+blockImagesAll[1].fill((255,255,255))
+blockImagesAll[2].fill((255,0,0))
+blockImagesAll[3].fill((0,255,0))
+blockImagesAll[4].fill((0,0,255))  
+blockImagesAll[5].fill((0,0,0))
+
+blockImages = [pygame.image.load('Images\stone.PNG'), pygame.image.load('Images/poison_grass.png')]
+
+blockIndexs = [6, 7]
+
 blockImageIndex = 0
 
 if loadFile:
@@ -318,7 +322,7 @@ if loadFile:
         if line == '':
             break
         line = line.split()
-        wall = Wall((int(line[0]),int(line[1])), blockImages[int(line[4])], (int(line[2]),int(line[3])), int(line[4]))
+        wall = Wall((int(line[0]),int(line[1])), blockImagesAll[int(line[4])], (int(line[2]),int(line[3])), int(line[4]))
         walls.append(wall)
 
 clock = pygame.time.Clock()
@@ -348,7 +352,7 @@ while 1:
                         emptySpot = False
                         break
                 if emptySpot == True:
-                    tile = Wall((tile[0]*25,tile[1]*25), blockImages[blockImageIndex], (25,25), blockImageIndex)
+                    tile = Wall((tile[0]*25,tile[1]*25), blockImages[blockImageIndex], (25,25), blockIndexs[blockImageIndex])
                     walls.append(tile)
 
             if pygame.mouse.get_pressed(3)[2]:
