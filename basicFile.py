@@ -269,7 +269,7 @@ for i in range(int(70/pageSize)):
     page = Wall((pageSize*i,h), pygame.image.load('Images\Ground.png'), (pageSize,h), 0)
     walls.append(page)
 
-map = "map.txt"
+map = "poison.txt"
 
 def saveMap():
     global walls
@@ -300,16 +300,16 @@ editPageNum = len(walls)-1
 editCooldown = 0
 
 tileSize = 25
-blockImagesAll = [pygame.image.load('Images\Ground.png'), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('Images\stone.PNG'), pygame.image.load('Images/poison_grass.png')]
+blockImagesAll = [pygame.image.load('Images\Ground.png'), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('Images\stone.PNG'), pygame.image.load('Images/pg.png'), pygame.image.load('Images/poison.png'), pygame.image.load('Images/ps.png')]
 blockImagesAll[1].fill((255,255,255))
 blockImagesAll[2].fill((255,0,0))
 blockImagesAll[3].fill((0,255,0))
 blockImagesAll[4].fill((0,0,255))  
 blockImagesAll[5].fill((0,0,0))
 
-blockImages = [pygame.image.load('Images\stone.PNG'), pygame.image.load('Images/poison_grass.png')]
+blockImages = [pygame.image.load('Images\stone.PNG'), pygame.image.load('Images/pg.png'), pygame.image.load('Images/poison.png'), pygame.image.load('Images/ps.png')]
 
-blockIndexs = [6, 7]
+blockIndexs = [6, 7, 8, 9]
 
 blockImageIndex = 0
 
