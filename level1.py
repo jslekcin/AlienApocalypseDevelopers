@@ -3,6 +3,7 @@ import sys, pygame, math, random
 from pygame.constants import K_2
 
 from event_system import Event_system
+from player_save import Save
 
 
 def level1():
@@ -31,9 +32,9 @@ def level1():
         # Loads image and creates a rect out of it
         image = pygame.image.load("Images\player.png") 
         poisonImage = pygame.image.load("Images\Posioned Player.PNG")
-        rect = image.get_rect()
+        rect = image.get_rect(center = Save.starting_pos)
         # Creates a static rect to display in the center of the screen
-        renderRect = image.get_rect()
+        renderRect = image.get_rect(center = Save.starting_pos)
         renderRect.center = (width/2, height/2)
         # Create movement variables
         xAcceleration = .1 # Running speed
@@ -59,7 +60,6 @@ def level1():
         poisonCounter = 0
         # Equipment
         weapon = None
-        alien_gems = 5
         attackCooldown = 0
         
 
@@ -187,12 +187,14 @@ def level1():
             Player.ySpeed += Player.yAcceleration
 
             #Weapon changing function
-            if pygame.key.get_pressed()[pygame.K_1]:
+            if pygame.key.get_pressed()[pygame.K_1] and Save.weapons["Bat"]:
                 Player.weapon = Bat()
             elif pygame.key.get_pressed()[pygame.K_2]:
                 Player.weapon = Gun()
             elif pygame.key.get_pressed()[pygame.K_3]:
                 Player.weapon = Sword()
+            elif pygame.key.get_pressed()[pygame.K_4] and Save.weapons["LaserGun"]:
+                Player.weapon = LaserGun()
 
             # Attack if player clicks
             if Player.attackCooldown > 0:
@@ -210,10 +212,10 @@ def level1():
                     Player.poisonCounter = 0
                 
 
-            """if pygame.key.get_pressed()[pygame.K_p] and Player.alien_gems >= 5 and Player.portalPlaced == False:
+            """if pygame.key.get_pressed()[pygame.K_p] and Save.gems[0] >= 5 and Player.portalPlaced == False:
                 Player.portalPlaced = True
                 print("portal placed")
-                Player.alien_gems -= 5"""
+                Save.gems[0] -= 5"""
 
 
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
@@ -259,8 +261,14 @@ def level1():
     class UFO_Portal(Portal):
         def __init__(self):
             super().__init__()
-            self.rect = pygame.Rect(-744, 755, 460, 225)
-            self.activated = False
+            if Save.portal_activated[0] == False:
+                self.rect = pygame.Rect(-744, 755, 460, 225)
+                
+            else:
+                self.text = False
+                self.image = self.assignImage()
+                self.rect = self.image.get_rect()
+                self.rect[0], self.rect[1] = -570, 790
 
         def update(self):
             """if Player.portalPlaced == False:
@@ -271,15 +279,19 @@ def level1():
                     print("collided")"""
         
             if self.rect.colliderect(Player.rect):
-                if self.activated:
+                self.text = True
+                if Save.portal_activated[0]:
+                    Save.starting_pos = 0, 0
                     return "boss_fight"
-                if pygame.key.get_pressed()[pygame.K_f] and Player.alien_gems >= 5 and self.activated == False:
+                if pygame.key.get_pressed()[pygame.K_f] and Save.gems[0] >= 5 and Save.portal_activated[0] == False:
                         print("The Portal Has Been Summoned")
                         self.image = self.assignImage()
                         self.rect = self.image.get_rect()
                         self.rect[0], self.rect[1] = -570, 790
-                        self.activated = True
-                        Player.alien_gems -= 5
+                        Save.portal_activated[0] = True
+                        Save.gems[0] -= 5
+            else:
+                self.text = False
             
         def assignImage(self):
             image = pygame.image.load("Images/BossFightPortal2.png")
@@ -288,10 +300,31 @@ def level1():
 
         def render(self):
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
-            if self.activated:
+            if Save.portal_activated[0]:
                 screen.blit(self.image, adjustedRect)
                 #pygame.draw.rect(screen, (0, 0, 0), adjustedRect)
 
+    class Poison_Portal(Portal):
+        def __init__(self):
+            super().__init__()
+            self.rect.topleft = (2600, 710)
+
+        def update(self):
+            if self.rect.colliderect(Player.rect) and Save.boss_defeated[0]:
+                print("collided")
+            
+        def assignImage(self):
+            if Save.boss_defeated[0]:
+                image = pygame.image.load("Images/PoisonPortal.png")
+            else:
+                image = pygame.image.load("Images/PoisonPortalEmpty.png")
+            image = pygame.transform.scale(image, (192,192))
+            return image
+
+        def render(self):
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            screen.blit(self.image, adjustedRect)
+                #pygame.draw.rect(screen, (0, 0, 0), adjustedRect)
 
 
     class healthItem:
@@ -358,7 +391,6 @@ def level1():
             elif mousePos[0] < Player.renderRect.centerx:
                 #pass
                 screen.blit(self.image_left, (Player.renderRect.centerx-78, Player.renderRect.centery-80))
-
 
     class Gun(Weapon):
         def __init__(self):
@@ -428,7 +460,7 @@ def level1():
 
             for enemy in enemies:
                 if self.rect.colliderect(enemy.rect):
-                    enemy.health -= 5
+                    enemy.health -= 3
                     projectiles.remove(self)
                     return
                 
@@ -441,6 +473,131 @@ def level1():
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             # Renders wall using modified rect
             screen.blit(self.image, adjustedRect)
+
+    class LaserGun(Weapon):
+        def __init__(self):
+            self.name = 'LaserGatlingGun'
+            mousePos = pygame.mouse.get_pos()
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            rel_x, rel_y = mouse_x - Player.renderRect.centerx-85, mouse_y - Player.renderRect.centerx-35
+            self.angle = 0
+            self.scale = 1
+            self.image_angle = math.atan2(rel_y, rel_x)
+            self.image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+            self.center = (0,0)
+            self.renderImage = pygame.image.load("Images/LaserGatlingGunv2(left).png")
+            
+            #left
+            self.image_left = pygame.image.load("Images/LaserGatlingGunv2(left).png")
+            self.image_left = pygame.transform.scale(self.image_left, (120,140))
+            self.renderImage = pygame.transform.rotozoom(self.image_left, self.angle, self.scale)
+            """self.new_rect = self.new_image_left.get_rect()
+            self.center=[self.new_rect_left.centerx,self.new_rect_left.centery]"""#center
+            
+            
+            #right
+            
+            self.image_right = pygame.image.load("Images/LaserGatlingGunv2(right).png")
+            self.image_right = pygame.transform.scale(self.image_right, (120,140))
+            self.renderImage = pygame.transform.rotozoom(self.image_right, self.angle, self.scale)
+            """self.new_rect_right = self.new_image_right.get_rect()
+            self.center=[self.new_rect_right.centerx,self.new_rect_right.centery]"""#center
+            
+
+            #self.rotated_image_right = pygame.transform.rotate(self.image_right, int(image_angle))
+            #self.rect_right = self.image_right.get_rect()#center=(self.rotated_image_right[0], self.rotated_image_right[1])\
+            #self.rect_right.center = [self.rotated_image_right[0], self.rotated_image_right[1]]
+
+            #self.rotated_image_right = pygame.transform.rotate(self.image_right, self.angle)
+            #self.rotated_rect_right = self.rotated_image_right.get_rect(center = self.image_right.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)
+
+            self.damage = 1
+            self.attackSpeed = 0.2
+            self.projectileSpeed = 20
+        def attack(self):
+
+            mousePos = pygame.mouse.get_pos()
+            dx = mousePos[0] - Player.renderRect.centerx
+            dy = mousePos[1] - Player.renderRect.centery
+            if dx == 0:
+                dx = .001
+            angle = math.atan(dy/dx)
+            if dx < 0:
+                angle += math.pi
+            
+            xSpeed = self.projectileSpeed * math.cos(angle)
+            ySpeed = self.projectileSpeed * math.sin(angle)
+            projectiles.append(LaserBullet(xSpeed, ySpeed))
+            Player.attackCooldown = self.attackSpeed * fps
+        def render(self):
+            mousePos = pygame.mouse.get_pos()
+            dx = mousePos[0] - Player.renderRect.centerx
+            dy = mousePos[1] - Player.renderRect.centery
+            if dx == 0:
+                dx = .001
+            angle = math.atan(dy/dx)
+            if dx < 0:
+                angle += math.pi
+            #image_angle = math.atan(mousePos[1]/mousePos[0])
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            
+            #print(image_angle)
+            if mousePos[0] >= Player.renderRect.centerx:
+                rel_x, rel_y = mouse_x - Player.renderRect.centerx-35, mouse_y - Player.renderRect.centerx-35
+                self.image_angle = math.atan2(rel_y, rel_x)
+                self.image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+
+                self.renderImage = pygame.transform.rotozoom(self.image_right, self.image_angle, self.scale)
+                screen.blit(self.renderImage, (Player.renderRect.centerx-35, Player.renderRect.centery-35))#10
+
+            elif mousePos[0] < Player.renderRect.centerx:
+                rel_x, rel_y = mouse_x - Player.renderRect.centerx-85, mouse_y - Player.renderRect.centerx-35
+                self.image_angle = math.atan2(rel_y, rel_x)
+                self.image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x) - 180
+                
+                self.renderImage = pygame.transform.rotozoom(self.image_left, self.image_angle, self.scale)
+                screen.blit(self.renderImage, (Player.renderRect.centerx-85, Player.renderRect.centery-35))
+                
+            #pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
+
+
+    class LaserBullet(Bullet):
+        def __init__(self, xSpeed, ySpeed):
+            self.xSpeed = xSpeed
+            self.ySpeed = ySpeed
+            self.image = pygame.Surface((10,10))
+            self.image.fill((200,0,0))#70
+            self.rect = self.image.get_rect()
+            self.rect.center = Player.rect.center
+            self.deathTimer = 120
+            
+            
+        def update(self):
+            self.rect = self.rect.move(self.xSpeed, self.ySpeed)
+            for wall in walls:
+                if self.rect.colliderect(wall.rect):
+                    projectiles.remove(self)
+                    return
+
+            for enemy in enemies:
+                if self.rect.colliderect(enemy.rect):
+                    enemy.health -= 1
+                    projectiles.remove(self)
+                    return
+                
+            self.deathTimer -= 1
+            if self.deathTimer < 1:
+                projectiles.remove(self)
+                print("disappear")
+                
+
+        def render(self):
+            # Modifys the position based on the centered player position
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            # Renders wall using modified rect
+            screen.blit(self.image, adjustedRect)
+
+    
 
 
     class Bat(Weapon):
@@ -1047,8 +1204,23 @@ def level1():
         def update(self):
             if self.rect.colliderect(Player.rect):
                 print("gem collected")
-                Player.alien_gems += 1
+                Save.gems[0] += 1
                 gems.remove(self)
+
+            floorCheck = (self.rect.centerx,self.rect.bottom + 5)
+            floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
+            move5 = True
+            move1 = True
+            for wall in walls:
+                if wall.rect.collidepoint(floorCheck):
+                    move5 = False
+                if wall.rect.collidepoint(floorCheck2):
+                    move1 = False
+
+            if move5 == True:
+                self.rect = self.rect.move(0,5)
+            elif move1 == True:
+                self.rect = self.rect.move(0,1)
         def render(self):
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             screen.blit(self.image, adjustedRect)
@@ -1087,6 +1259,7 @@ def level1():
     # worldPos, image, sized )
     gems = []
     ufoPortal = UFO_Portal()
+    poisonPortal = Poison_Portal()
     enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-980, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100)),FlyingAilenEnemy((-1126, 818),pygame.image.load('Images\Ailen.png'), (100,100))]
     projectiles = []
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
@@ -1151,7 +1324,7 @@ def level1():
                 if event.key == pygame.K_ESCAPE:
                     paused = not paused
                 if event.key == pygame.K_p:
-                    Player.rect.center = 0,0
+                    Player.rect.center = 0, 0
                     Player.ySpeed, Player.xSpeed = 0, 0
                 
 
@@ -1201,9 +1374,7 @@ def level1():
             # update
             Player.update()
 
-
-            if ufoPortal.update() == "boss_fight":
-                return "boss_fight"
+            poisonPortal.update()
 
             for gem in gems:
                 gem.update()
@@ -1287,8 +1458,13 @@ def level1():
             for gem in gems:
                 gem.render()
 
+            poisonPortal.render()
+                
             #if Player.portalPlaced:
-            ufoPortal.render()
+            if Save.boss_defeated[0] == False:
+                if ufoPortal.update() == "boss_fight":
+                    return "boss_fight"
+                ufoPortal.render()
 
             Player.render()
 
@@ -1312,10 +1488,23 @@ def level1():
             
             weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
             levelText = uiFont.render(str(level), True, (255,255,255))
-            gemText = uiFont.render("Alien_Gems:"+str(Player.alien_gems), True, (255,255,255))
+            gemText = uiFont.render("Alien_Gems:"+str(Save.gems[0]), True, (255,255,255))
             screen.blit(weaponText, (10, 10))
             screen.blit(levelText, (720, 6))
             screen.blit(gemText, (0, 40))
+
+            portalText1 = uiFont.render("Gems Needed "+ str(Save.gems[0]) + "/5.", False, (0, 255, 0))
+            portalText2 = uiFont.render("Press 'F' To Summon Portal.", False, (0, 255, 0))
+            adjustedRect1 = portalText1.get_rect().move(-604, 777).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            adjustedRect2 = portalText2.get_rect().move(-630, 805).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            if (ufoPortal.text and Save.portal_activated[0] == False and Save.boss_defeated[0] == False):
+                screen.blit(portalText1, (adjustedRect1.left, adjustedRect1.top))
+                if (Save.gems[0] >= 5):
+                    screen.blit(portalText2, (adjustedRect2.left, adjustedRect2.top))
+        
+                        
+            #portalText2 = uiFont.render("The Portal Has Been ", False, (0, 255, 0))
+
 
             if generatingMap:
                 screen.blit(pygame.transform.scale(blockImages[blockImageIndex], (25,25)), (220,220))

@@ -7,7 +7,7 @@ import intructions
 import tutorial
 import boss_fight
 
-level = "main_menu"
+level = "level1"
 prev_level = ""
 
 while level != "quit":

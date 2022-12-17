@@ -3,6 +3,8 @@ from pygame.constants import K_2
 
 from event_system import Event_system
 
+from player_save import Save
+
 #Hello
 
 def tutorialLoop():
@@ -64,7 +66,6 @@ def tutorialLoop():
             portalPlaced = False
             # Equipment
             weapon = None
-            collected_bat = False
             #alien_gems = 5
             attackCooldown = 0
             
@@ -186,7 +187,7 @@ def tutorialLoop():
                 Player.ySpeed += Player.yAcceleration
 
                 #Weapon changing function
-                if pygame.key.get_pressed()[pygame.K_1] and Player.collected_bat == True:
+                if pygame.key.get_pressed()[pygame.K_1] and Save.weapons["Bat"] == True:
                     Player.weapon = Bat()
                     
 
@@ -279,13 +280,13 @@ def tutorialLoop():
             #print(self.rect)
             self.rect.center = self.pos
             if self.rect.colliderect(Player.rect):
-                Player.collected_bat = True
+                Save.weapons["Bat"] = True
 
         def render(self):
             #adjust position based on players position
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             #render image
-            if Player.collected_bat == False:
+            if Save.weapons["Bat"] == False:
                 screen.blit(self.image, adjustedRect)
 
     Player.weapon = Weapon()

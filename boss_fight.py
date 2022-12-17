@@ -3,6 +3,7 @@ import sys, pygame, math, random, time
 from pygame.constants import K_2
 
 from event_system import Event_system
+from player_save import Save
 #from sympy import false
 
 def boss_fight_loop():
@@ -29,9 +30,9 @@ def boss_fight_loop():
         # Loads image and creates a rect out of it
         image = pygame.image.load("Images\player.png") 
         poisonImage = pygame.image.load("Images\Posioned Player.PNG")
-        rect = image.get_rect()
+        rect = image.get_rect(center = Save.starting_pos)
         # Creates a static rect to display in the center of the screen
-        renderRect = image.get_rect()
+        renderRect = image.get_rect(center = Save.starting_pos)
         renderRect.center = (width/2, height/2)
         # Create movement variables
         xAcceleration = .1 # Running speed
@@ -53,7 +54,6 @@ def boss_fight_loop():
         # Equipment
         weapon = None
         attackCooldown = 0
-        collected_laser_gun = False
 
         def update():
             s = .1 * Player.rect.w
@@ -173,7 +173,7 @@ def boss_fight_loop():
                 Player.weapon = Gun()
             elif pygame.key.get_pressed()[pygame.K_3]:
                 Player.weapon = Sword()
-            elif pygame.key.get_pressed()[pygame.K_4] and Player.collected_laser_gun == True:
+            elif pygame.key.get_pressed()[pygame.K_4] and Save.weapons["LaserGun"] == True:
                 Player.weapon = LaserGun()
 
                 # Attack if player clicks
@@ -613,6 +613,7 @@ def boss_fight_loop():
 
             if self.health <= 0:
                 enemies.remove(self)
+                Save.boss_defeated[0] = True
                 
 
         def shoot(self):
@@ -672,7 +673,30 @@ def boss_fight_loop():
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             screen.blit(self.image, adjustedRect)
                 
-        
+
+    class Portal():
+        def __init__(self):
+            self.image = self.assignImage()
+            self.rect = self.image.get_rect()
+            self.rect.topleft = (-405, 842)
+
+        def update(self):
+            if self.rect.colliderect(Player.rect) and Save.boss_defeated[0]:
+                print("collided")
+                return "level1"
+            
+            pygame.draw.rect(screen, (0, 0, 0), self.rect)
+                
+            
+        def assignImage(self):
+            image = pygame.image.load("Images/BossFightPortal2.png")
+            image = pygame.transform.scale(image, (115,35))
+            return image
+
+        def render(self):
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            screen.blit(self.image, adjustedRect)
+                #pygame.draw.rect(screen, (0, 0, 0), adjustedRect)
                     
     class UFO_laser:
         def __init__(self, location, damage, speed, angle, image):
@@ -732,13 +756,13 @@ def boss_fight_loop():
             #print(self.rect)
             self.rect.center = self.pos
             if self.rect.colliderect(Player.rect):
-                Player.collected_laser_gun = True
+                Save.weapons["LaserGun"] = True
 
         def render(self):
             #adjust position based on players position
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             #render image
-            if Player.collected_laser_gun == False:
+            if Save.weapons["LaserGun"] == False:
                 screen.blit(self.image, adjustedRect)
 
 
@@ -776,6 +800,7 @@ def boss_fight_loop():
     boss = UFO_Boss((-360, 650), pygame.image.load('Images/UFO.png'), (400, 200))
     enemies = [boss]
     projectiles = []
+    portal = Portal()
     boss_projectiles = []
     item = LaserGunItem((-360, 850),pygame.image.load("Images/LaserGatlingGunv2(right).png"),(120,140))
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
@@ -867,6 +892,8 @@ def boss_fight_loop():
         # update
         Player.update()
 
+        
+
         item.update()
 
         for wall in walls:
@@ -896,6 +923,11 @@ def boss_fight_loop():
 
         for enemy in enemies:
             enemy.render()
+
+        if Save.boss_defeated[0]:
+            portal.render()
+            if portal.update() == "level1":
+                return "level1"
         
         """for projectile in boss.projectiles:
             time_left = projectile.time_decrease()     
@@ -934,7 +966,7 @@ def boss_fight_loop():
         staminaText = uiFont.render(f'{Player.stamina} / {Player.maxStamina}', True, (255, 255, 255))
         screen.blit(staminaText, (465 - staminaText.get_width() / 2,7))
         # Draw Boss Health
-        if boss.health >= 0:
+        if Save.boss_defeated[0] == False:
             pygame.draw.rect(screen, (0,0,0), pygame.Rect(168,31,400,37))
             pygame.draw.rect(screen, (255,0,0), pygame.Rect(168,34,boss.health / boss.maxHealth * 405,37))
             bossHealthText = uiFont.render(f'{boss.health} / {boss.maxHealth}', True, (255, 255, 255))
@@ -949,4 +981,7 @@ def boss_fight_loop():
 
         # print('TODO: Gameplay')
         pygame.display.flip()
+
+        if pygame.mouse.get_pressed(3)[0]:
+            print(mousePosW)
 
