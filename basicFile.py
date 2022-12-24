@@ -16,7 +16,7 @@ screen = pygame.display.set_mode(size)
 fps = 60
 
 black = (0,0,0)
-background = pygame.image.load('Images\sky.png')
+background = pygame.image.load('Images/purple_screen.png')
 background = pygame.transform.scale(background, size)
 gameState = 1
 
