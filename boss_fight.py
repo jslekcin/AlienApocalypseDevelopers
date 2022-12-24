@@ -4,6 +4,7 @@ from pygame.constants import K_2
 
 from event_system import Event_system
 from player_save import Save
+from wall_save import WallSave
 #from sympy import false
 
 def boss_fight_loop():
@@ -811,13 +812,6 @@ def boss_fight_loop():
     editCooldown = 0
 
     tileSize = 25
-    blockImages = [pygame.image.load('Images\Ground.png'), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('Images\stone.PNG')]
-    blockImages[1].fill((255,255,255))
-    blockImages[2].fill((255,0,0))
-    blockImages[3].fill((0,255,0))
-    blockImages[4].fill((0,0,255))  
-    blockImages[5].fill((0,0,0))
-    print(blockImages[1])
     blockImageIndex = 0
 
     if loadFile:
@@ -829,7 +823,7 @@ def boss_fight_loop():
             if line == '':
                 break
             line = line.split()
-            wall = Wall((int(line[0]),int(line[1])), blockImages[int(line[4])], (int(line[2]),int(line[3])), int(line[4]))
+            wall = Wall((int(line[0]),int(line[1])), WallSave.blockImages[int(line[4])], (int(line[2]),int(line[3])), int(line[4]))
             walls.append(wall)
 
     clock = pygame.time.Clock()
@@ -861,7 +855,7 @@ def boss_fight_loop():
                             emptySpot = False
                             break
                     if emptySpot == True:
-                        tile = Wall((tile[0]*25,tile[1]*25), blockImages[blockImageIndex], (25,25), blockImageIndex)
+                        tile = Wall((tile[0]*25,tile[1]*25), WallSave.blockImages[blockImageIndex], (25,25), blockImageIndex)
                         walls.append(tile)
 
                 if pygame.mouse.get_pressed(3)[2]:
@@ -876,7 +870,7 @@ def boss_fight_loop():
 
                 if pygame.mouse.get_pressed(3)[1] or pygame.key.get_pressed()[pygame.K_c] and editCooldown == 0:
                     blockImageIndex += 1
-                    if blockImageIndex >= len(blockImages):
+                    if blockImageIndex >= len(WallSave.blockImages):
                         blockImageIndex = 0
                     print(blockImageIndex)
                     editCooldown = 10

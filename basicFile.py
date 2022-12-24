@@ -300,7 +300,7 @@ editPageNum = len(walls)-1
 editCooldown = 0
 
 tileSize = 25
-blockImagesAll = [pygame.image.load('Images\Ground.png').convert(), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('Images\stone.PNG').convert(), pygame.image.load('Images/pg.png').convert(), pygame.image.load('Images/poison.png').convert(), pygame.image.load('Images/ps.png').convert()]
+blockImagesAll = [pygame.image.load('Images\Grass.png').convert(), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('Images\stone.PNG').convert(), pygame.image.load('Images/pg.png').convert(), pygame.image.load('Images/poison.png').convert(), pygame.image.load('Images/ps.png').convert(), pygame.image.load('Images/Dirt3.png').convert()]
 blockImagesAll[1].fill((255,255,255))
 blockImagesAll[2].fill((255,0,0))
 blockImagesAll[3].fill((0,255,0))

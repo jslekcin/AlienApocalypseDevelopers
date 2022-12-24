@@ -4,6 +4,7 @@ from pygame.constants import K_2
 
 from event_system import Event_system
 from player_save import Save
+from wall_save import WallSave
 
 
 def level1():
@@ -1271,13 +1272,6 @@ def level1():
     editCooldown = 0
 
     tileSize = 25
-    blockImages = [pygame.image.load('Images\Ground.png'), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.Surface((25,25)), pygame.image.load('Images\stone.PNG')]
-    blockImages[1].fill((255,255,255))
-    blockImages[2].fill((255,0,0))
-    blockImages[3].fill((0,255,0))
-    blockImages[4].fill((0,0,255))  
-    blockImages[5].fill((0,0,0))
-    print(blockImages[1])
     blockImageIndex = 0
 
     if loadFile:
@@ -1289,7 +1283,7 @@ def level1():
             if line == '':
                 break
             line = line.split()
-            wall = Wall((int(line[0]),int(line[1])), blockImages[int(line[4])], (int(line[2]),int(line[3])), int(line[4]))
+            wall = Wall((int(line[0]),int(line[1])), WallSave.blockImages[int(line[4])], (int(line[2]),int(line[3])), int(line[4]))
             walls.append(wall)
 
     def enemyRespawn(enemies):
@@ -1408,7 +1402,7 @@ def level1():
                             emptySpot = False
                             break
                     if emptySpot == True:
-                        tile = Wall((tile[0]*25,tile[1]*25), blockImages[blockImageIndex], (25,25), blockImageIndex)
+                        tile = Wall((tile[0]*25,tile[1]*25), WallSave.blockImages[blockImageIndex], (25,25), blockImageIndex)
                         walls.append(tile)
 
                 if pygame.mouse.get_pressed(3)[2]:
@@ -1423,7 +1417,7 @@ def level1():
 
                 if pygame.mouse.get_pressed(3)[1] or pygame.key.get_pressed()[pygame.K_c] and editCooldown == 0:
                     blockImageIndex += 1
-                    if blockImageIndex >= len(blockImages):
+                    if blockImageIndex >= len(WallSave.blockImages):
                         blockImageIndex = 0
                     print(blockImageIndex)
                     editCooldown = 10
@@ -1507,7 +1501,7 @@ def level1():
 
 
             if generatingMap:
-                screen.blit(pygame.transform.scale(blockImages[blockImageIndex], (25,25)), (220,220))
+                screen.blit(pygame.transform.scale(WallSave.blockImages[blockImageIndex], (25,25)), (220,220))
 
             # print('TODO: Gameplay')
 
