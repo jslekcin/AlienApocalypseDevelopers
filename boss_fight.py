@@ -168,13 +168,13 @@ def boss_fight_loop():
             Player.ySpeed += Player.yAcceleration
 
             #Weapon changing function
-            if pygame.key.get_pressed()[pygame.K_1]:
+            if pygame.key.get_pressed()[pygame.K_1] and Save.weapons["Bat"]:
                 Player.weapon = Bat()
             elif pygame.key.get_pressed()[pygame.K_2]:
                 Player.weapon = Gun()
             elif pygame.key.get_pressed()[pygame.K_3]:
                 Player.weapon = Sword()
-            elif pygame.key.get_pressed()[pygame.K_4] and Save.weapons["LaserGun"] == True:
+            elif pygame.key.get_pressed()[pygame.K_4] and Save.weapons["LaserGun"]:
                 Player.weapon = LaserGun()
 
                 # Attack if player clicks

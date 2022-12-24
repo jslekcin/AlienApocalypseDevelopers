@@ -8,7 +8,7 @@ import tutorial
 import boss_fight
 import poison_level
 
-level = "poison_level"
+level = "level1"
 prev_level = ""
 
 while level != "quit":

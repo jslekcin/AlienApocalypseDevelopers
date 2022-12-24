@@ -313,6 +313,7 @@ def level1():
         def update(self):
             if self.rect.colliderect(Player.rect) and Save.boss_defeated[0]:
                 print("collided")
+                return "poison_level"
             
         def assignImage(self):
             if Save.boss_defeated[0]:
@@ -1077,9 +1078,13 @@ def level1():
 
             self.projectileSpeed = 10
         def update(self):
-            self.topright = (Player.rect.centerx+200,Player.rect.centery-200)
-            self.topleft = (Player.rect.centerx-200,Player.rect.centery-200)
-            self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
+            #self.topright = (Player.rect.centerx+200,Player.rect.centery-200)
+            #self.topleft = (Player.rect.centerx-200,Player.rect.centery-200)
+            #self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
+            self.topright = (Player.rect.centerx+200,736)
+            self.topleft = (Player.rect.centerx-200,736)
+            self.pos = (Player.rect.centerx+self.xpos,736)
+            
             
             #Attacking
             
@@ -1122,13 +1127,15 @@ def level1():
                 if self.moving:
                     if self.onRight:
                         self.xpos -= 4
-                        self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
+                        #self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
+                        self.pos = (Player.rect.centerx+self.xpos,736)
                         if self.rect.centerx == (Player.rect.centerx-200):
                             self.moving = False
                             self.onRight = False
                     elif self.onRight == False:
                         self.xpos += 4
-                        self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
+                        #self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
+                        self.pos = (Player.rect.centerx+self.xpos,736)
                         if self.rect.centerx == (Player.rect.centerx+200):
                             self.moving = False
                             self.onRight = True
@@ -1368,7 +1375,8 @@ def level1():
             # update
             Player.update()
 
-            poisonPortal.update()
+            if poisonPortal.update() == "poison_level":
+                return "poison_level"
 
             for gem in gems:
                 gem.update()
