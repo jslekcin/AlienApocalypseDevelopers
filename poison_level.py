@@ -561,8 +561,86 @@ def poisonLevelLoop():
 
     mainPortal = Main_Portal()
     enemies = []
+    class poison_blob:
+        def __init__(self, worldPos, image, size):
+            # Generates rect from given parameters
+            self.size = size
+            self.image = pygame.transform.scale(image, self.size)
+            self.rect = pygame.Rect(worldPos,size)
+            
+            self.maxHealth = 100
+            self.health = self.maxHealth
+
+            # Movement Variables
+            self.facingLeft = False
+            self.speed = 2
+            self.timer = 0
+
+        def update(self):
+            # Check that enemy is on screen
+            if Player.rect.x - self.rect.x < 500 or Player.rect.x - self.rect.x > -500:
+                # Set the direction enemy is facing
+                if self.rect.x < Player.rect.x:
+                    self.facingLeft = False
+                else:
+                    self.facingLeft = True
+
+                # Move based on direction facing
+                if self.facingLeft:
+                    moveable = False
+                    collideRect = pygame.Rect(self.rect.x - self.speed, self.rect.y, self.speed, self.rect.h)
+                    for wall in walls:
+                        if wall.rect.collidepoint((self.rect.left - 1, self.rect.bottom + 1)):
+                            moveable = True
+                        if wall.rect.colliderect(collideRect):
+                            moveable = False
+                            break
+                    if collideRect.colliderect(Player.rect):
+                        moveable = False
+
+                    player_dist = abs(self.rect.centerx-Player.rect.centerx)
+                    if moveable and player_dist <= 250:
+                        self.rect = self.rect.move(-self.speed, 0)
+                else:
+                    moveable = False
+                    collideRect = pygame.Rect(self.rect.right, self.rect.y, self.speed, self.rect.h)
+                    for wall in walls:
+                        if wall.rect.collidepoint((self.rect.right + 1, self.rect.bottom + 1)):
+                            moveable = True
+                        if wall.rect.colliderect(collideRect):
+                            moveable = False
+                            break
+                        if collideRect.colliderect(Player.rect):
+                            moveable = False
+
+                    player_dist = abs(self.rect.centerx-Player.rect.centerx)
+                    if moveable and player_dist <= 250:
+                        self.rect = self.rect.move(self.speed, 0)
+
+            floorCheck = (self.rect.centerx,self.rect.bottom + 5)
+            floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
+            move5 = True
+            move1 = True
+            for wall in walls:
+                if wall.rect.collidepoint(floorCheck):
+                    move5 = False
+                if wall.rect.collidepoint(floorCheck2):
+                    move1 = False
+
+            if move5 == True:
+                self.rect = self.rect.move(0,5)
+            elif move1 == True:
+                self.rect = self.rect.move(0,1)
+
+        def render(self):
+            # Modifys the position based on the centered player position
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            healthRect = pygame.Rect(adjustedRect.x, adjustedRect.y - 10, self.health / self.maxHealth * adjustedRect.w, 10)
+            # Renders wall using modified rect
+            screen.blit(self.image, adjustedRect)
+
     # worldPos, image, sized )
-    enemies = []
+    enemies = [poison_blob((0,0),pygame.image.load('Images/poison_blob.png'),(50,50))]
     projectiles = []
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
     midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
