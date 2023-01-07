@@ -815,10 +815,12 @@ def boss_fight_loop():
         file.write(out)
         file.close()
 
-    # worldPos, image, sized )
-    if Save.boss_defeated[0]:
-        boss = UFO_Boss((-360, 650), pygame.image.load('Images/UFO.png'), (400, 200))
-    enemies = [boss]
+    # worldPos, image, sized 
+    boss = UFO_Boss((-360, 650), pygame.image.load('Images/UFO.png'), (400, 200))
+    if Save.boss_defeated[0] == False:
+        enemies = [boss]
+    else:
+        enemies = []
     projectiles = []
     portal = Portal()
     boss_projectiles = []
