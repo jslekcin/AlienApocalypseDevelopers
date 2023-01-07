@@ -7,8 +7,9 @@ import intructions
 import tutorial
 import boss_fight
 import poison_level
+from player_save import Save
 
-level = "poison_level"
+level = "level1"
 prev_level = ""
 
 while level != "quit":
@@ -36,5 +37,7 @@ while level != "quit":
     for event in pygame.event.get():
             if event.type == Event_system.On_Death:
                 print("dead")
+                Save.health = 100
+                Save.stamina = 120
                 prev_level = level
                 level = "death_screen"

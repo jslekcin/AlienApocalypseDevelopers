@@ -1,5 +1,6 @@
 import sys, pygame, math, random
 from pygame.constants import K_2
+from player_save import Save
 
 def poisonLevelLoop():
     loadFile = True
@@ -25,9 +26,9 @@ def poisonLevelLoop():
             # Loads image and creates a rect out of it
             image = pygame.image.load("Images\player.png") 
             poisonImage = pygame.image.load("Images\Posioned Player.PNG")
-            rect = image.get_rect()
+            rect = image.get_rect(center = Save.starting_pos)
             # Creates a static rect to display in the center of the screen
-            renderRect = image.get_rect()
+            renderRect = image.get_rect(center = Save.starting_pos)
             renderRect.center = (width/2, height/2)
             # Create movement variables
             xAcceleration = .1 # Running speed
@@ -40,13 +41,15 @@ def poisonLevelLoop():
             # Sprinting Variables
             maxStamina = 120
             staminaRegen = .5
-            stamina = maxStamina
+            stamina = Save.stamina
             sprintCooldown = False
             # Stats
             maxHealth = 100
             isPoisned = False
-            health = maxHealth
+            health = Save.health
             portalPlaced = False
+            regenTimer = fps * 10
+            prev_health = health
             # Equipment
             weapon = None
             #alien_gems = 5
@@ -54,6 +57,17 @@ def poisonLevelLoop():
             
 
             def update():
+                if Player.health < Player.prev_health:
+                    Player.regenTimer = fps * 10
+                
+                else: 
+                    Player.regenTimer -= 1
+
+                if Player.regenTimer <= 0:
+                    Player.health += 0.005 
+                if Player.health > Player.maxHealth:
+                    Player.health = 100
+
                 s = .1 * Player.rect.w
                 w = .8 * Player.rect.w
                 belowRect = pygame.Rect((Player.rect.left + s, Player.rect.bottom), (w, 2))
@@ -165,9 +179,14 @@ def poisonLevelLoop():
                 Player.ySpeed += Player.yAcceleration
 
                 #Weapon changing function
-                if pygame.key.get_pressed()[pygame.K_1]:
-                    #Player.weapon = Bat()
-                    pass
+                if pygame.key.get_pressed()[pygame.K_1] and Save.weapons["Bat"]:
+                    Player.weapon = Bat()
+                elif pygame.key.get_pressed()[pygame.K_2]:
+                    Player.weapon = Gun()
+                elif pygame.key.get_pressed()[pygame.K_3]:
+                    Player.weapon = Sword()
+                elif pygame.key.get_pressed()[pygame.K_4] and Save.weapons["LaserGun"]:
+                    Player.weapon = LaserGun()
 
                 # Attack if player clicks
                 if Player.attackCooldown > 0:
@@ -182,6 +201,8 @@ def poisonLevelLoop():
 
                 Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
+                Player.prev_health = Player.health
+
 
             def render():
                 if Player.isPoisned == False:
@@ -190,15 +211,299 @@ def poisonLevelLoop():
                     screen.blit(Player.poisonImage, Player.renderRect)
                 Player.weapon.render()
 
+    class Portal:
+        def __init__(self):
+            self.image = self.assignImage()
+            self.rect = self.image.get_rect()
+            #self.rect.bottom = Player.rect.bottom
+            #self.rect[0] = Player.rect[0] - 150
+
+        def update(self):
+            if Player.portalPlaced == False:
+                self.rect.bottom = Player.rect.bottom
+                self.rect[0] = Player.rect[0] - 150
+            elif Player.portalPlaced == True:
+                if self.rect.colliderect(Player.rect):
+                    print("collided")
+                
+
+        def assignImage(self):
+            pass
+
+        def render(self):
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            screen.blit(self.image, adjustedRect)
+
+    class Main_Portal(Portal):
+        def __init__(self):
+            super().__init__()
+            self.rect.topleft = (620, 565)
+        def update(self):
+            if self.rect.colliderect(Player.rect):
+                print("collided")
+                Save.starting_pos = (2492, 794)
+                Save.health = Player.health
+                Save.stamina = Player.stamina
+                return "level1"
+            
+        def assignImage(self):
+            image = pygame.image.load("Images/PoisonPortal.png")
+            image = pygame.transform.scale(image, (192,192))
+            return image
+
+        def render(self):
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            screen.blit(self.image, adjustedRect)
+                #pygame.draw.rect(screen, (0, 0, 0), adjustedRect)
+
     class Weapon:
-            def __init__(self):
-                self.name = 'None'
+        def __init__(self):
+            self.name = 'None'
 
-            def attack(self):
-                print("Attacking with weapon")
+        def attack(self):
+            pass
 
-            def render(self):
-                pass
+        def render(self):
+            pass
+    class Sword(Weapon):
+        def __init__(self):
+            self.name = 'Sword'
+            self.damage = 8
+            self.attackSpeed = .3
+            self.image_left = pygame.image.load("Images/Sword(left).png")
+            self.image_left = pygame.transform.scale(self.image_left, (110,140))
+            self.image_right = pygame.image.load("Images/Sword(right).png")
+            self.image_right = pygame.transform.scale(self.image_right, (110,140))
+        def attack(self):
+            hitBox = pygame.Rect(0, 0, 45, 64)
+            mousePos = pygame.mouse.get_pos()
+            if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
+                hitBox.topright = Player.rect.topleft
+            else:
+                hitBox.topleft = Player.rect.topright
+                #do damage to enemies left of the player
+            for enemy in enemies:
+                if hitBox.colliderect(enemy.rect):
+                    enemy.health -= self.damage
+                    print("hit")
+
+            Player.attackCooldown = self.attackSpeed * fps
+        def render(self):
+            mousePos = pygame.mouse.get_pos()
+            if mousePos[0] >= Player.renderRect.centerx:
+                #pass
+                screen.blit(self.image_right, (Player.renderRect.centerx-18, Player.renderRect.centery-75))
+            elif mousePos[0] < Player.renderRect.centerx:
+                #pass
+                screen.blit(self.image_left, (Player.renderRect.centerx-78, Player.renderRect.centery-80))
+
+    class Gun(Weapon):
+        def __init__(self):
+            self.name = 'Gun'
+            self.image_left = pygame.image.load("Images/gun (left).png")
+            self.image_left = pygame.transform.scale(self.image_left, (60,70))
+            self.image_right = pygame.image.load("Images/gun (right).png")
+            self.image_right = pygame.transform.scale(self.image_right, (60,70)) 
+            self.damage = 10
+            self.attackSpeed = 1
+            self.projectileSpeed = 15
+        def attack(self):
+            #gunshot sound
+            pygame.mixer.music.load('sounds\gunshot.mp3')
+            pygame.mixer.music.set_volume(0.3)
+            pygame.mixer.music.play()
+            #pygame.mixer.music.load('sounds\gunshot.mp3')
+            #pygame.mixer.music.set_volume(0.3)
+            #pygame.mixer.music.play()
+
+            mousePos = pygame.mouse.get_pos()
+            dx = mousePos[0] - Player.renderRect.centerx
+            dy = mousePos[1] - Player.renderRect.centery
+            if dx == 0:
+                dx = .001
+            angle = math.atan(dy/dx)
+            if dx < 0:
+                angle += math.pi
+            xSpeed = self.projectileSpeed * math.cos(angle)
+            ySpeed = self.projectileSpeed * math.sin(angle)
+            projectiles.append(Bullet(xSpeed, ySpeed))
+            Player.attackCooldown = self.attackSpeed * fps
+        def render(self):
+            mousePos = pygame.mouse.get_pos()
+            dx = mousePos[0] - Player.renderRect.centerx
+            dy = mousePos[1] - Player.renderRect.centery
+            if dx == 0:
+                dx = .001
+            angle = math.atan(dy/dx)
+            if dx < 0:
+                angle += math.pi 
+            if mousePos[0] >= Player.renderRect.centerx:
+                #pass
+                screen.blit(self.image_right, (Player.renderRect.centerx+-10, Player.renderRect.centery-35))
+            elif mousePos[0] < Player.renderRect.centerx:
+                #pass
+                screen.blit(self.image_left, (Player.renderRect.centerx-45, Player.renderRect.centery-40))
+                
+            pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
+
+    class Bullet:
+        def __init__(self, xSpeed, ySpeed):
+            self.xSpeed = xSpeed
+            self.ySpeed = ySpeed
+            self.image = pygame.Surface((10,10))
+            self.image.fill((70,70,70))
+            self.rect = self.image.get_rect()
+            self.rect.center = Player.rect.center
+            self.deathTimer = 120
+            
+        def update(self):
+            self.rect = self.rect.move(self.xSpeed, self.ySpeed)
+            for wall in walls:
+                if self.rect.colliderect(wall.rect):
+                    projectiles.remove(self)
+                    return
+
+            for enemy in enemies:
+                if self.rect.colliderect(enemy.rect):
+                    enemy.health -= 3
+                    projectiles.remove(self)
+                    return
+                
+            self.deathTimer -= 1
+            if self.deathTimer < 1:
+                projectiles.remove(self)
+                print("disappear")
+        def render(self):
+            # Modifys the position based on the centered player position
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            # Renders wall using modified rect
+            screen.blit(self.image, adjustedRect)
+
+    class LaserGun(Weapon):
+        def __init__(self):
+            self.name = 'LaserGatlingGun'
+            mousePos = pygame.mouse.get_pos()
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            rel_x, rel_y = mouse_x - Player.renderRect.centerx-85, mouse_y - Player.renderRect.centerx-35
+            self.angle = 0
+            self.scale = 1
+            self.image_angle = math.atan2(rel_y, rel_x)
+            self.image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+            self.center = (0,0)
+            self.renderImage = pygame.image.load("Images/LaserGatlingGunv2(left).png")
+            
+            #left
+            self.image_left = pygame.image.load("Images/LaserGatlingGunv2(left).png")
+            self.image_left = pygame.transform.scale(self.image_left, (120,140))
+            self.renderImage = pygame.transform.rotozoom(self.image_left, self.angle, self.scale)
+            """self.new_rect = self.new_image_left.get_rect()
+            self.center=[self.new_rect_left.centerx,self.new_rect_left.centery]"""#center
+            
+            
+            #right
+            
+            self.image_right = pygame.image.load("Images/LaserGatlingGunv2(right).png")
+            self.image_right = pygame.transform.scale(self.image_right, (120,140))
+            self.renderImage = pygame.transform.rotozoom(self.image_right, self.angle, self.scale)
+            """self.new_rect_right = self.new_image_right.get_rect()
+            self.center=[self.new_rect_right.centerx,self.new_rect_right.centery]"""#center
+            
+
+            #self.rotated_image_right = pygame.transform.rotate(self.image_right, int(image_angle))
+            #self.rect_right = self.image_right.get_rect()#center=(self.rotated_image_right[0], self.rotated_image_right[1])\
+            #self.rect_right.center = [self.rotated_image_right[0], self.rotated_image_right[1]]
+
+            #self.rotated_image_right = pygame.transform.rotate(self.image_right, self.angle)
+            #self.rotated_rect_right = self.rotated_image_right.get_rect(center = self.image_right.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)
+
+            self.damage = 1
+            self.attackSpeed = 0.2
+            self.projectileSpeed = 20
+        def attack(self):
+
+            mousePos = pygame.mouse.get_pos()
+            dx = mousePos[0] - Player.renderRect.centerx
+            dy = mousePos[1] - Player.renderRect.centery
+            if dx == 0:
+                dx = .001
+            angle = math.atan(dy/dx)
+            if dx < 0:
+                angle += math.pi
+            
+            xSpeed = self.projectileSpeed * math.cos(angle)
+            ySpeed = self.projectileSpeed * math.sin(angle)
+            projectiles.append(LaserBullet(xSpeed, ySpeed))
+            Player.attackCooldown = self.attackSpeed * fps
+        def render(self):
+            mousePos = pygame.mouse.get_pos()
+            dx = mousePos[0] - Player.renderRect.centerx
+            dy = mousePos[1] - Player.renderRect.centery
+            if dx == 0:
+                dx = .001
+            angle = math.atan(dy/dx)
+            if dx < 0:
+                angle += math.pi
+            #image_angle = math.atan(mousePos[1]/mousePos[0])
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            
+            #print(image_angle)
+            if mousePos[0] >= Player.renderRect.centerx:
+                rel_x, rel_y = mouse_x - Player.renderRect.centerx-35, mouse_y - Player.renderRect.centerx-35
+                self.image_angle = math.atan2(rel_y, rel_x)
+                self.image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+
+                self.renderImage = pygame.transform.rotozoom(self.image_right, self.image_angle, self.scale)
+                screen.blit(self.renderImage, (Player.renderRect.centerx-35, Player.renderRect.centery-35))#10
+
+            elif mousePos[0] < Player.renderRect.centerx:
+                rel_x, rel_y = mouse_x - Player.renderRect.centerx-85, mouse_y - Player.renderRect.centerx-35
+                self.image_angle = math.atan2(rel_y, rel_x)
+                self.image_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x) - 180
+                
+                self.renderImage = pygame.transform.rotozoom(self.image_left, self.image_angle, self.scale)
+                screen.blit(self.renderImage, (Player.renderRect.centerx-85, Player.renderRect.centery-35))
+                
+            #pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
+
+
+    class LaserBullet(Bullet):
+        def __init__(self, xSpeed, ySpeed):
+            self.xSpeed = xSpeed
+            self.ySpeed = ySpeed
+            self.image = pygame.Surface((10,10))
+            self.image.fill((200,0,0))#70
+            self.rect = self.image.get_rect()
+            self.rect.center = Player.rect.center
+            self.deathTimer = 120
+            
+            
+        def update(self):
+            self.rect = self.rect.move(self.xSpeed, self.ySpeed)
+            for wall in walls:
+                if self.rect.colliderect(wall.rect):
+                    projectiles.remove(self)
+                    return
+
+            for enemy in enemies:
+                if self.rect.colliderect(enemy.rect):
+                    enemy.health -= 1
+                    projectiles.remove(self)
+                    return
+                
+            self.deathTimer -= 1
+            if self.deathTimer < 1:
+                projectiles.remove(self)
+                print("disappear")
+                
+
+        def render(self):
+            # Modifys the position based on the centered player position
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            # Renders wall using modified rect
+            screen.blit(self.image, adjustedRect)
+
+    
+
 
     class Bat(Weapon):
         def __init__(self):
@@ -236,7 +541,7 @@ def poisonLevelLoop():
                 #pass
                 screen.blit(self.image, (Player.renderRect.centerx-85, Player.renderRect.centery-80))
 
-    Player.weapon = Bat()
+    Player.weapon = Weapon()
     walls = []
     class Wall:
         def __init__(self, worldPos, image, size, imageIndex): 
@@ -254,7 +559,7 @@ def poisonLevelLoop():
             # Renders wall using modified rect
             screen.blit(self.image, adjustedRect)
 
-
+    mainPortal = Main_Portal()
     enemies = []
     # worldPos, image, sized )
     enemies = []
@@ -296,7 +601,7 @@ def poisonLevelLoop():
 
 
 
-    generatingMap = loadFile
+    generatingMap = not loadFile
     editPageNum = len(walls)-1
     editCooldown = 0
 
@@ -381,6 +686,10 @@ def poisonLevelLoop():
                     generatingMap = False
 
             # update
+
+        if mainPortal.update() == "level1":
+            return "level1"
+
         Player.update()
 
         for wall in walls:
@@ -410,16 +719,19 @@ def poisonLevelLoop():
 
         Player.render()    
 
+        mainPortal.render()
+
+       
         # Draw Health Bar
-        pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,5,200,30))
-        pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,5,Player.health / Player.maxHealth * 200,30))
-        hpText = uiFont.render(f'{Player.health} / 100', True, (255, 255, 255))
-        screen.blit(hpText, (250 - hpText.get_width() / 2,10))
+        pygame.draw.rect(screen, (0,0,0), pygame.Rect(170,1,200,30))
+        pygame.draw.rect(screen, (255,0,0), pygame.Rect(170,1,Player.health / Player.maxHealth * 200,30))
+        hpText = uiFont.render(f'{Player.health:0.2f} / 100', True, (255, 255, 255))
+        screen.blit(hpText, (250 - hpText.get_width() / 2,7))
         # Draw Stamina Bar
-        pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,35,200,30))
-        pygame.draw.rect(screen, (0,0,255), pygame.Rect(150,35,Player.stamina / Player.maxStamina * 200,30))
+        pygame.draw.rect(screen, (0,0,0), pygame.Rect(372,1,200,30))
+        pygame.draw.rect(screen, (0,0,255), pygame.Rect(372,1,Player.stamina / Player.maxStamina * 200,30))
         staminaText = uiFont.render(f'{Player.stamina} / {Player.maxStamina}', True, (255, 255, 255))
-        screen.blit(staminaText, (250 - staminaText.get_width() / 2,40))
+        screen.blit(staminaText, (465 - staminaText.get_width() / 2,7))
 
             
         weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
@@ -428,3 +740,6 @@ def poisonLevelLoop():
         #screen.blit(levelText, (400, 10))
 
         pygame.display.flip()
+
+        if pygame.mouse.get_pressed(3)[0]:
+            print(mousePosW)

@@ -46,6 +46,8 @@ class Player:
         isPoisned = False
         health = maxHealth
         portalPlaced = False
+        regenTimer = fps * 10
+        prev_health = health
         # Equipment
         weapon = None
         #alien_gems = 5
@@ -53,6 +55,17 @@ class Player:
         
 
         def update():
+            if Player.health < Player.prev_health:
+                Player.regenTimer = fps * 10
+            
+            else: 
+                Player.regenTimer -= 1
+
+            if Player.regenTimer <= 0:
+                Player.health += 0.005 
+            if Player.health > Player.maxHealth:
+                Player.health = 100
+
             s = .1 * Player.rect.w
             w = .8 * Player.rect.w
             belowRect = pygame.Rect((Player.rect.left + s, Player.rect.bottom), (w, 2))
@@ -181,7 +194,8 @@ class Player:
 
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
-
+            Player.prev_health = Player.health
+            
         def render():
             if Player.isPoisned == False:
                 screen.blit(Player.image, Player.renderRect)
@@ -410,15 +424,15 @@ while 1:
     Player.render()    
 
     # Draw Health Bar
-    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,5,200,30))
-    pygame.draw.rect(screen, (255,0,0), pygame.Rect(150,5,Player.health / Player.maxHealth * 200,30))
-    hpText = uiFont.render(f'{Player.health} / 100', True, (255, 255, 255))
-    screen.blit(hpText, (250 - hpText.get_width() / 2,10))
+    pygame.draw.rect(screen, (0,0,0), pygame.Rect(170,1,200,30))
+    pygame.draw.rect(screen, (255,0,0), pygame.Rect(170,1,Player.health / Player.maxHealth * 200,30))
+    hpText = uiFont.render(f'{Player.health:0.2f} / 100', True, (255, 255, 255))
+    screen.blit(hpText, (250 - hpText.get_width() / 2,7))
     # Draw Stamina Bar
-    pygame.draw.rect(screen, (0,0,0), pygame.Rect(150,35,200,30))
-    pygame.draw.rect(screen, (0,0,255), pygame.Rect(150,35,Player.stamina / Player.maxStamina * 200,30))
+    pygame.draw.rect(screen, (0,0,0), pygame.Rect(372,1,200,30))
+    pygame.draw.rect(screen, (0,0,255), pygame.Rect(372,1,Player.stamina / Player.maxStamina * 200,30))
     staminaText = uiFont.render(f'{Player.stamina} / {Player.maxStamina}', True, (255, 255, 255))
-    screen.blit(staminaText, (250 - staminaText.get_width() / 2,40))
+    screen.blit(staminaText, (465 - staminaText.get_width() / 2,7))
 
         
     weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))

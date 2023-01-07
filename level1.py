@@ -46,14 +46,14 @@ def level1():
         # Sprinting Variables
         maxStamina = 120
         staminaRegen = .5
-        stamina = maxStamina
+        stamina = Save.stamina
         sprintCooldown = False
         maxWalkSpeed = 6
         maxRunSpeed = 12
         # Stats
         maxHealth = 100
         isPoisoned = False
-        health = maxHealth
+        health = Save.health
         prev_health = health
         regenTimer = fps * 10
         portalPlaced = False
@@ -249,6 +249,8 @@ def level1():
                 self.rect[0] = Player.rect[0] - 150
             elif Player.portalPlaced == True:
                 if self.rect.colliderect(Player.rect):
+                    Save.health = Player.health
+                    Save.stamina = Player.stamina
                     print("collided")
                 
 
@@ -283,6 +285,8 @@ def level1():
                 self.text = True
                 if Save.portal_activated[0]:
                     Save.starting_pos = 0, 0
+                    Save.health = Player.health
+                    Save.stamina = Player.stamina
                     return "boss_fight"
                 if pygame.key.get_pressed()[pygame.K_f] and Save.gems[0] >= 5 and Save.portal_activated[0] == False:
                         print("The Portal Has Been Summoned")
@@ -313,6 +317,10 @@ def level1():
         def update(self):
             if self.rect.colliderect(Player.rect) and Save.boss_defeated[0]:
                 print("collided")
+                Save.starting_pos = (528, 609)
+                Save.health = Player.health
+                Save.stamina = Player.stamina
+                return "poison_level"
             
         def assignImage(self):
             if Save.boss_defeated[0]:
@@ -1059,7 +1067,7 @@ def level1():
     class FlyingAilenEnemy:
         def __init__(self,worldPos,image,size):
             self.rect = pygame.Rect(worldPos,size)
-            self.rect.center = (Player.rect.centerx+200,Player.rect.centery-200)
+            #self.rect.center = (Player.rect.centerx+200,Player.rect.centery-200)
             self.size = size
             self.image = pygame.transform.scale(image, self.size)
             self.damage = 5
@@ -1071,19 +1079,26 @@ def level1():
             self.topright = (Player.rect.centerx+200,Player.rect.centery-200)
             self.topleft = (Player.rect.centerx-200,Player.rect.centery-200)
             self.xpos = 200
-            self.rect.center = self.topleft
+            self.pos = (self.xpos,736)
+            #self.rect.center = self.topleft
             self.onRight = False
             self.moving = False
 
             self.projectileSpeed = 10
+
+            self.atRange = False
         def update(self):
-            self.topright = (Player.rect.centerx+200,Player.rect.centery-200)
-            self.topleft = (Player.rect.centerx-200,Player.rect.centery-200)
-            self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
+            #self.topright = (Player.rect.centerx+200,Player.rect.centery-200)
+            #self.topleft = (Player.rect.centerx-200,Player.rect.centery-200)
+            #self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
+            self.topright = (Player.rect.centerx+200,736)
+            self.topleft = (Player.rect.centerx-200,736)
+            #self.pos = (Player.rect.centerx+self.xpos,736)
+            
             
             #Attacking
             
-            if self.onCooldown == False:
+            if self.onCooldown == False and ((abs(self.xpos-Player.rect.centerx) <= 600 and self.atRange) or self.atRange == False):
                 #print("attack")
 
                 #fire projectile
@@ -1102,15 +1117,17 @@ def level1():
 
                 #move positions
                 self.moving = True
-                if self.rect.centerx == (Player.rect.centerx-200):
+                if self.rect.centerx <= (Player.rect.centerx-200):
                     self.onRight = False
                 
-                elif self.rect.centerx == (Player.rect.centerx+200):
+                elif self.rect.centerx >= (Player.rect.centerx+200):
                     self.onRight = True
-
                 
-
                 
+                
+                else:
+                    self.onRight = False
+
                     
                 #reset cooldown
                 self.onCooldown = True
@@ -1121,17 +1138,28 @@ def level1():
             if self.cooldown <= 0:
                 if self.moving:
                     if self.onRight:
-                        self.xpos -= 4
-                        self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
-                        if self.rect.centerx == (Player.rect.centerx-200):
+                        self.xpos -= 7
+                        #self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
+                        self.pos = (self.xpos,736)
+                        if self.rect.centerx <= (Player.rect.centerx-200):
                             self.moving = False
                             self.onRight = False
+                            
+                        
+
                     elif self.onRight == False:
-                        self.xpos += 4
-                        self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
-                        if self.rect.centerx == (Player.rect.centerx+200):
+                        pos2 = self.pos
+                        self.xpos += 7
+                        #self.pos = (Player.rect.centerx+self.xpos,Player.rect.centery-200)
+                        self.pos = (self.xpos,736)
+                        if self.rect.centerx >= (Player.rect.centerx+200):
                             self.moving = False
                             self.onRight = True
+                        if self.pos[0] > 1037:
+                            self.pos = pos2
+                            self.xpos -= 7
+                            self.moving = False
+                            self.atRange = True
 
                 else:
                     self.onCooldown = False
@@ -1368,7 +1396,8 @@ def level1():
             # update
             Player.update()
 
-            poisonPortal.update()
+            if poisonPortal.update() == "poison_level":
+                return "poison_level"
 
             for gem in gems:
                 gem.update()
@@ -1491,7 +1520,7 @@ def level1():
             portalText2 = uiFont.render("Press 'F' To Summon Portal.", False, (0, 255, 0))
             adjustedRect1 = portalText1.get_rect().move(-604, 777).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             adjustedRect2 = portalText2.get_rect().move(-630, 805).move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
-            if (ufoPortal.text and Save.portal_activated[0] == False and Save.boss_defeated[0] == False):
+            if (Save.portal_activated[0] == False and Save.boss_defeated[0] == False and ufoPortal.text):
                 screen.blit(portalText1, (adjustedRect1.left, adjustedRect1.top))
                 if (Save.gems[0] >= 5):
                     screen.blit(portalText2, (adjustedRect2.left, adjustedRect2.top))
