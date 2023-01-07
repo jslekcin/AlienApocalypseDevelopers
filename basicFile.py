@@ -46,6 +46,8 @@ class Player:
         isPoisned = False
         health = maxHealth
         portalPlaced = False
+        regenTimer = fps * 10
+        prev_health = health
         # Equipment
         weapon = None
         #alien_gems = 5
@@ -53,6 +55,17 @@ class Player:
         
 
         def update():
+            if Player.health < Player.prev_health:
+                Player.regenTimer = fps * 10
+            
+            else: 
+                Player.regenTimer -= 1
+
+            if Player.regenTimer <= 0:
+                Player.health += 0.005 
+            if Player.health > Player.maxHealth:
+                Player.health = 100
+
             s = .1 * Player.rect.w
             w = .8 * Player.rect.w
             belowRect = pygame.Rect((Player.rect.left + s, Player.rect.bottom), (w, 2))
@@ -181,7 +194,8 @@ class Player:
 
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
-
+            Player.prev_health = Player.health
+            
         def render():
             if Player.isPoisned == False:
                 screen.blit(Player.image, Player.renderRect)

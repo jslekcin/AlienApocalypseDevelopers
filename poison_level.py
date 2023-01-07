@@ -26,9 +26,9 @@ def poisonLevelLoop():
             # Loads image and creates a rect out of it
             image = pygame.image.load("Images\player.png") 
             poisonImage = pygame.image.load("Images\Posioned Player.PNG")
-            rect = image.get_rect()
+            rect = image.get_rect(center = Save.starting_pos)
             # Creates a static rect to display in the center of the screen
-            renderRect = image.get_rect()
+            renderRect = image.get_rect(center = Save.starting_pos)
             renderRect.center = (width/2, height/2)
             # Create movement variables
             xAcceleration = .1 # Running speed
@@ -41,13 +41,15 @@ def poisonLevelLoop():
             # Sprinting Variables
             maxStamina = 120
             staminaRegen = .5
-            stamina = maxStamina
+            stamina = Save.stamina
             sprintCooldown = False
             # Stats
             maxHealth = 100
             isPoisned = False
-            health = maxHealth
+            health = Save.health
             portalPlaced = False
+            regenTimer = fps * 10
+            prev_health = health
             # Equipment
             weapon = None
             #alien_gems = 5
@@ -55,6 +57,17 @@ def poisonLevelLoop():
             
 
             def update():
+                if Player.health < Player.prev_health:
+                    Player.regenTimer = fps * 10
+                
+                else: 
+                    Player.regenTimer -= 1
+
+                if Player.regenTimer <= 0:
+                    Player.health += 0.005 
+                if Player.health > Player.maxHealth:
+                    Player.health = 100
+
                 s = .1 * Player.rect.w
                 w = .8 * Player.rect.w
                 belowRect = pygame.Rect((Player.rect.left + s, Player.rect.bottom), (w, 2))
@@ -188,6 +201,8 @@ def poisonLevelLoop():
 
                 Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
+                Player.prev_health = Player.health
+
 
             def render():
                 if Player.isPoisned == False:
@@ -195,6 +210,51 @@ def poisonLevelLoop():
                 elif Player.isPoisned:
                     screen.blit(Player.poisonImage, Player.renderRect)
                 Player.weapon.render()
+
+    class Portal:
+        def __init__(self):
+            self.image = self.assignImage()
+            self.rect = self.image.get_rect()
+            #self.rect.bottom = Player.rect.bottom
+            #self.rect[0] = Player.rect[0] - 150
+
+        def update(self):
+            if Player.portalPlaced == False:
+                self.rect.bottom = Player.rect.bottom
+                self.rect[0] = Player.rect[0] - 150
+            elif Player.portalPlaced == True:
+                if self.rect.colliderect(Player.rect):
+                    print("collided")
+                
+
+        def assignImage(self):
+            pass
+
+        def render(self):
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            screen.blit(self.image, adjustedRect)
+
+    class Main_Portal(Portal):
+        def __init__(self):
+            super().__init__()
+            self.rect.topleft = (620, 565)
+        def update(self):
+            if self.rect.colliderect(Player.rect):
+                print("collided")
+                Save.starting_pos = (2492, 794)
+                Save.health = Player.health
+                Save.stamina = Player.stamina
+                return "level1"
+            
+        def assignImage(self):
+            image = pygame.image.load("Images/PoisonPortal.png")
+            image = pygame.transform.scale(image, (192,192))
+            return image
+
+        def render(self):
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            screen.blit(self.image, adjustedRect)
+                #pygame.draw.rect(screen, (0, 0, 0), adjustedRect)
 
     class Weapon:
         def __init__(self):
@@ -499,7 +559,7 @@ def poisonLevelLoop():
             # Renders wall using modified rect
             screen.blit(self.image, adjustedRect)
 
-
+    mainPortal = Main_Portal()
     enemies = []
     # worldPos, image, sized )
     enemies = []
@@ -626,6 +686,10 @@ def poisonLevelLoop():
                     generatingMap = False
 
             # update
+
+        if mainPortal.update() == "level1":
+            return "level1"
+
         Player.update()
 
         for wall in walls:
@@ -655,6 +719,8 @@ def poisonLevelLoop():
 
         Player.render()    
 
+        mainPortal.render()
+
        
         # Draw Health Bar
         pygame.draw.rect(screen, (0,0,0), pygame.Rect(170,1,200,30))
@@ -674,3 +740,6 @@ def poisonLevelLoop():
         #screen.blit(levelText, (400, 10))
 
         pygame.display.flip()
+
+        if pygame.mouse.get_pressed(3)[0]:
+            print(mousePosW)

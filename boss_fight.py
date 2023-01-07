@@ -44,19 +44,32 @@ def boss_fight_loop():
         # Sprinting Variables
         maxStamina = 120
         staminaRegen = .5
-        stamina = maxStamina
+        stamina = Save.stamina
         sprintCooldown = False
         maxWalkSpeed = 6
         maxRunSpeed = 12
         # Stats
         maxHealth = 100
         isPoisned = False
-        health = maxHealth
+        health = Save.health
+        regenTimer = fps * 10
+        prev_health = health
         # Equipment
         weapon = None
         attackCooldown = 0
 
         def update():
+            if Player.health < Player.prev_health:
+                    Player.regenTimer = fps * 10
+                
+            else: 
+                Player.regenTimer -= 1
+
+            if Player.regenTimer <= 0:
+                Player.health += 0.005 
+            if Player.health > Player.maxHealth:
+                Player.health = 100
+
             s = .1 * Player.rect.w
             w = .8 * Player.rect.w
             belowRect = pygame.Rect((Player.rect.left + s, Player.rect.bottom), (w, 2))
@@ -184,6 +197,8 @@ def boss_fight_loop():
                 Player.weapon.attack()
 
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
+
+            Player.prev_health = Player.health
 
         def applyDamage(damage):
                 Player.health -= damage
@@ -684,6 +699,9 @@ def boss_fight_loop():
         def update(self):
             if self.rect.colliderect(Player.rect) and Save.boss_defeated[0]:
                 print("collided")
+                Save.starting_pos = (-516, 696)
+                Save.health = Player.health
+                Save.stamina = Player.stamina
                 return "level1"
             
             pygame.draw.rect(screen, (0, 0, 0), self.rect)
@@ -798,7 +816,8 @@ def boss_fight_loop():
         file.close()
 
     # worldPos, image, sized )
-    boss = UFO_Boss((-360, 650), pygame.image.load('Images/UFO.png'), (400, 200))
+    if Save.boss_defeated[0]:
+        boss = UFO_Boss((-360, 650), pygame.image.load('Images/UFO.png'), (400, 200))
     enemies = [boss]
     projectiles = []
     portal = Portal()
@@ -952,7 +971,7 @@ def boss_fight_loop():
         # Draw Health Bar
         pygame.draw.rect(screen, (0,0,0), pygame.Rect(170,1,200,30))
         pygame.draw.rect(screen, (255,0,0), pygame.Rect(168,1,Player.health / Player.maxHealth * 200,30))
-        hpText = uiFont.render(f'{Player.health} / 100', True, (255, 255, 255))
+        hpText = uiFont.render(f'{Player.health:0.2f} / 100', True, (255, 255, 255))
         screen.blit(hpText, (250 - hpText.get_width() / 2,7))
         # Draw Stamina Bar
         pygame.draw.rect(screen, (0,0,0), pygame.Rect(370,1,200,30))
