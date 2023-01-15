@@ -45,11 +45,14 @@ def poisonLevelLoop():
             sprintCooldown = False
             # Stats
             maxHealth = 100
-            isPoisned = False
+            isPoisoned = False
             health = Save.health
             portalPlaced = False
             regenTimer = fps * 10
             prev_health = health
+            portalPlaced = False
+            poisonTimer = fps * 2
+            poisonCounter = 0
             # Equipment
             weapon = None
             #alien_gems = 5
@@ -193,6 +196,15 @@ def poisonLevelLoop():
                     Player.attackCooldown -= 1
                 elif pygame.mouse.get_pressed(3)[0]:
                     Player.weapon.attack()
+
+                if Player.isPoisoned == True:
+                    #print(Player.poisonTimer, Player.isPoisoned)
+                    Player.poisonTimer -= 1
+                    Player.health -= 0.03 * Player.poisonCounter
+                    #print(self.poisonTimer)
+                    if Player.poisonTimer <= 0:
+                        Player.isPoisoned = False
+                        Player.poisonCounter = 0
                 """
                 if pygame.key.get_pressed()[pygame.K_p] and Player.alien_gems >= 5 and Player.portalPlaced == False:
                     Player.portalPlaced = True
@@ -203,11 +215,16 @@ def poisonLevelLoop():
 
                 Player.prev_health = Player.health
 
+            def applyPoison():
+                Player.poisonTimer = fps * 3
+
+            def applyDamage(damage):
+                Player.health -= damage
 
             def render():
-                if Player.isPoisned == False:
+                if Player.isPoisoned == False:
                     screen.blit(Player.image, Player.renderRect)
-                elif Player.isPoisned:
+                elif Player.isPoisoned:
                     screen.blit(Player.poisonImage, Player.renderRect)
                 Player.weapon.render()
 
@@ -639,8 +656,166 @@ def poisonLevelLoop():
             # Renders wall using modified rect
             screen.blit(self.image, adjustedRect)
 
+    class PoisonShooterEnemy: # Jaeho
+        def __init__(self, worldPos, image, size): # Create the enemy
+            # Generates rect from given parameters
+            self.size = size
+            self.image = pygame.transform.scale(image, self.size)
+            self.rect = pygame.Rect(worldPos,size)
+            
+            self.damage = 5
+            self.health = 7
+            self.speed  = 4
+
+            self.shootingDirection = 0
+            
+            self.approachRange = 300
+            self.attackRange = 200
+            self.fleeRange = 100
+
+            self.counter = 0
+            
+        def update(self): # Change the enemies variables (like position)
+            # Check that enemy is on screen
+            distToPlayer = abs(Player.rect.x - self.rect.x)
+            if distToPlayer <= self.approachRange and distToPlayer >= self.attackRange or distToPlayer < self.fleeRange:
+                if distToPlayer >= self.attackRange:
+                    # Set the direction enemy is facing
+                    if self.rect.x < Player.rect.x:
+                        self.facingLeft = False
+                    else:
+                        self.facingLeft = True
+                else:
+                    # Set the direction enemy is facing
+                    if self.rect.x < Player.rect.x:
+                        self.facingLeft = True
+                    else:
+                        self.facingLeft = False
+            
+                # Move based on direction facing
+                if self.facingLeft:
+                    moveable = False
+                    collideRect = pygame.Rect(self.rect.x - self.speed, self.rect.y, self.speed, self.rect.h)
+                    for wall in walls:
+                        if wall.rect.collidepoint((self.rect.left - 1, self.rect.bottom + 1)):
+                            moveable = True
+                        if wall.rect.colliderect(collideRect):
+                            moveable = False
+                            break
+                    if collideRect.colliderect(Player.rect):
+                        moveable = False
+
+                    if moveable:
+                        self.rect = self.rect.move(-self.speed, 0)
+                else:
+                    moveable = False
+                    collideRect = pygame.Rect(self.rect.right, self.rect.y, self.speed, self.rect.h)
+                    for wall in walls:
+                        if wall.rect.collidepoint((self.rect.right + 1, self.rect.bottom + 1)):
+                            moveable = True
+                        if wall.rect.colliderect(collideRect):
+                            moveable = False
+                            break
+                        if collideRect.colliderect(Player.rect):
+                            moveable = False
+
+                    if moveable:
+                        self.rect = self.rect.move(self.speed, 0)
+            
+            elif distToPlayer < self.attackRange and distToPlayer >= self.fleeRange:
+                # How often they attack
+                self.counter += 1
+                if self.counter >= 60:
+                    self.counter = 0
+
+                    # Aiming
+                    xdist = Player.rect.centerx - self.rect.centerx
+                    ydist = Player.rect.centery - self.rect.centery
+                    angle = math.degrees(math.atan2(ydist,xdist))
+                    # Add in inaccuracy
+                    angle = angle + random.randint(-40,40)
+                    angle = math.radians(angle)
+                    projectiles.append(PoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
+            floorCheck = (self.rect.centerx,self.rect.bottom + 5)
+            floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
+            move5 = True
+            move1 = True
+            for wall in walls:
+                if wall.rect.collidepoint(floorCheck):
+                    move5 = False
+                if wall.rect.collidepoint(floorCheck2):
+                    move1 = False
+
+            if self.health <= 0:
+                enemies.remove(self)
+                """number = random.randint(1,10)
+                if number == 1:
+                    gems.append(Gem(self.rect.x,self.rect.bottom))"""
+
+            if move5 == True:
+                self.rect = self.rect.move(0,5)
+            elif move1 == True:
+                self.rect = self.rect.move(0,1)
+            
+        def render(self): # Show the enemy and visual effects
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            screen.blit(self.image, adjustedRect)
+            #Render Enemy
+            #Render Poison blob
+
+    #class RangedEnemyProjectile:
+    class PoisonShooterEnemyProjectile:
+        # When it hits somthing it will stay for a while
+        def __init__(self, location, damage, speed, angle):
+            #self.image = pygame.Surface((20,20))
+            #pygame.draw.circle(self.image, (23,52,200), (10,10), 10)
+            self.image = pygame.image.load("Images/Posion Projectile.PNG")
+            self.rect = self.image.get_rect()
+            self.rect.center = location
+            self.damage = damage
+            self.dx = speed * math.cos(angle)
+            self.dy = speed * math.sin(angle)
+            self.timer = 10 * fps
+            self.poisonTimer = fps * 2
+        def update(self):
+            # Check if it hits anything
+            hit = False
+            for wall in walls:
+                if self.rect.colliderect(wall.rect):
+                    hit = True
+                    break
+            if hit:
+                # Change image if hit something
+                self.image = pygame.image.load("Images/poison puddle.PNG")
+                #self.rect = self.image.get_rect()
+                self.timer -= 1
+                if self.timer <= 0:
+                    projectiles.remove(self)
+            else:
+                # Moving the projectile
+                self.dy += .05
+                self.rect = self.rect.move(self.dx,self.dy)
+
+            if self.rect.colliderect(Player.rect):
+                # Do damage if it does
+                Player.poisonCounter += 1
+                print("Player hit", Player.poisonCounter)
+                if hit == False:
+                    Player.applyDamage(6)
+                Player.isPoisoned = True
+                Player.applyPoison()
+                projectiles.remove(self)
+            
+
+        def render(self):
+            # Modifys the position based on the centered player position
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            # Renders wall using modified rect
+            screen.blit(self.image, adjustedRect)
+
+
     # worldPos, image, sized )
-    enemies = [poison_blob((0,0),pygame.image.load('Images/poison_blob.png'),(50,50))]
+    enemies = [poison_blob((0,0),pygame.image.load('Images/poison_blob.png'),(50,50)), PoisonShooterEnemy((-945, 338), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100))]
     projectiles = []
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
     midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
