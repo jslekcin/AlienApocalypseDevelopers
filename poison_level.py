@@ -833,7 +833,7 @@ def poisonLevelLoop():
 
             self.shootingDirection = 0
             
-            self.approachRange = 300
+            self.approachRange = 350
             self.attackRange = 200
             self.fleeRange = 100
 
