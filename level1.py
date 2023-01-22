@@ -1102,8 +1102,8 @@ def level1():
                 #print("attack")
 
                 #fire projectile
-                dx = Player.rect.centerx - self.rect.x
-                dy = Player.rect.centery - self.rect.y
+                dx = Player.rect.centerx - self.rect.centerx
+                dy = Player.rect.centery - self.rect.centery
                 if dx == 0:
                     dx = .001
                 angle = math.atan(dy/dx)
