@@ -915,6 +915,9 @@ def poisonLevelLoop():
                         projectiles.append(PoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
                         
                         # second shot
+                        xdist = Player.rect.centerx - self.rect.centerx
+                        ydist = Player.rect.centery - self.rect.centery
+                        angle = math.degrees(math.atan2(ydist,xdist))
                         angle = angle + random.randint(-40,40)
                         angle = math.radians(angle)
                         projectiles.append(PoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
