@@ -749,6 +749,7 @@ def poisonLevelLoop():
             self.image = pygame.transform.scale(image, self.size)
             self.rect = pygame.Rect(worldPos,size)
             
+            
             self.maxHealth = 100
             self.health = self.maxHealth
 
@@ -1055,15 +1056,15 @@ def poisonLevelLoop():
             self.image = pygame.transform.scale(image, self.size)
             self.rect = pygame.Rect(worldPos,size)
             
-            self.damage = 3
-            self.health = 15
-            self.speed  = 0
+            self.damage = 8
+            self.health = 125
+            self.speed  = 5
 
             self.shootingDirection = 0
             
-            self.approachRange = 1
-            self.attackRange = 500
-            self.fleeRange = 1
+            self.approachRange = 300
+            self.attackRange = 250
+            self.fleeRange = 75
 
             self.counter = 0
             self.puddle_counter = 0
@@ -1181,13 +1182,13 @@ def poisonLevelLoop():
         def __init__(self, location, damage, speed, angle):
             #self.image = pygame.Surface((20,20))
             #pygame.draw.circle(self.image, (23,52,200), (10,10), 10)
-            self.image = pygame.image.load("Images/NewPoisonProjectile.png")
+            self.image = pygame.image.load("Images/wizardproj.png")
             self.rect = self.image.get_rect()
             self.rect.center = location
             self.damage = damage
             self.dx = speed * math.cos(angle)
             self.dy = speed * math.sin(angle)
-            self.timer = 10 * fps
+            self.timer = 20 * fps
             self.poisonTimer = fps * 2
         def update(self):
             # Check if it hits anything
@@ -1198,7 +1199,7 @@ def poisonLevelLoop():
                     break
             if hit:
                 # Change image if hit something
-                self.image = pygame.image.load("Images/poison puddle.PNG")
+                self.image = pygame.image.load("Images/wizardpuddle.png")
                 #self.rect = self.image.get_rect()
                 self.timer -= 1
                 if self.timer <= 0:
@@ -1230,8 +1231,8 @@ def poisonLevelLoop():
         def __init__(self, location, damage, speed, angle):
             #self.image = pygame.Surface((20,20))
             #pygame.draw.circle(self.image, (23,52,200), (10,10), 10)
-            self.image = pygame.Surface((30,30))
-            self.image.fill((255,0,255))
+            self.image = pygame.Surface((75,50))
+            self.image.fill((64,224,208))
             self.rect = self.image.get_rect()
             self.rect.center = location
             self.damage = damage
@@ -1248,8 +1249,8 @@ def poisonLevelLoop():
                     break
             if hit:
                 # Change image if hit something
-                self.image = pygame.image.load("Images/poison puddle.PNG")
-                self.image = pygame.transform.scale(self.image, (150,50))
+                self.image = pygame.image.load("Images/wizardpuddle.png")
+                self.image = pygame.transform.scale(self.image, (200,90))
                 #self.rect = self.image.get_rect()
                 self.timer -= 1
                 if self.timer <= 0:
@@ -1288,7 +1289,7 @@ def poisonLevelLoop():
 
 
     # worldPos, image, sized )
-    enemies = [poison_blob((-300,338),pygame.image.load('Images/poison_blob.png'),(50,50)), PoisonShooterEnemy((-1450, 338), pygame.image.load('Images/NewPoisonShooter.png'),(64,100)), NewPoisonShooterEnemy((-3900, 338), pygame.image.load('Images/PoisonEnemy.png'), (64,100))]
+    enemies = [poison_blob((-300,338),pygame.image.load('Images/poison_blob.png'),(50,50)), PoisonShooterEnemy((-1450, 338), pygame.image.load('Images/NewPoisonShooter.png'),(64,100)), NewPoisonShooterEnemy((-3900, 338), pygame.image.load('Images/Wizardenemy.png'), (64,120))]
     projectiles = []
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
     midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
