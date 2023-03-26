@@ -15,6 +15,8 @@ def boss_fight_loop():
     pygame.mixer.init()
 
     uiFont = pygame.font.Font(None, 32)
+    levelFont = pygame.font.Font(None, 64)
+    borderFont = pygame.font.Font(None, 66)
 
     size = width, height=750, 750 # TODO: Decide on final window size
     screen = pygame.display.set_mode(size) 
@@ -849,6 +851,9 @@ def boss_fight_loop():
 
     clock = pygame.time.Clock()
 
+    titleTimer = fps * 3
+    titleInvis = 45
+
     while 1:
         clock.tick(fps) 
         
@@ -927,11 +932,11 @@ def boss_fight_loop():
         for wall in walls:
             wall.render()
 
-        for decor in foreground:
+        """for decor in foreground:
             decor.render()
             
         for decor in midground:
-            decor.render()
+            decor.render()"""
 
         for projectile in projectiles:
             projectile.render()
@@ -990,9 +995,22 @@ def boss_fight_loop():
 
             
         weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
+        mapText = levelFont.render("UFO Guard's Domain", True, (255, 255, 255))
+        borderText = levelFont.render("UFO Guard's Domain", True, (0, 0, 0))
         #levelText = uiFont.render(str(level), True, (255,255,255))
         screen.blit(weaponText, (10, 10))
         #screen.blit(levelText, (400, 10))
+        if titleTimer >= 0:
+            mapText.set_alpha(titleInvis/45 * 255)
+            borderText.set_alpha(titleInvis/45 * 255)
+            screen.blit(borderText, (243,228))
+            screen.blit(borderText, (247,232))
+            screen.blit(borderText, (243,232))
+            screen.blit(borderText, (247,228))
+            screen.blit(mapText,(245,230))
+            if titleTimer < 45:
+                titleInvis -= 1
+            titleTimer -= 1
 
         # print('TODO: Gameplay')
         pygame.display.flip()

@@ -13,6 +13,7 @@ def poisonLevelLoop():
     #from main_menu import mainMenuLoop
 
     uiFont = pygame.font.Font(None, 32)
+    levelFont = pygame.font.Font(None, 64)
 
     size = width, height = 750, 750 # TODO: Decide on final window size
     screen = pygame.display.set_mode(size) 
@@ -58,6 +59,10 @@ def poisonLevelLoop():
             weapon = None
             #alien_gems = 5
             attackCooldown = 0
+            #LaserGun
+            maxCoolDownBar = Save.maxCoolDownBar
+            coolDownBar = Save.coolDownBar
+            onCoolDown = Save.onCoolDown
             
 
             def update():
@@ -202,6 +207,13 @@ def poisonLevelLoop():
 
                 Player.prev_health = Player.health
 
+                if isinstance(Player.weapon, LaserGun):
+                    #print(Player.coolDownBar)
+                    Player.coolDownBar -= 0.2
+                    if Player.coolDownBar <= 0:
+                        Player.coolDownBar = 0
+                        Player.onCoolDown = False
+
                 if Player.isPoisoned == True:
                     #print(Player.poisonTimer, Player.isPoisoned)
                     Player.poisonTimer -= 1
@@ -266,6 +278,9 @@ def poisonLevelLoop():
                 Save.starting_pos = (2492, 794)
                 Save.health = Player.health
                 Save.stamina = Player.stamina
+                Save.maxCoolDownBar = Player.maxCoolDownBar
+                Save.coolDownBar = Player.coolDownBar
+                Save.onCoolDown = Player.onCoolDown
                 return "level1"
             
         def assignImage(self):
@@ -442,20 +457,29 @@ def poisonLevelLoop():
             self.attackSpeed = 0.2
             self.projectileSpeed = 20
         def attack(self):
+            if Player.onCoolDown == False:
+                Player.coolDownBar += 8
+                if Player.coolDownBar > 100:
+                    Player.coolDownBar = 100
 
-            mousePos = pygame.mouse.get_pos()
-            dx = mousePos[0] - Player.renderRect.centerx
-            dy = mousePos[1] - Player.renderRect.centery
-            if dx == 0:
-                dx = .001
-            angle = math.atan(dy/dx)
-            if dx < 0:
-                angle += math.pi
-            
-            xSpeed = self.projectileSpeed * math.cos(angle)
-            ySpeed = self.projectileSpeed * math.sin(angle)
-            projectiles.append(LaserBullet(xSpeed, ySpeed))
-            Player.attackCooldown = self.attackSpeed * fps
+                mousePos = pygame.mouse.get_pos()
+                dx = mousePos[0] - Player.renderRect.centerx
+                dy = mousePos[1] - Player.renderRect.centery
+                if dx == 0:
+                    dx = .001
+                angle = math.atan(dy/dx)
+                if dx < 0:
+                    angle += math.pi
+                
+                xSpeed = self.projectileSpeed * math.cos(angle)
+                ySpeed = self.projectileSpeed * math.sin(angle)
+                projectiles.append(LaserBullet(xSpeed, ySpeed))
+
+                if Player.coolDownBar >= Player.maxCoolDownBar:
+                    Player.onCoolDown = True        
+
+                Player.attackCooldown = self.attackSpeed * fps  
+              
         def render(self):
             mousePos = pygame.mouse.get_pos()
             dx = mousePos[0] - Player.renderRect.centerx
@@ -818,6 +842,7 @@ def poisonLevelLoop():
             # Modifys the position based on the centered player position
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             healthRect = pygame.Rect(adjustedRect.x, adjustedRect.y - 10, self.health / self.maxHealth * adjustedRect.w, 10)
+            pygame.draw.rect(screen, (0,255,0), healthRect)
             # Renders wall using modified rect
             screen.blit(self.image, adjustedRect)
 
@@ -829,7 +854,8 @@ def poisonLevelLoop():
             self.rect = pygame.Rect(worldPos,size)
             
             self.damage = 5
-            self.health = 15
+            self.maxHealth = 15
+            self.health = self.maxHealth
             self.speed  = 4
 
             self.shootingDirection = 0
@@ -916,6 +942,9 @@ def poisonLevelLoop():
                         projectiles.append(PoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
                         
                         # second shot
+                        xdist = Player.rect.centerx - self.rect.centerx
+                        ydist = Player.rect.centery - self.rect.centery
+                        angle = math.degrees(math.atan2(ydist,xdist))
                         angle = angle + random.randint(-40,40)
                         angle = math.radians(angle)
                         projectiles.append(PoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
@@ -947,6 +976,8 @@ def poisonLevelLoop():
             screen.blit(self.image, adjustedRect)
             #Render Enemy
             #Render Poison blob
+            healthRect = pygame.Rect(adjustedRect.x, adjustedRect.y - 10, self.health / self.maxHealth * adjustedRect.w, 10)
+            pygame.draw.rect(screen, (0,255,0), healthRect)
 
     #class RangedEnemyProjectile:
     class PoisonShooterEnemyProjectile:
@@ -997,6 +1028,7 @@ def poisonLevelLoop():
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             # Renders wall using modified rect
             screen.blit(self.image, adjustedRect)
+            
     
     class PoisonPuddleProjectile:
         # When it hits somthing it will stay for a while
@@ -1359,6 +1391,10 @@ def poisonLevelLoop():
             walls.append(wall)
 
     clock = pygame.time.Clock()
+
+    titleTimer = fps * 3
+    titleInvis = 45
+
     while 1:
         clock.tick(fps) 
         
@@ -1432,11 +1468,11 @@ def poisonLevelLoop():
         for wall in walls:
             wall.render()
 
-        for decor in foreground:
-            decor.render()
+        #for decor in foreground:
+            #decor.render()
             
-        for decor in midground:
-            decor.render()
+        #for decor in midground:
+            #decor.render()
 
         for projectile in projectiles:
             projectile.render()
@@ -1463,12 +1499,28 @@ def poisonLevelLoop():
         pygame.draw.rect(screen, (0,0,255), pygame.Rect(372,1,Player.stamina / Player.maxStamina * 200,30))
         staminaText = uiFont.render(f'{Player.stamina} / {Player.maxStamina}', True, (255, 255, 255))
         screen.blit(staminaText, (465 - staminaText.get_width() / 2,7))
+        #Draw LaserGun Cooldown Bar
+        if isinstance(Player.weapon, LaserGun) and Player.coolDownBar > 0:
+            pygame.draw.rect(screen, (0,0,0), pygame.Rect(271,32,200,30))
+            if Player.onCoolDown:
+                pygame.draw.rect(screen, (200,10,10), pygame.Rect(271,32,Player.coolDownBar / Player.maxCoolDownBar * 200,30))
+            else:
+                pygame.draw.rect(screen, (10,200,10), pygame.Rect(271,32,Player.coolDownBar / Player.maxCoolDownBar * 200,30))
+            laserText = uiFont.render(f'{Player.coolDownBar:0.2f} / {Player.maxCoolDownBar}', True, (255, 255, 255))
+            screen.blit(laserText, (370 - laserText.get_width() / 2,37))
 
             
         weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
+        mapText = levelFont.render("Poison Level", True, (255, 255, 255))
         #levelText = uiFont.render(str(level), True, (255,255,255))
         screen.blit(weaponText, (10, 10))
         #screen.blit(levelText, (400, 10))
+        if titleTimer >= 0:
+            mapText.set_alpha(titleInvis/45 * 255)
+            screen.blit(mapText,(245,230))
+            if titleTimer < 45:
+                titleInvis -= 1
+            titleTimer -= 1
 
         pygame.display.flip()
 
