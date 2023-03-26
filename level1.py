@@ -17,6 +17,7 @@ def level1():
     #from main_menu import mainMenuLoop
 
     uiFont = pygame.font.Font(None, 32)
+    levelFont = pygame.font.Font(None, 64)
 
     size = width, height = 750, 750 # TODO: Decide on final window size
     screen = pygame.display.set_mode(size) 
@@ -28,6 +29,7 @@ def level1():
     gameState = 1
 
     clock = pygame.time.Clock()
+
     # Classes
     class Player:
         # Loads image and creates a rect out of it
@@ -62,6 +64,10 @@ def level1():
         # Equipment
         weapon = None
         attackCooldown = 0
+        #LaserGun
+        maxCoolDownBar = Save.maxCoolDownBar
+        coolDownBar = Save.coolDownBar
+        onCoolDown = Save.onCoolDown
         
 
         def update():
@@ -203,6 +209,15 @@ def level1():
             elif pygame.mouse.get_pressed(3)[0]:
                 Player.weapon.attack()
 
+            Player.prev_health = Player.health
+
+            if isinstance(Player.weapon, LaserGun):
+                #print(Player.coolDownBar)
+                Player.coolDownBar -= 0.2
+                if Player.coolDownBar <= 0:
+                    Player.coolDownBar = 0
+                    Player.onCoolDown = False
+
             if Player.isPoisoned == True:
                 #print(Player.poisonTimer, Player.isPoisoned)
                 Player.poisonTimer -= 1
@@ -221,7 +236,7 @@ def level1():
 
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
-            Player.prev_health = Player.health
+            
 
         def applyPoison():
             Player.poisonTimer = fps * 2
@@ -320,6 +335,9 @@ def level1():
                 Save.starting_pos = (528, 609)
                 Save.health = Player.health
                 Save.stamina = Player.stamina
+                Save.maxCoolDownBar = Player.maxCoolDownBar
+                Save.coolDownBar = Player.coolDownBar
+                Save.onCoolDown = Player.onCoolDown
                 return "poison_level"
             
         def assignImage(self):
@@ -511,33 +529,35 @@ def level1():
             self.renderImage = pygame.transform.rotozoom(self.image_right, self.angle, self.scale)
             """self.new_rect_right = self.new_image_right.get_rect()
             self.center=[self.new_rect_right.centerx,self.new_rect_right.centery]"""#center
-            
-
-            #self.rotated_image_right = pygame.transform.rotate(self.image_right, int(image_angle))
-            #self.rect_right = self.image_right.get_rect()#center=(self.rotated_image_right[0], self.rotated_image_right[1])\
-            #self.rect_right.center = [self.rotated_image_right[0], self.rotated_image_right[1]]
-
-            #self.rotated_image_right = pygame.transform.rotate(self.image_right, self.angle)
-            #self.rotated_rect_right = self.rotated_image_right.get_rect(center = self.image_right.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)
 
             self.damage = 1
             self.attackSpeed = 0.2
             self.projectileSpeed = 20
-        def attack(self):
-
-            mousePos = pygame.mouse.get_pos()
-            dx = mousePos[0] - Player.renderRect.centerx
-            dy = mousePos[1] - Player.renderRect.centery
-            if dx == 0:
-                dx = .001
-            angle = math.atan(dy/dx)
-            if dx < 0:
-                angle += math.pi
             
-            xSpeed = self.projectileSpeed * math.cos(angle)
-            ySpeed = self.projectileSpeed * math.sin(angle)
-            projectiles.append(LaserBullet(xSpeed, ySpeed))
-            Player.attackCooldown = self.attackSpeed * fps
+        def attack(self):
+            if Player.onCoolDown == False:
+                Player.coolDownBar += 8
+                if Player.coolDownBar > 100:
+                    Player.coolDownBar = 100
+
+                mousePos = pygame.mouse.get_pos()
+                dx = mousePos[0] - Player.renderRect.centerx
+                dy = mousePos[1] - Player.renderRect.centery
+                if dx == 0:
+                    dx = .001
+                angle = math.atan(dy/dx)
+                if dx < 0:
+                    angle += math.pi
+                
+                xSpeed = self.projectileSpeed * math.cos(angle)
+                ySpeed = self.projectileSpeed * math.sin(angle)
+                projectiles.append(LaserBullet(xSpeed, ySpeed))
+
+                if Player.coolDownBar >= Player.maxCoolDownBar:
+                    Player.onCoolDown = True        
+
+                Player.attackCooldown = self.attackSpeed * fps        
+
         def render(self):
             mousePos = pygame.mouse.get_pos()
             dx = mousePos[0] - Player.renderRect.centerx
@@ -861,7 +881,8 @@ def level1():
             self.rect = pygame.Rect(worldPos,size)
             
             self.damage = 5
-            self.health = 7
+            self.maxHealth = 7
+            self.health = self.maxHealth
             self.speed  = 4
 
             self.shootingDirection = 0
@@ -957,6 +978,8 @@ def level1():
         def render(self): # Show the enemy and visual effects
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             screen.blit(self.image, adjustedRect)
+            healthRect = pygame.Rect(adjustedRect.x, adjustedRect.y - 10, self.health / self.maxHealth * adjustedRect.w, 10)
+            pygame.draw.rect(screen, (0,255,0), healthRect)
             #Render Enemy
             #Render Poison blob
 
@@ -1019,7 +1042,8 @@ def level1():
             self.rect = pygame.Rect(worldPos,size)
             self.damage = 20
             self.speed = 1
-            self.health = 10
+            self.maxHealth = 10
+            self.health = self.maxHealth
             self.cooldown = 0
 
             self.invisiblity = 0
@@ -1060,6 +1084,8 @@ def level1():
         def render(self): # Show the enemy and visual effects
             # Modifys the position based on the centered player position
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            healthRect = pygame.Rect(adjustedRect.x, adjustedRect.y - 10, self.health / self.maxHealth * adjustedRect.w, 10)
+            pygame.draw.rect(screen, (0,255,0), healthRect)
             self.image.set_alpha(self.invisibility / 100 * 255)
             # Renders wall using modified rect
             screen.blit(self.image, adjustedRect)
@@ -1072,7 +1098,8 @@ def level1():
             self.image = pygame.transform.scale(image, self.size)
             self.damage = 5
             self.speed = 2
-            self.health = 10
+            self.maxHealth = 10
+            self.health = self.maxHealth
             self.maxCooldown = 75
             self.cooldown = self.maxCooldown
             self.onCooldown = True
@@ -1203,6 +1230,8 @@ def level1():
         def render(self):
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             screen.blit(self.image, adjustedRect)
+            healthRect = pygame.Rect(adjustedRect.x + 20, adjustedRect.y - 10, self.health / self.maxHealth * (adjustedRect.w - 45), 10)
+            pygame.draw.rect(screen, (0,255,0), healthRect)
 
     class FlyingEnemyProjectile:
         def __init__(self, xSpeed, ySpeed,center):
@@ -1212,11 +1241,22 @@ def level1():
             self.xSpeed = xSpeed
             self.ySpeed = ySpeed
             self.rect.center = center
+            self.deathTimer = 120
         def update(self):
             self.rect = self.rect.move(self.xSpeed, self.ySpeed)
             if self.rect.colliderect(Player.rect):
                 Player.applyDamage(5)
                 projectiles.remove(self)
+            for wall in walls:
+                if self.rect.colliderect(wall.rect):
+                    projectiles.remove(self)
+                    return
+            self.deathTimer -= 1
+            if self.deathTimer < 1:
+                projectiles.remove(self)
+                print("disappear")
+            
+            
         def render(self):
             # Modifys the position based on the centered player position
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
@@ -1324,6 +1364,9 @@ def level1():
 
     portalRect = pygame.Rect(-744, 755, 460, 225)
     portalAdjustedRect = portalRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+
+    titleTimer = fps * 3
+    titleInvis = 45
 
     while 1:
         """if pygame.key.get_pressed()[pygame.K_ESCAPE]:
@@ -1462,14 +1505,14 @@ def level1():
             for wall in walls:
                 wall.render()
 
-            for decor in foreground:
+            """for decor in foreground:
                 decor.render()
+
+            for decor in midground:
+                decor.render()"""
 
             for item in items:
                 item.render()
-
-            for decor in midground:
-                decor.render()
 
             for projectile in projectiles:
                 projectile.render()
@@ -1508,13 +1551,30 @@ def level1():
             staminaText = uiFont.render(f'{Player.stamina} / {Player.maxStamina}', True, (255, 255, 255))
             screen.blit(staminaText, (465 - staminaText.get_width() / 2,7))
 
-            
+            #Draw LaserGun Cooldown Bar
+            if isinstance(Player.weapon, LaserGun) and Player.coolDownBar > 0:
+                pygame.draw.rect(screen, (0,0,0), pygame.Rect(271,32,200,30))
+                if Player.onCoolDown:
+                    pygame.draw.rect(screen, (200,10,10), pygame.Rect(271,32,Player.coolDownBar / Player.maxCoolDownBar * 200,30))
+                else:
+                    pygame.draw.rect(screen, (10,200,10), pygame.Rect(271,32,Player.coolDownBar / Player.maxCoolDownBar * 200,30))
+                laserText = uiFont.render(f'{Player.coolDownBar:0.2f} / {Player.maxCoolDownBar}', True, (255, 255, 255))
+                screen.blit(laserText, (370 - laserText.get_width() / 2,37))
+
             weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
             levelText = uiFont.render(str(level), True, (255,255,255))
             gemText = uiFont.render("Alien_Gems:"+str(Save.gems[0]), True, (255,255,255))
+            mapText = levelFont.render("Main Level", True, (255, 255, 255))
             screen.blit(weaponText, (10, 10))
             screen.blit(levelText, (720, 6))
             screen.blit(gemText, (0, 40))
+            if titleTimer >= 0:
+                mapText.set_alpha(titleInvis/45 * 255)
+                screen.blit(mapText,(260,230))
+                if titleTimer < 45:
+                    titleInvis -= 1
+                titleTimer -= 1
+                
 
             portalText1 = uiFont.render("Gems Needed "+ str(Save.gems[0]) + "/5.", False, (0, 255, 0))
             portalText2 = uiFont.render("Press 'F' To Summon Portal.", False, (0, 255, 0))
@@ -1528,7 +1588,6 @@ def level1():
                         
             #portalText2 = uiFont.render("The Portal Has Been ", False, (0, 255, 0))
 
-
             if generatingMap:
                 screen.blit(pygame.transform.scale(WallSave.blockImages[blockImageIndex], (25,25)), (220,220))
 
@@ -1537,8 +1596,8 @@ def level1():
             #print(mousePos)
             pygame.display.flip()
 
-            if pygame.mouse.get_pressed(3)[0]:
-                print(mousePosW)
+            #if pygame.mouse.get_pressed(3)[0]:
+                #print(mousePosW)
 
 if __name__ == "__main__":
     level1()

@@ -17,6 +17,8 @@ def tutorialLoop():
     #from main_menu import mainMenuLoop
 
     uiFont = pygame.font.Font(None, 32)
+    levelFont = pygame.font.Font(None, 64)
+    outLineFont = pygame.font.Font(None, 74)
 
     size = width, height = 750, 750 # TODO: Decide on final window size
     screen = pygame.display.set_mode(size) 
@@ -499,6 +501,10 @@ def tutorialLoop():
             walls.append(wall)
 
     clock = pygame.time.Clock()
+
+    titleTimer = fps * 3
+    titleInvis = 45
+    
     while 1:
         clock.tick(fps) 
         
@@ -634,6 +640,13 @@ def tutorialLoop():
         #levelText = uiFont.render(str(level), True, (255,255,255))
         screen.blit(weaponText, (10, 10))
         #screen.blit(levelText, (400, 10))
+        mapText = levelFont.render("The Cave", True, (255, 255, 255))
+        if titleTimer >= 0:
+            mapText.set_alpha(titleInvis/45 * 255)
+            screen.blit(mapText,(270,250))
+            if titleTimer < 45:
+                titleInvis -= 1
+            titleTimer -= 1
 
     
         if pygame.mouse.get_pressed(3)[0]:
