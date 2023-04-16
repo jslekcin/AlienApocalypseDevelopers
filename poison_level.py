@@ -771,19 +771,24 @@ def poisonLevelLoop():
             # Generates rect from given parameters
             self.size = size
             self.image = pygame.transform.scale(image, self.size)
+            self.rect = pygame.Rect(worldPos,size)  
+            self.damage = 5
             self.rect = pygame.Rect(worldPos,size)
             
             
-            self.maxHealth = 100
+            self.maxHealth = 20
             self.health = self.maxHealth
+            
 
-            # Movement Variables
             self.facingLeft = False
             self.speed = 2
             self.timer = 0
-
+            self.cooldown = 0
+            self.poisonTimer = fps * 2
+        
+            
         def update(self):
-            # Check that enemy is on screen
+            
             if Player.rect.x - self.rect.x < 500 or Player.rect.x - self.rect.x > -500:
                 # Set the direction enemy is facing
                 if self.rect.x < Player.rect.x:
@@ -791,7 +796,7 @@ def poisonLevelLoop():
                 else:
                     self.facingLeft = True
 
-                # Move based on direction facing
+             
                 if self.facingLeft:
                     moveable = False
                     collideRect = pygame.Rect(self.rect.x - self.speed, self.rect.y, self.speed, self.rect.h)
@@ -838,6 +843,21 @@ def poisonLevelLoop():
             elif move1 == True:
                 self.rect = self.rect.move(0,1)
 
+            if self.cooldown == 0:
+                distToPlayer = ((Player.rect.x - self.rect.x)**2 + (Player.rect.y - self.rect.y)**2)**.5
+                if distToPlayer < 85:
+                    # Attack player
+                    self.cooldown = 5 * fps
+                    Player.applyDamage(self.damage)
+                    Player.poisonCounter += 1
+                    print("Player hit", Player.poisonCounter)
+                    Player.isPoisoned = True
+                    Player.applyPoison()
+            else: self.cooldown -= 1
+            if self.health <= 0:
+                enemies.remove(self)
+
+
         def render(self):
             # Modifys the position based on the centered player position
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
@@ -854,7 +874,7 @@ def poisonLevelLoop():
             self.rect = pygame.Rect(worldPos,size)
             
             self.damage = 5
-            self.maxHealth = 15
+            self.maxHealth = 35
             self.health = self.maxHealth
             self.speed  = 4
 
@@ -1089,7 +1109,8 @@ def poisonLevelLoop():
             self.rect = pygame.Rect(worldPos,size)
             
             self.damage = 8
-            self.health = 125
+            self.maxHealth = 120
+            self.health = self.maxHealth
             self.speed  = 5
 
             self.shootingDirection = 0
@@ -1173,12 +1194,12 @@ def poisonLevelLoop():
                         # Add in inaccuracy
                         angle = angle + random.randint(-40,40)
                         angle = math.radians(angle)
-                        projectiles.append(NewPoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
+                        projectiles.append(NewPoisonShooterEnemyProjectile(self.rect.center, 5,5, angle))
                         
                         # second shot
-                        angle = angle + random.randint(-40,40)
-                        angle = math.radians(angle)
-                        projectiles.append(NewPoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
+                        #angle = angle + random.randint(-40,40)
+                        #angle = math.radians(angle)
+                        #projectiles.append(NewPoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
                     
             
             floorCheck = (self.rect.centerx,self.rect.bottom + 5)
@@ -1196,6 +1217,7 @@ def poisonLevelLoop():
                 """number = random.randint(1,10)
                 if number == 1:
                     gems.append(Gem(self.rect.x,self.rect.bottom))"""
+                
 
             if move5 == True:
                 self.rect = self.rect.move(0,5)
@@ -1207,6 +1229,8 @@ def poisonLevelLoop():
             screen.blit(self.image, adjustedRect)
             #Render Enemy
             #Render Poison blob
+            healthRect = pygame.Rect(adjustedRect.x, adjustedRect.y - 10, self.health / self.maxHealth * adjustedRect.w, 10)
+            pygame.draw.rect(screen, (0,255,0), healthRect)
 
     #class RangedEnemyProjectile:
     class NewPoisonShooterEnemyProjectile:
@@ -1215,6 +1239,8 @@ def poisonLevelLoop():
             #self.image = pygame.Surface((20,20))
             #pygame.draw.circle(self.image, (23,52,200), (10,10), 10)
             self.image = pygame.image.load("Images/wizardproj.png")
+            self.image = pygame.transform.scale(self.image,(65,65))
+            self.hit = False
             self.rect = self.image.get_rect()
             self.rect.center = location
             self.damage = damage
@@ -1224,14 +1250,19 @@ def poisonLevelLoop():
             self.poisonTimer = fps * 2
         def update(self):
             # Check if it hits anything
-            hit = False
-            for wall in walls:
-                if self.rect.colliderect(wall.rect):
-                    hit = True
-                    break
-            if hit:
+            #hit = False
+            if self.hit == False:
+            
+                for wall in walls:
+                    if self.rect.colliderect(wall.rect):
+                        self.hit = True
+                        self.rect = self.rect.move(0,55)
+                        break
+            if self.hit:
                 # Change image if hit something
                 self.image = pygame.image.load("Images/wizardpuddle.png")
+                self.image = pygame.transform.scale(self.image,(65,30))
+                self.rect
                 #self.rect = self.image.get_rect()
                 self.timer -= 1
                 if self.timer <= 0:
@@ -1245,7 +1276,7 @@ def poisonLevelLoop():
                 # Do damage if it does
                 Player.poisonCounter += 1
                 print("Player hit", Player.poisonCounter)
-                if hit == False:
+                if self.hit == False:
                     Player.applyDamage(6)
                 Player.isPoisoned = True
                 Player.applyPoison()
@@ -1263,7 +1294,7 @@ def poisonLevelLoop():
         def __init__(self, location, damage, speed, angle):
             #self.image = pygame.Surface((20,20))
             #pygame.draw.circle(self.image, (23,52,200), (10,10), 10)
-            self.image = pygame.Surface((75,50))
+            self.image = pygame.Surface((65,50))
             self.image.fill((64,224,208))
             self.rect = self.image.get_rect()
             self.rect.center = location
