@@ -7,9 +7,10 @@ import intructions
 import tutorial
 import boss_fight
 import poison_level
+import poison_boss
 from player_save import Save
 
-level = "tutorial"
+level = "poison_boss"
 prev_level = ""
 
 while level != "quit":
@@ -33,6 +34,9 @@ while level != "quit":
 
     if level == "poison_level":
         level = poison_level.poisonLevelLoop()
+
+    if level == "poison_boss":
+        level = poison_boss.poison_boss_loop()
 
     for event in pygame.event.get():
             if event.type == Event_system.On_Death:

@@ -391,7 +391,7 @@ def level1():
         def __init__(self):
             self.name = 'Sword'
             self.damage = 8
-            self.attackSpeed = .3
+            self.attackSpeed = .7
             self.image_left = pygame.image.load("Images/Sword(left).png")
             self.image_left = pygame.transform.scale(self.image_left, (110,140))
             self.image_right = pygame.image.load("Images/Sword(right).png")
@@ -632,9 +632,9 @@ def level1():
     class Bat(Weapon):
         def __init__(self):
             self.name = 'Bat'
-            self.damage = 10
+            self.damage = 6
             self.range = 32 #irection we are facing and create a rect in that direction
-            self.attackSpeed = .5
+            self.attackSpeed = 1
             self.image = pygame.image.load("Images\Bat3.PNG")
             self.image = pygame.transform.scale(self.image,(120,130))
         def attack(self):
@@ -881,7 +881,7 @@ def level1():
             self.rect = pygame.Rect(worldPos,size)
             
             self.damage = 5
-            self.maxHealth = 7
+            self.maxHealth = 20
             self.health = self.maxHealth
             self.speed  = 4
 
@@ -1042,7 +1042,7 @@ def level1():
             self.rect = pygame.Rect(worldPos,size)
             self.damage = 20
             self.speed = 1
-            self.maxHealth = 10
+            self.maxHealth = 20
             self.health = self.maxHealth
             self.cooldown = 0
 
@@ -1098,7 +1098,7 @@ def level1():
             self.image = pygame.transform.scale(image, self.size)
             self.damage = 5
             self.speed = 2
-            self.maxHealth = 10
+            self.maxHealth = 20
             self.health = self.maxHealth
             self.maxCooldown = 75
             self.cooldown = self.maxCooldown

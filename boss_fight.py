@@ -225,7 +225,7 @@ def boss_fight_loop():
         def __init__(self):
             self.name = 'Sword'
             self.damage = 8
-            self.attackSpeed = .3
+            self.attackSpeed = .7
             self.image_left = pygame.image.load("Images/Sword(left).png")
             self.image_left = pygame.transform.scale(self.image_left, (110,140))
             self.image_right = pygame.image.load("Images/Sword(right).png")
@@ -465,9 +465,9 @@ def boss_fight_loop():
     class Bat(Weapon):
         def __init__(self):
             self.name = 'Bat'
-            self.damage = 10
+            self.damage = 6
             self.range = 32 #irection we are facing and create a rect in that direction
-            self.attackSpeed = .5
+            self.attackSpeed = 1
             self.image = pygame.image.load("Images\Bat3.PNG")
             self.image = pygame.transform.scale(self.image,(120,130))
         def attack(self):

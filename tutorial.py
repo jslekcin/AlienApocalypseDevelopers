@@ -235,9 +235,9 @@ def tutorialLoop():
     class Bat(Weapon):
         def __init__(self):
             self.name = 'Bat'
-            self.damage = 10
+            self.damage = 6
             self.range = 32 #irection we are facing and create a rect in that direction
-            self.attackSpeed = .5
+            self.attackSpeed = 1
             self.image = pygame.image.load("Images\Bat3.PNG")
             self.image = pygame.transform.scale(self.image,(120,130))
         def attack(self):
