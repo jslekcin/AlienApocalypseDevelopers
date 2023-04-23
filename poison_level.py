@@ -184,6 +184,37 @@ def poisonLevelLoop():
                             Player.ySpeed = 0
                             Player.rect.top = wall.rect.bottom
 
+                for wall in Barriers:
+                    # Standing on floor
+                    if wall.rect.colliderect(belowRect):
+                        downC = True
+                        if downA:
+                            Player.ySpeed = 0
+                            Player.rect.bottom = wall.rect.top
+                        # Slows player x movement
+                        if Player.xSpeed > 0 and not pygame.key.get_pressed()[pygame.K_d]:
+                            Player.xSpeed -= Player.xFriction
+                        if Player.xSpeed < 0 and not pygame.key.get_pressed()[pygame.K_a]:
+                            Player.xSpeed += Player.xFriction
+                        # Jump
+                        if pygame.key.get_pressed()[pygame.K_SPACE]:
+                            Player.ySpeed = -10
+                    if wall.rect.colliderect(leftRect):
+                        leftC = True
+                        if leftA:
+                            Player.xSpeed = 0
+                            Player.rect.left = wall.rect.right
+                    if wall.rect.colliderect(rightRect):
+                        rightC = True
+                        if rightA:
+                            Player.xSpeed = 0
+                            Player.rect.right = wall.rect.left
+                    if wall.rect.colliderect(topRect):
+                        upC = True
+                        if upA:
+                            Player.ySpeed = 0
+                            Player.rect.top = wall.rect.bottom
+
                 Player.rect = Player.rect.move(Player.xSpeed, Player.ySpeed)
 
                 # Updates player y position then the velocity based on acceleration
@@ -1364,13 +1395,20 @@ def poisonLevelLoop():
             screen.blit(self.image, adjustedRect)
 
     class Barrier:
-        def __init__(self,worldPos):
-            self.image = pygame.Surface((50,150))
+        def __init__(self,worldPos,enemyCount,size):
+            self.image = pygame.Surface((size))
             self.image.fill((255,0,0))
-            self.rect = self.image.get_rect()
-            self.rect.bottom = Player.rect.bottom
-            self.rect[0] = Player.rect[0] - 150
             self.rect = pygame.Rect(worldPos,size)
+            self.enemyCount = enemyCount
+        
+        def update(self):       
+            if len(enemies) >= self.enemyCount:
+                self.render()
+
+            else:
+                Barriers.remove(self)
+        
+        
         def render(self):
         # Modifys the position based on the centered player position
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
@@ -1390,7 +1428,7 @@ def poisonLevelLoop():
 
                     
     # worldPos, image, sized )
-    Barriers = [Barrier((-1650,338))]
+    Barriers = [Barrier((-1650,150), 2,(40,450)), Barrier((-3300,100),1,(40,500))]
     enemies = [poison_blob((-300,338),pygame.image.load('Images/poison_blob.png'),(50,50)), PoisonShooterEnemy((-1450, 338), pygame.image.load('Images/NewPoisonShooter.png'),(64,100)), NewPoisonShooterEnemy((-3900, 338), pygame.image.load('Images/Wizardenemy.png'), (64,120))]
     projectiles = []
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
@@ -1558,12 +1596,9 @@ def poisonLevelLoop():
         sword_item.render()
 
         mainPortal.render()
-
-        if len(enemies) <= 2:
-            barrier.render()
         
         for barrier in Barriers:
-            barrier.render()
+            barrier.update()
         
 
         if Player.health <= 0:
