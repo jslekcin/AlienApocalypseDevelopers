@@ -1339,19 +1339,28 @@ def poisonLevelLoop():
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             # Renders wall using modified rect
             screen.blit(self.image, adjustedRect)
-            
-            
-            
 
-            
+    class Barrier:
+        def __init__(self):
+            self.image = pygame.Surface((50,150))
+            self.image.fill((255,0,0))
+            self.rect = self.image.get_rect()
+            self.rect.bottom = Player.rect.bottom
+            self.rect[0] = Player.rect[0] - 150
 
-            
-            
+        #def update(self):
+            #if Player.BarrierPlaced == False:
+                #self.rect.bottom = Player.rect.bottom
+                #self.rect.x,self.rect.y = 2550, 725
+            #elif Player.BarrierPlaced == True:
+                #if self.rect.colliderect(Player.rect):
+                   #print("collided")
+                
+                
 
-            
-
-
+                    
     # worldPos, image, sized )
+    Barriers = [Barrier((-1650,338))]
     enemies = [poison_blob((-300,338),pygame.image.load('Images/poison_blob.png'),(50,50)), PoisonShooterEnemy((-1450, 338), pygame.image.load('Images/NewPoisonShooter.png'),(64,100)), NewPoisonShooterEnemy((-3900, 338), pygame.image.load('Images/Wizardenemy.png'), (64,120))]
     projectiles = []
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
@@ -1514,6 +1523,10 @@ def poisonLevelLoop():
         Player.render()    
 
         mainPortal.render()
+
+        if len(enemies) <= 2:
+            Barrier.render()
+        
 
         if Player.health <= 0:
             pygame.event.post(pygame.event.Event(Event_system.On_Death))
