@@ -8,7 +8,7 @@ def deathScreenLoop(prev_level):
 
     size = width, height = 500, 500 
 
-    uiFont = pygame.font.Font(None, 80)
+    uiFont = pygame.font.Font(None, 65)
     screen = pygame.display.set_mode(size)
 
     QuitButtonPressed = False
@@ -19,8 +19,8 @@ def deathScreenLoop(prev_level):
             break
         mouse = pygame.mouse.get_pos()
 
-        quitRect = pygame.Rect(160, 280, 170, 50)
-        retryRect = pygame.Rect(170, 160, 190, 50)
+        quitRect = pygame.Rect(155, 280, 200, 60)
+        retryRect = pygame.Rect(155, 160, 200, 65)
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -45,16 +45,16 @@ def deathScreenLoop(prev_level):
         pygame.draw.rect(screen,(255,255,255),quitRect)
         pygame.draw.rect(screen,(0,0,0),retryRect)
 
-        screen.blit(QuitText, (160, 280))
+        screen.blit(QuitText, (195, 290))
         
         
         RetryText = uiFont.render("RETRY", True, (255,255,255))
 
-        screen.blit(RetryText, (180, 160))
+        screen.blit(RetryText, (181, 170))
         
         #pygame.draw.rect(screen, (0,0,0),(0,0,75,50))
         DeathScreenText = uiFont.render("YOU DIED", True, (252,3,3))
-        screen.blit(DeathScreenText, (125,45))
+        screen.blit(DeathScreenText, (155,45))
 
         
 

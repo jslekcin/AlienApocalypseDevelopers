@@ -10,7 +10,7 @@ import poison_level
 import poison_boss
 from player_save import Save
 
-level = "poison_level"
+level = "death_screen"
 prev_level = ""
 
 while level != "quit":

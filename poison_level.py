@@ -1341,12 +1341,19 @@ def poisonLevelLoop():
             screen.blit(self.image, adjustedRect)
 
     class Barrier:
-        def __init__(self):
+        def __init__(self,worldPos):
             self.image = pygame.Surface((50,150))
             self.image.fill((255,0,0))
             self.rect = self.image.get_rect()
             self.rect.bottom = Player.rect.bottom
             self.rect[0] = Player.rect[0] - 150
+            self.rect = pygame.Rect(worldPos,size)
+        def render(self):
+        # Modifys the position based on the centered player position
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            # Renders wall using modified rect
+            screen.blit(self.image, adjustedRect)
+            
 
         #def update(self):
             #if Player.BarrierPlaced == False:
@@ -1525,7 +1532,10 @@ def poisonLevelLoop():
         mainPortal.render()
 
         if len(enemies) <= 2:
-            Barrier.render()
+            barrier.render()
+        
+        for barrier in Barriers:
+            barrier.render()
         
 
         if Player.health <= 0:
