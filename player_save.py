@@ -17,6 +17,6 @@ class Save:
     onCoolDown = False
 
 
-    weapons = {"Bat":True,"Sword":True,"Gun":True,"LaserGun":True}
+    weapons = {"Bat":True,"Sword":True,"Gun":True,"LaserGun":False}
 
     

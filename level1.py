@@ -196,9 +196,9 @@ def level1():
             #Weapon changing function
             if pygame.key.get_pressed()[pygame.K_1] and Save.weapons["Bat"]:
                 Player.weapon = Bat()
-            elif pygame.key.get_pressed()[pygame.K_2]:
+            elif pygame.key.get_pressed()[pygame.K_2] and Save.weapons["Gun"]:
                 Player.weapon = Gun()
-            elif pygame.key.get_pressed()[pygame.K_3]:
+            elif pygame.key.get_pressed()[pygame.K_3] and Save.weapons["Sword"]:
                 Player.weapon = Sword()
             elif pygame.key.get_pressed()[pygame.K_4] and Save.weapons["LaserGun"]:
                 Player.weapon = LaserGun()
@@ -426,7 +426,6 @@ def level1():
             self.image_left = pygame.transform.scale(self.image_left, (60,70))
             self.image_right = pygame.image.load("Images/gun (right).png")
             self.image_right = pygame.transform.scale(self.image_right, (60,70)) 
-            self.damage = 10
             self.attackSpeed = 1
             self.projectileSpeed = 15
         def attack(self):
@@ -477,6 +476,7 @@ def level1():
             self.rect = self.image.get_rect()
             self.rect.center = Player.rect.center
             self.deathTimer = 120
+            self.damage = 10
             
         def update(self):
             self.rect = self.rect.move(self.xSpeed, self.ySpeed)
@@ -487,7 +487,7 @@ def level1():
 
             for enemy in enemies:
                 if self.rect.colliderect(enemy.rect):
-                    enemy.health -= 3
+                    enemy.health -= self.damage
                     projectiles.remove(self)
                     return
                 
@@ -500,6 +500,29 @@ def level1():
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             # Renders wall using modified rect
             screen.blit(self.image, adjustedRect)
+
+    class GunItem:
+        def __init__(self,worldPos,image,size):
+            #Bat Item
+            self.pos = worldPos
+            self.size = size
+            self.rect = pygame.Rect(self.pos,self.size)
+            self.image = pygame.transform.scale(image, self.size)
+            #self.rect = self.image.get_rect()
+            
+
+        def update(self):
+            #print(self.rect)
+            self.rect.center = self.pos
+            if self.rect.colliderect(Player.rect):
+                Save.weapons["Gun"] = True
+
+        def render(self):
+            #adjust position based on players position
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            #render image
+            if Save.weapons["Gun"] == False:
+                screen.blit(self.image, adjustedRect)
 
     class LaserGun(Weapon):
         def __init__(self):
@@ -1333,7 +1356,7 @@ def level1():
     projectiles = []
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
     midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
-    items = [healthItem((-1284, 919))]
+    items = [healthItem((-1284, 919)), GunItem((1823, 647),pygame.image.load("Images/Gun (left).png"),(102,119))]
 
     generatingMap = not loadFile
     editPageNum = len(walls)-1
@@ -1596,8 +1619,8 @@ def level1():
             #print(mousePos)
             pygame.display.flip()
 
-            #if pygame.mouse.get_pressed(3)[0]:
-                #print(mousePosW)
+            if pygame.mouse.get_pressed(3)[0]:
+                print(mousePosW)
 
 if __name__ == "__main__":
     level1()

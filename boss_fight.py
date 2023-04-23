@@ -185,9 +185,9 @@ def boss_fight_loop():
             #Weapon changing function
             if pygame.key.get_pressed()[pygame.K_1] and Save.weapons["Bat"]:
                 Player.weapon = Bat()
-            elif pygame.key.get_pressed()[pygame.K_2]:
+            elif pygame.key.get_pressed()[pygame.K_2] and Save.weapons["Gun"]:
                 Player.weapon = Gun()
-            elif pygame.key.get_pressed()[pygame.K_3]:
+            elif pygame.key.get_pressed()[pygame.K_3] and Save.weapons["Sword"]:
                 Player.weapon = Sword()
             elif pygame.key.get_pressed()[pygame.K_4] and Save.weapons["LaserGun"]:
                 Player.weapon = LaserGun()
@@ -260,17 +260,18 @@ def boss_fight_loop():
             self.image_left = pygame.image.load("Images/gun (left).png")
             self.image_left = pygame.transform.scale(self.image_left, (60,70))
             self.image_right = pygame.image.load("Images/gun (right).png")
-            self.image_right = pygame.transform.scale(self.image_right, (60,70))
-            self.damage = 12
+            self.image_right = pygame.transform.scale(self.image_right, (60,70)) 
             self.attackSpeed = 1
             self.projectileSpeed = 15
         def attack(self):
-            
             #gunshot sound
             pygame.mixer.music.load('sounds\gunshot.mp3')
             pygame.mixer.music.set_volume(0.3)
             pygame.mixer.music.play()
-            
+            #pygame.mixer.music.load('sounds\gunshot.mp3')
+            #pygame.mixer.music.set_volume(0.3)
+            #pygame.mixer.music.play()
+
             mousePos = pygame.mouse.get_pos()
             dx = mousePos[0] - Player.renderRect.centerx
             dy = mousePos[1] - Player.renderRect.centery
@@ -310,6 +311,7 @@ def boss_fight_loop():
             self.rect = self.image.get_rect()
             self.rect.center = Player.rect.center
             self.deathTimer = 120
+            self.damage = 10
             
         def update(self):
             self.rect = self.rect.move(self.xSpeed, self.ySpeed)
@@ -320,16 +322,14 @@ def boss_fight_loop():
 
             for enemy in enemies:
                 if self.rect.colliderect(enemy.rect):
-                    enemy.health -= 5
+                    enemy.health -= self.damage
                     projectiles.remove(self)
                     return
-            
+                
             self.deathTimer -= 1
             if self.deathTimer < 1:
                 projectiles.remove(self)
-                
-            
-            
+                print("disappear")
         def render(self):
             # Modifys the position based on the centered player position
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])

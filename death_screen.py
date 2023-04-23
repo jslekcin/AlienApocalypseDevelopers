@@ -6,7 +6,7 @@ def deathScreenLoop(prev_level):
     pygame.init()
     pygame.font.init()
 
-    size = width, height = 500, 500 
+    size = width, height = 750, 750 
 
     uiFont = pygame.font.Font(None, 65)
     screen = pygame.display.set_mode(size)
@@ -34,8 +34,8 @@ def deathScreenLoop(prev_level):
                     return prev_level
 
 
-        death_image = pygame.image.load('Images/death.jpg')
-        death_image = pygame.transform.scale(death_image,[500,500])
+        death_image = pygame.image.load('Images/death3.png')
+        death_image = pygame.transform.scale(death_image,[750,750])
         screen.blit(death_image,(0,0))
 
 
@@ -53,8 +53,8 @@ def deathScreenLoop(prev_level):
         screen.blit(RetryText, (181, 170))
         
         #pygame.draw.rect(screen, (0,0,0),(0,0,75,50))
-        DeathScreenText = uiFont.render("YOU DIED", True, (252,3,3))
-        screen.blit(DeathScreenText, (155,45))
+        """DeathScreenText = uiFont.render("YOU DIED", True, (252,3,3))
+        screen.blit(DeathScreenText, (125,45))"""
 
         
 

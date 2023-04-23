@@ -8,6 +8,7 @@ import tutorial
 import boss_fight
 import poison_level
 import poison_boss
+import win_screen
 from player_save import Save
 
 level = "death_screen"
@@ -37,6 +38,9 @@ while level != "quit":
 
     if level == "poison_boss":
         level = poison_boss.poison_boss_loop()
+
+    if level == "win_screen":
+        level = win_screen.WinScreenLoop()
 
     for event in pygame.event.get():
             if event.type == Event_system.On_Death:
