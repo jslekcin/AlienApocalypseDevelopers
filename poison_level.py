@@ -324,6 +324,21 @@ def poisonLevelLoop():
             screen.blit(self.image, adjustedRect)
                 #pygame.draw.rect(screen, (0, 0, 0), adjustedRect)
 
+    class Boss_Portal(Portal):
+        def __init__(self):
+            self.rect = pygame.Rect(-5099, 253, 200, 50)
+        def update(self):
+            if self.rect.colliderect(Player.rect):
+                print("collided")
+                Save.starting_pos = (2492, 794)
+                Save.health = Player.health
+                Save.stamina = Player.stamina
+                Save.maxCoolDownBar = Player.maxCoolDownBar
+                Save.coolDownBar = Player.coolDownBar
+                Save.onCoolDown = Player.onCoolDown
+                return "poison_boss"
+            
+
     class Weapon:
         def __init__(self):
             self.name = 'None'
@@ -660,6 +675,7 @@ def poisonLevelLoop():
             screen.blit(self.image, adjustedRect)
 
     mainPortal = Main_Portal()
+    bossPortal = Boss_Portal()
     enemies = []
 
     class PoisonShooterEnemy: # Jaeho
@@ -1561,6 +1577,9 @@ def poisonLevelLoop():
 
         if mainPortal.update() == "level1":
             return "level1"
+        
+        if bossPortal.update() == "poison_boss":
+            return "poison_boss"
 
         Player.update()
 
