@@ -85,10 +85,10 @@ def poison_boss_loop():
 
                 topRect   = pygame.Rect((Player.rect.left + s, Player.rect.top - 2), (w, 2))
 
-                pygame.draw.rect(screen, (255,0,0), belowRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
-                pygame.draw.rect(screen, (255,0,0), leftRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
-                pygame.draw.rect(screen, (255,0,0), rightRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
-                pygame.draw.rect(screen, (255,0,0), topRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
+                #pygame.draw.rect(screen, (255,0,0), belowRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
+                #pygame.draw.rect(screen, (255,0,0), leftRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
+                #pygame.draw.rect(screen, (255,0,0), rightRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
+                #pygame.draw.rect(screen, (255,0,0), topRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
 
                 # Gets whether or not we are sprinting
                 sprinting = False
@@ -257,7 +257,7 @@ def poison_boss_loop():
 
             # Debug show attack box
             adjustedRect = attackBox.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
-            pygame.draw.rect(screen, (255,255,255), adjustedRect)
+            #pygame.draw.rect(screen, (255,255,255), adjustedRect)
 
             # See if it collides with enemies and if it does, damages it
             for enemy in enemies:
@@ -321,7 +321,7 @@ def poison_boss_loop():
                 #pass
                 screen.blit(self.image_left, (Player.renderRect.centerx-45, Player.renderRect.centery-40))
                 
-            pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
+            #pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
 
     class Bullet:
         def __init__(self, xSpeed, ySpeed):
@@ -809,8 +809,10 @@ def poison_boss_loop():
 
     class RangedPoisonProjectile:
             def __init__(self, xSpeed, ySpeed,center):
-                self.image = pygame.Surface((30,30))
-                self.image.fill((180,0,255))
+                #self.image = pygame.Surface((30,30))
+                #self.image.fill((180,0,255))
+                self.image = pygame.image.load('Images\pb_proj.png')
+                self.image = pygame.transform.scale(self.image, (30,30))
                 self.rect = self.image.get_rect()
                 self.xSpeed = xSpeed
                 self.ySpeed = ySpeed

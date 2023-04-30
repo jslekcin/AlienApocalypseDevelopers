@@ -92,10 +92,10 @@ def level1():
 
             topRect   = pygame.Rect((Player.rect.left + s, Player.rect.top - 2), (w, 2))
 
-            pygame.draw.rect(screen, (255,0,0), belowRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
-            pygame.draw.rect(screen, (255,0,0), leftRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
-            pygame.draw.rect(screen, (255,0,0), rightRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
-            pygame.draw.rect(screen, (255,0,0), topRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
+            #pygame.draw.rect(screen, (255,0,0), belowRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
+            #pygame.draw.rect(screen, (255,0,0), leftRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
+            #pygame.draw.rect(screen, (255,0,0), rightRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
+            #pygame.draw.rect(screen, (255,0,0), topRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1]-5))
 
             # Gets whether or not we are sprinting
             sprinting = False
@@ -465,7 +465,7 @@ def level1():
                 #pass
                 screen.blit(self.image_left, (Player.renderRect.centerx-45, Player.renderRect.centery-40))
                 
-            pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
+            #pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
 
     class Bullet:
         def __init__(self, xSpeed, ySpeed):
@@ -670,7 +670,7 @@ def level1():
 
             # Debug show attack box
             adjustedRect = attackBox.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
-            pygame.draw.rect(screen, (255,255,255), adjustedRect)
+            #pygame.draw.rect(screen, (255,255,255), adjustedRect)
 
             # See if it collides with enemies and if it does, damages it
             for enemy in enemies:
@@ -1089,6 +1089,9 @@ def level1():
             
             if self.health <= 0:
                 enemies.remove(self)
+                number = random.randint(1,10)
+                if number == 1:
+                    gems.append(Gem(self.rect.x,self.rect.bottom))
             floorCheck = (self.rect.centerx,self.rect.bottom + 5)
             floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
             move5 = True
@@ -1258,8 +1261,10 @@ def level1():
 
     class FlyingEnemyProjectile:
         def __init__(self, xSpeed, ySpeed,center):
-            self.image = pygame.Surface((30,30))
-            self.image.fill((0,255,0))
+            #self.image = pygame.Surface((30,30))
+            #self.image.fill((0,255,0))
+            self.image = pygame.image.load('Images/flying_proj.png')
+            self.image = pygame.transform.scale(self.image, (30,30))
             self.rect = self.image.get_rect()
             self.xSpeed = xSpeed
             self.ySpeed = ySpeed
@@ -1378,7 +1383,7 @@ def level1():
             walls.append(wall)
 
     def enemyRespawn(enemies):
-        enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100))]
+        enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-980, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100)),FlyingAilenEnemy((-1126, 818),pygame.image.load('Images\Ailen.png'), (100,100))]
         return enemies
 
     doubleHealth = 10
@@ -1455,7 +1460,7 @@ def level1():
                     enemy.health = doubleHealth"""
 
             #draw player renderrect
-            pygame.draw.rect(screen,(0,255,0),Player.renderRect)
+            #pygame.draw.rect(screen,(0,255,0),Player.renderRect)
 
             portalAdjustedRect = portalRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             #pygame.draw.rect(screen, (0,0,0),portalAdjustedRect)
@@ -1589,7 +1594,7 @@ def level1():
             gemText = uiFont.render("Alien_Gems:"+str(Save.gems[0]), True, (255,255,255))
             mapText = levelFont.render("Main Level", True, (255, 255, 255))
             screen.blit(weaponText, (10, 10))
-            screen.blit(levelText, (720, 6))
+            #screen.blit(levelText, (720, 6))
             screen.blit(gemText, (0, 40))
             if titleTimer >= 0:
                 mapText.set_alpha(titleInvis/45 * 255)
