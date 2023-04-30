@@ -1428,7 +1428,7 @@ def poisonLevelLoop():
 
                     
     # worldPos, image, sized )
-    Barriers = [Barrier((-1650,150), 2,(40,450)), Barrier((-3300,100),1,(40,500))]
+    Barriers = [Barrier((-1650,150), 2,(40,450)), Barrier((-4500,100),1,(40,500))]
     enemies = [poison_blob((-300,338),pygame.image.load('Images/poison_blob.png'),(50,50)), PoisonShooterEnemy((-1450, 338), pygame.image.load('Images/NewPoisonShooter.png'),(64,100)), NewPoisonShooterEnemy((-3900, 338), pygame.image.load('Images/Wizardenemy.png'), (64,120))]
     projectiles = []
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
