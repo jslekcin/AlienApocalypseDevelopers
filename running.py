@@ -11,7 +11,11 @@ import poison_boss
 import win_screen
 from player_save import Save
 
+<<<<<<< HEAD
 level = "poison_level"
+=======
+level = "tutorial"
+>>>>>>> 4e3a3736db48dd0069142f59acbed5a3b81dc8a2
 prev_level = ""
 
 while level != "quit":

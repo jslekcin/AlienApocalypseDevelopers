@@ -5,7 +5,7 @@ class Save:
     health = 100
     stamina = 120
     gems = [0] * 5
-    gems[0] = 5
+    gems[0] = 0
     boss_defeated = [False] * 5
     portal_activated = [False] * 5
 
@@ -17,6 +17,6 @@ class Save:
     onCoolDown = False
 
 
-    weapons = {"Bat":True,"Sword":True,"Gun":True,"LaserGun":False}
+    weapons = {"Bat":False,"Sword":False,"Gun":False,"LaserGun":False}
 
     
