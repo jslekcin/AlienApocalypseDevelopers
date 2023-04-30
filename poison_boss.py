@@ -541,7 +541,7 @@ def poison_boss_loop():
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = 198, 1209
             #self.rect = self.image.get_rect()
-            self.maxHealth = 200
+            self.maxHealth = 220
             self.health = self.maxHealth
             self.damage = 5
 
