@@ -185,20 +185,6 @@ def poisonLevelLoop():
                             Player.rect.top = wall.rect.bottom
 
                 for wall in Barriers:
-                    # Standing on floor
-                    if wall.rect.colliderect(belowRect):
-                        downC = True
-                        if downA:
-                            Player.ySpeed = 0
-                            Player.rect.bottom = wall.rect.top
-                        # Slows player x movement
-                        if Player.xSpeed > 0 and not pygame.key.get_pressed()[pygame.K_d]:
-                            Player.xSpeed -= Player.xFriction
-                        if Player.xSpeed < 0 and not pygame.key.get_pressed()[pygame.K_a]:
-                            Player.xSpeed += Player.xFriction
-                        # Jump
-                        if pygame.key.get_pressed()[pygame.K_SPACE]:
-                            Player.ySpeed = -10
                     if wall.rect.colliderect(leftRect):
                         leftC = True
                         if leftA:
@@ -209,11 +195,6 @@ def poisonLevelLoop():
                         if rightA:
                             Player.xSpeed = 0
                             Player.rect.right = wall.rect.left
-                    if wall.rect.colliderect(topRect):
-                        upC = True
-                        if upA:
-                            Player.ySpeed = 0
-                            Player.rect.top = wall.rect.bottom
 
                 Player.rect = Player.rect.move(Player.xSpeed, Player.ySpeed)
 

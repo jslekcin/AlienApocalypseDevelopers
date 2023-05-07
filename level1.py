@@ -1110,11 +1110,13 @@ def level1():
         def render(self): # Show the enemy and visual effects
             # Modifys the position based on the centered player position
             adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
-            healthRect = pygame.Rect(adjustedRect.x, adjustedRect.y - 10, self.health / self.maxHealth * adjustedRect.w, 10)
-            pygame.draw.rect(screen, (0,255,0), healthRect)
             self.image.set_alpha(self.invisibility / 100 * 255)
             # Renders wall using modified rect
             screen.blit(self.image, adjustedRect)
+            healthRect = pygame.Rect(adjustedRect.x, adjustedRect.y - 10, self.health / self.maxHealth * adjustedRect.w, 10)
+            surf = pygame.Surface(healthRect.size, pygame.SRCALPHA)
+            pygame.draw.rect(surf, (0,255,0, self.invisibility / 100 * 255), surf.get_rect())
+            screen.blit(surf,healthRect)
 
     class FlyingAilenEnemy:
         def __init__(self,worldPos,image,size):
@@ -1275,6 +1277,7 @@ def level1():
             if self.rect.colliderect(Player.rect):
                 Player.applyDamage(5)
                 projectiles.remove(self)
+                return
             for wall in walls:
                 if self.rect.colliderect(wall.rect):
                     projectiles.remove(self)
@@ -1383,8 +1386,19 @@ def level1():
             walls.append(wall)
 
     def enemyRespawn(enemies):
-        enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-980, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100)),FlyingAilenEnemy((-1126, 818),pygame.image.load('Images\Ailen.png'), (100,100))]
-        return enemies
+        enemies.append(FlyingAilenEnemy((-1126, 818),pygame.image.load('Images\Ailen.png'), (100,100)))
+        for i in range(2):
+            reaperX = random.randint(-1021,823)
+            enemies.append(ReaperEnemy((reaperX, 654), pygame.image.load('Images\Reaper.png'), (64,100)))
+        reaperX = random.randint(1194,2391)
+        enemies.append(ReaperEnemy((reaperX, 480), pygame.image.load('Images\Reaper.png'), (64,100)))
+        for i in range(2):
+            poisonX = random.randint(-1121,829)
+            enemies.append(PoisonShooterEnemy((poisonX, 654), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100)))
+        poisonX = random.randint(1194,2391)
+        enemies.append(PoisonShooterEnemy((poisonX, 480), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100)))
+        #enemies = 
+        #return enemies
 
     doubleHealth = 10
     level = 1
@@ -1452,7 +1466,7 @@ def level1():
             #doubleHealth = 10
             if len(enemies) <= 0:
                 level += 1
-                enemies = enemyRespawn(enemies)
+                enemyRespawn(enemies)
                 #enemies = [ReaperEnemy((367, 805), pygame.image.load('Images\Reaper.png'), (64,100)),PoisonShooterEnemy((-819, 854), pygame.image.load('Images\Posion Shooter Design.PNG'), (64,100))]
                 doubleHealth = doubleHealth * 2
                 #print("Level:", level)

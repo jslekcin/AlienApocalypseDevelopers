@@ -5,12 +5,14 @@ from pygame.constants import K_2
 pygame.init()
 pygame.font.init()
 
-size = width, height = 500, 500 
+size = width, height = 750, 750 
 
 uiFont = pygame.font.Font(None, 36)
+titleFont = pygame.font.Font(None, 45)
 screen = pygame.display.set_mode(size)
 
 bg = pygame.image.load("images\Menu Screen.png")
+bg = pygame.transform.scale(bg, size)
 
 startButtonPressed = False
 def mainMenuLoop():
@@ -38,21 +40,21 @@ def mainMenuLoop():
 
         screen.blit(bg,(0,0))
         
-        startButton = pygame.draw.rect(screen, (255,255,255), pygame.Rect(100, 200, 300, 50))
-        quitButton = pygame.draw.rect(screen, (255,255,255), pygame.Rect(100, 265, 140, 50))
-        instructionButton = pygame.draw.rect(screen, (255,255,255), pygame.Rect(260, 265, 140, 50))
+        startButton = pygame.draw.rect(screen, (255,255,255), pygame.Rect(200, 275, 300, 50))#100, 200, 300, 50
+        quitButton = pygame.draw.rect(screen, (255,255,255), pygame.Rect(200, 340, 140, 50))#100, 265, 140, 50
+        instructionButton = pygame.draw.rect(screen, (255,255,255), pygame.Rect(360, 340, 140, 50))#260, 265, 140, 50
 
         startText = uiFont.render("Start", True, (0,0,0))
         quitText = uiFont.render("Quit Game", True, (0,0,0))
         instructionText = uiFont.render("How to Play", True, (0,0,0))
 
-        TitleText = uiFont.render("Ailen Apocalypse",True,(255,0,0))
+        TitleText = titleFont.render("Ailen Apocalypse",True,(255,0,0))
 
-        screen.blit(startText, (225, 215))
-        screen.blit(quitText, (105, 280))
-        screen.blit(instructionText, (260, 280))
+        screen.blit(startText, (325, 290))#225, 215
+        screen.blit(quitText, (205, 355))#105, 280
+        screen.blit(instructionText, (360, 355))#260, 280
 
-        screen.blit(TitleText, (145, 150))
+        screen.blit(TitleText, (215, 55))#145, 150
 
         pygame.display.flip()
 
