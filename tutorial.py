@@ -29,7 +29,7 @@ def tutorialLoop():
     background = pygame.transform.scale(background, size)
     gameState = 1
 
-    tutorial_text1 = uiFont.render("Press A or D to move.", False, (200, 200, 200))
+    tutorial_text1 = uiFont.render("Hold down A or D to move.", False, (200, 200, 200))
 
     tutorial_text2 = uiFont.render("Press SPACE to jump & SHIFT to sprint", False, (200, 200, 200))
 
