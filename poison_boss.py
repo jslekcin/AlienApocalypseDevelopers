@@ -15,6 +15,7 @@ def poison_boss_loop():
     #from main_menu import mainMenuLoop
 
     uiFont = pygame.font.Font(None, 32)
+    levelFont = pygame.font.Font(None, 64)
 
     size = width, height = 750, 750 # TODO: Decide on final window size
     screen = pygame.display.set_mode(size) 
@@ -762,6 +763,7 @@ def poison_boss_loop():
                     print("attack")
                     self.meleeTimer = fps * 1.5
                     Player.applyDamage(self.damage)
+                    Save.LastDamageSource = "FinalBoss"
 
             self.laserTimer -= 1
             self.meleeTimer -= 1
@@ -796,6 +798,7 @@ def poison_boss_loop():
                 pygame.draw.rect(screen,(0,255,0),adjustedRect2)
                 if laserRect.colliderect(Player.rect):
                     Player.applyDamage(2)
+                    Save.LastDamageSource = "FinalBoss"
 
             self.laserTimer -= 1
 
@@ -822,6 +825,7 @@ def poison_boss_loop():
                 self.rect = self.rect.move(self.xSpeed, self.ySpeed)
                 if self.rect.colliderect(Player.rect):
                     Player.applyDamage(5)
+                    Save.LastDamageSource = "FinalBoss"
                     projectiles.remove(self)
                 else:
                     for wall in walls:
@@ -879,6 +883,7 @@ def poison_boss_loop():
                 print("Player hit", Player.poisonCounter)
                 if hit == False:
                     Player.applyDamage(4)
+                    Save.LastDamageSource = "FinalBoss"
                 Player.isPoisoned = True
                 Player.applyPoison()
                 projectiles.remove(self)
@@ -1010,6 +1015,9 @@ def poison_boss_loop():
             walls.append(wall)
 
     clock = pygame.time.Clock()
+
+    titleTimer = fps * 3
+    titleInvis = 45
     while 1:
         clock.tick(fps) 
         
@@ -1121,6 +1129,22 @@ def poison_boss_loop():
 
             
         weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
+        mapText = levelFont.render("Alien Overlord's Lair", True, (255, 255, 255))
+        borderText = levelFont.render("Alien Overlord's Lair", True, (0, 0, 0))
+        #levelText = uiFont.render(str(level), True, (255,255,255))
+        screen.blit(weaponText, (10, 10))
+        #screen.blit(levelText, (400, 10))
+        if titleTimer >= 0:
+            mapText.set_alpha(titleInvis/45 * 255)
+            borderText.set_alpha(titleInvis/45 * 255)
+            screen.blit(borderText, (228,228))
+            screen.blit(borderText, (232,232))
+            screen.blit(borderText, (228,232))
+            screen.blit(borderText, (232,228))
+            screen.blit(mapText,(230,230))
+            if titleTimer < 45:
+                titleInvis -= 1
+            titleTimer -= 1
         #levelText = uiFont.render(str(level), True, (255,255,255))
         screen.blit(weaponText, (10, 10))
         #screen.blit(levelText, (400, 10))

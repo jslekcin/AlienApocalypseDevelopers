@@ -900,6 +900,7 @@ def poisonLevelLoop():
                     # Attack player
                     self.cooldown = 5 * fps
                     Player.applyDamage(self.damage)
+                    Save.LastDamageSource = "poison_blob"
                     Player.poisonCounter += 1
                     print("Player hit", Player.poisonCounter)
                     Player.isPoisoned = True
@@ -1089,6 +1090,7 @@ def poisonLevelLoop():
                 print("Player hit", Player.poisonCounter)
                 if hit == False:
                     Player.applyDamage(6)
+                    Save.LastDamageSource = "NewPoisonShooter"
                 Player.isPoisoned = True
                 Player.applyPoison()
                 projectiles.remove(self)
@@ -1329,6 +1331,7 @@ def poisonLevelLoop():
                 print("Player hit", Player.poisonCounter)
                 if self.hit == False:
                     Player.applyDamage(6)
+                    Save.LastDamageSource = "WizardEnemy"
                 Player.isPoisoned = True
                 Player.applyPoison()
                 projectiles.remove(self)

@@ -1,5 +1,7 @@
 import sys, pygame, math, random
 
+from player_save import Save
+
 from pygame.constants import K_2
 
 def deathScreenLoop(prev_level):
@@ -34,7 +36,7 @@ def deathScreenLoop(prev_level):
                     return prev_level
 
 
-        death_image = pygame.image.load('Images/death3.png')
+        death_image = Save.DeathScreens[Save.LastDamageSource]
         death_image = pygame.transform.scale(death_image,[750,750])
         screen.blit(death_image,(0,0))
 

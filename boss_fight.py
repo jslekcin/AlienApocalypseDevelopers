@@ -666,6 +666,8 @@ def boss_fight_loop():
         def update(self):
             if self.rect.colliderect(Player.rect) and not self.exploded:
                 Player.applyDamage(self.damage)
+                Save.LastDamageSource = "UFOBoss"
+                
                 projectiles.remove(self)
 
             else:
@@ -737,6 +739,7 @@ def boss_fight_loop():
             # Check if it hits anything
             if self.rect.colliderect(Player.rect):
                 Player.applyDamage(self.damage)
+                Save.LastDamageSource = "UFOBoss"
                 projectiles.remove(self)
 
             else:
@@ -995,19 +998,19 @@ def boss_fight_loop():
 
             
         weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
-        mapText = levelFont.render("UFO Guard's Domain", True, (255, 255, 255))
-        borderText = levelFont.render("UFO Guard's Domain", True, (0, 0, 0))
+        mapText = levelFont.render("UFO Enforcer's Fortress", True, (255, 255, 255))
+        borderText = levelFont.render("UFO Enforcer's Fortress", True, (0, 0, 0))
         #levelText = uiFont.render(str(level), True, (255,255,255))
         screen.blit(weaponText, (10, 10))
         #screen.blit(levelText, (400, 10))
         if titleTimer >= 0:
             mapText.set_alpha(titleInvis/45 * 255)
             borderText.set_alpha(titleInvis/45 * 255)
-            screen.blit(borderText, (243,228))
-            screen.blit(borderText, (247,232))
-            screen.blit(borderText, (243,232))
-            screen.blit(borderText, (247,228))
-            screen.blit(mapText,(245,230))
+            screen.blit(borderText, (200,228))
+            screen.blit(borderText, (204,232))
+            screen.blit(borderText, (200,232))
+            screen.blit(borderText, (204,228))
+            screen.blit(mapText,(202,230))
             if titleTimer < 45:
                 titleInvis -= 1
             titleTimer -= 1

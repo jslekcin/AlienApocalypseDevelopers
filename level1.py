@@ -1045,6 +1045,7 @@ def level1():
                 print("Player hit", Player.poisonCounter)
                 if hit == False:
                     Player.applyDamage(4)
+                    Save.LastDamageSource = "PoisonShooterEnemy"
                 Player.isPoisoned = True
                 Player.applyPoison()
                 projectiles.remove(self)
@@ -1077,6 +1078,7 @@ def level1():
                     # Attack player
                     self.cooldown = 15 * fps
                     Player.applyDamage(self.damage)
+                    Save.LastDamageSource = "ReaperEnemy"
                 elif distToPlayer < 100:
                     self.invisibility = 100
                 elif distToPlayer < 200:# close 75
@@ -1276,6 +1278,7 @@ def level1():
             self.rect = self.rect.move(self.xSpeed, self.ySpeed)
             if self.rect.colliderect(Player.rect):
                 Player.applyDamage(5)
+                Save.LastDamageSource = "FlyingEnemy"
                 projectiles.remove(self)
                 return
             for wall in walls:

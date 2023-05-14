@@ -11,7 +11,7 @@ import poison_boss
 import win_screen
 from player_save import Save
 
-level = "poison_level"
+level = "boss_fight"
 prev_level = ""
 
 while level != "quit":
