@@ -339,7 +339,7 @@ def tutorialLoop():
             self.image = pygame.transform.scale(image, self.size)
             self.rect = pygame.Rect(worldPos,size)
             
-            self.maxHealth = 100
+            self.maxHealth = 12
             self.health = self.maxHealth
 
             # Movement Variables

@@ -5,6 +5,7 @@ from pygame.constants import K_2
 from event_system import Event_system
 from player_save import Save
 from wall_save import WallSave
+from audio_manager import sounds
 
 
 def level1():
@@ -68,6 +69,7 @@ def level1():
         maxCoolDownBar = Save.maxCoolDownBar
         coolDownBar = Save.coolDownBar
         onCoolDown = Save.onCoolDown
+
         
 
         def update():
@@ -369,6 +371,21 @@ def level1():
                 Player.health += 20
                 items.remove(self)
                 print("item collided")
+            
+            floorCheck = (self.rect.centerx,self.rect.bottom + 5)
+            floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
+            move5 = True
+            move1 = True
+            for wall in walls:
+                if wall.rect.collidepoint(floorCheck):
+                    move5 = False
+                if wall.rect.collidepoint(floorCheck2):
+                    move1 = False
+
+            if move5 == True:
+                self.rect = self.rect.move(0,5)
+            elif move1 == True:
+                self.rect = self.rect.move(0,1)
         
         def render(self):
             #print("rendering")
@@ -430,9 +447,7 @@ def level1():
             self.projectileSpeed = 15
         def attack(self):
             #gunshot sound
-            pygame.mixer.music.load('sounds\gunshot.mp3')
-            pygame.mixer.music.set_volume(0.3)
-            pygame.mixer.music.play()
+            sounds.playsound("gunshot")
             #pygame.mixer.music.load('sounds\gunshot.mp3')
             #pygame.mixer.music.set_volume(0.3)
             #pygame.mixer.music.play()
@@ -559,7 +574,7 @@ def level1():
             
         def attack(self):
             if Player.onCoolDown == False:
-                Player.coolDownBar += 8
+                Player.coolDownBar += 7
                 if Player.coolDownBar > 100:
                     Player.coolDownBar = 100
 
@@ -633,7 +648,7 @@ def level1():
 
             for enemy in enemies:
                 if self.rect.colliderect(enemy.rect):
-                    enemy.health -= 1
+                    enemy.health -= 3
                     projectiles.remove(self)
                     return
                 
@@ -761,9 +776,18 @@ def level1():
 
             if self.health <= 0:
                 enemies.remove(self)
-                number = random.randint(1,10)
-                if number == 1:
+                Save.enemyCounter += 1
+                if Save.enemyCounter >= 3:
+                    number = 1
+                    Save.enemyCounter = 0
+                else:
+                    number = random.randint(1,10)
+                if number == 1 and Save.boss_defeated[0] == False and Save.gems[0] < 5:
                     gems.append(Gem(self.rect.x,self.rect.bottom))
+                    Save.enemyCounter = 0
+                if number == 2:
+                    items.append(healthItem((self.rect.x,self.rect.bottom)))
+                    
 
         def render(self):
             # Modifys the position based on the centered player position
@@ -857,9 +881,17 @@ def level1():
 
             if self.health <= 0:
                 enemies.remove(self)
-                number = random.randint(1,10)
-                if number == 1:
+                Save.enemyCounter += 1
+                if Save.enemyCounter >= 3:
+                    number = 1
+                    Save.enemyCounter = 0
+                else:
+                    number = random.randint(1,10)
+                if number == 1 and Save.boss_defeated[0] == False and Save.gems[0] < 5:
                     gems.append(Gem(self.rect.x,self.rect.bottom))
+                    Save.enemyCounter = 0
+                if number == 2:
+                    items.append(healthItem((self.rect.x,self.rect.bottom)))
 
         def render(self):
             # Modifys the position based on the centered player position
@@ -989,9 +1021,17 @@ def level1():
 
             if self.health <= 0:
                 enemies.remove(self)
-                number = random.randint(1,10)
-                if number == 1:
+                Save.enemyCounter += 1
+                if Save.enemyCounter >= 3:
+                    number = 1
+                    Save.enemyCounter = 0
+                else:
+                    number = random.randint(1,10)
+                if number == 1 and Save.boss_defeated[0] == False and Save.gems[0] < 5:
                     gems.append(Gem(self.rect.x,self.rect.bottom))
+                    Save.enemyCounter = 0
+                if number == 2:
+                    items.append(healthItem((self.rect.x,self.rect.bottom)))
 
             if move5 == True:
                 self.rect = self.rect.move(0,5)
@@ -1091,9 +1131,17 @@ def level1():
             
             if self.health <= 0:
                 enemies.remove(self)
-                number = random.randint(1,10)
-                if number == 1:
+                Save.enemyCounter += 1
+                if Save.enemyCounter >= 3:
+                    number = 1
+                    Save.enemyCounter = 0
+                else:
+                    number = random.randint(1,10)
+                if number == 1 and Save.boss_defeated[0] == False and Save.gems[0] < 5:
                     gems.append(Gem(self.rect.x,self.rect.bottom))
+                    Save.enemyCounter = 0
+                if number == 2:
+                    items.append(healthItem((self.rect.x,self.rect.bottom)))
             floorCheck = (self.rect.centerx,self.rect.bottom + 5)
             floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
             move5 = True
@@ -1235,9 +1283,17 @@ def level1():
 
             if self.health <= 0:
                 enemies.remove(self)
-                number = random.randint(1,10)
-                if number == 1:
+                Save.enemyCounter += 1
+                if Save.enemyCounter >= 3:
+                    number = 1
+                    Save.enemyCounter = 0
+                else:
+                    number = random.randint(1,10)
+                if number == 1 and Save.boss_defeated[0] == False and Save.gems[0] < 5:
                     gems.append(Gem(self.rect.x,self.rect.bottom))
+                    Save.enemyCounter = 0
+                if number == 2:
+                    items.append(healthItem((self.rect.x,self.rect.bottom)))
             """floorCheck = (self.rect.centerx,self.rect.bottom + 5)
             floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
             move5 = True

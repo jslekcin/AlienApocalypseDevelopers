@@ -59,6 +59,10 @@ def boss_fight_loop():
         # Equipment
         weapon = None
         attackCooldown = 0
+        #LaserGun
+        maxCoolDownBar = Save.maxCoolDownBar
+        coolDownBar = Save.coolDownBar
+        onCoolDown = Save.onCoolDown
 
         def update():
             if Player.health < Player.prev_health:
@@ -197,6 +201,13 @@ def boss_fight_loop():
                 Player.attackCooldown -= 1
             elif pygame.mouse.get_pressed(3)[0]:
                 Player.weapon.attack()
+
+            if isinstance(Player.weapon, LaserGun):
+                #print(Player.coolDownBar)
+                Player.coolDownBar -= 0.2
+                if Player.coolDownBar <= 0:
+                    Player.coolDownBar = 0
+                    Player.onCoolDown = False
 
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
@@ -364,33 +375,35 @@ def boss_fight_loop():
             self.renderImage = pygame.transform.rotozoom(self.image_right, self.angle, self.scale)
             """self.new_rect_right = self.new_image_right.get_rect()
             self.center=[self.new_rect_right.centerx,self.new_rect_right.centery]"""#center
-            
-
-            #self.rotated_image_right = pygame.transform.rotate(self.image_right, int(image_angle))
-            #self.rect_right = self.image_right.get_rect()#center=(self.rotated_image_right[0], self.rotated_image_right[1])\
-            #self.rect_right.center = [self.rotated_image_right[0], self.rotated_image_right[1]]
-
-            #self.rotated_image_right = pygame.transform.rotate(self.image_right, self.angle)
-            #self.rotated_rect_right = self.rotated_image_right.get_rect(center = self.image_right.get_rect(center = (Player.renderRect.centerx,Player.renderRect.centery)).center)
 
             self.damage = 1
             self.attackSpeed = 0.2
             self.projectileSpeed = 20
-        def attack(self):
-
-            mousePos = pygame.mouse.get_pos()
-            dx = mousePos[0] - Player.renderRect.centerx
-            dy = mousePos[1] - Player.renderRect.centery
-            if dx == 0:
-                dx = .001
-            angle = math.atan(dy/dx)
-            if dx < 0:
-                angle += math.pi
             
-            xSpeed = self.projectileSpeed * math.cos(angle)
-            ySpeed = self.projectileSpeed * math.sin(angle)
-            projectiles.append(LaserBullet(xSpeed, ySpeed))
-            Player.attackCooldown = self.attackSpeed * fps
+        def attack(self):
+            if Player.onCoolDown == False:
+                Player.coolDownBar += 7
+                if Player.coolDownBar > 100:
+                    Player.coolDownBar = 100
+
+                mousePos = pygame.mouse.get_pos()
+                dx = mousePos[0] - Player.renderRect.centerx
+                dy = mousePos[1] - Player.renderRect.centery
+                if dx == 0:
+                    dx = .001
+                angle = math.atan(dy/dx)
+                if dx < 0:
+                    angle += math.pi
+                
+                xSpeed = self.projectileSpeed * math.cos(angle)
+                ySpeed = self.projectileSpeed * math.sin(angle)
+                projectiles.append(LaserBullet(xSpeed, ySpeed))
+
+                if Player.coolDownBar >= Player.maxCoolDownBar:
+                    Player.onCoolDown = True        
+
+                Player.attackCooldown = self.attackSpeed * fps        
+
         def render(self):
             mousePos = pygame.mouse.get_pos()
             dx = mousePos[0] - Player.renderRect.centerx
@@ -423,7 +436,7 @@ def boss_fight_loop():
             #pygame.draw.line(screen, (0,255,0), Player.renderRect.center, pygame.mouse.get_pos())
 
 
-    class LaserBullet:
+    class LaserBullet(Bullet):
         def __init__(self, xSpeed, ySpeed):
             self.xSpeed = xSpeed
             self.ySpeed = ySpeed
@@ -431,29 +444,26 @@ def boss_fight_loop():
             self.image.fill((200,0,0))#70
             self.rect = self.image.get_rect()
             self.rect.center = Player.rect.center
+            self.deathTimer = 120
             
             
         def update(self):
             self.rect = self.rect.move(self.xSpeed, self.ySpeed)
-            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            for wall in walls:
+                if self.rect.colliderect(wall.rect):
+                    projectiles.remove(self)
+                    return
 
-            boss_adjustedRect = boss.rect.move(-Player.rect[0] + Player.renderRect[0] + 65, -Player.rect[1] + Player.renderRect[1] + 30)
-
-            collide = pygame.Rect.colliderect(adjustedRect,boss_adjustedRect)
-            if collide:
-                boss.health -= 1
+            for enemy in enemies:
+                if self.rect.colliderect(enemy.rect):
+                    enemy.health -= 3
+                    projectiles.remove(self)
+                    return
+                
+            self.deathTimer -= 1
+            if self.deathTimer < 1:
                 projectiles.remove(self)
-                return
-            range_rect = pygame.Rect((0,0),(500,500))
-            range_rect.center = Player.renderRect.center
-            #pygame.draw.rect(screen,(255,255,255),range_rect)
-
-            bullet_range = pygame.Rect.colliderect(adjustedRect,range_rect)
-
-            if bullet_range:
-                pass
-            else:
-                projectiles.remove(self)
+                print("disappear")
                 
 
         def render(self):
@@ -990,10 +1000,19 @@ def boss_fight_loop():
         screen.blit(staminaText, (465 - staminaText.get_width() / 2,7))
         # Draw Boss Health
         if Save.boss_defeated[0] == False:
-            pygame.draw.rect(screen, (0,0,0), pygame.Rect(168,31,400,37))
-            pygame.draw.rect(screen, (255,0,0), pygame.Rect(168,34,boss.health / boss.maxHealth * 405,37))
+            pygame.draw.rect(screen, (0,0,0), pygame.Rect(168,713,400,37))#168,31,400,37
+            pygame.draw.rect(screen, (255,0,0), pygame.Rect(168,713,boss.health / boss.maxHealth * 405,37))#168,34,boss.health / boss.maxHealth * 405,37
             bossHealthText = uiFont.render(f'{boss.health} / {boss.maxHealth}', True, (255, 255, 255))
-            screen.blit(bossHealthText, (370 - bossHealthText.get_width() / 2,40))
+            screen.blit(bossHealthText, (370 - bossHealthText.get_width() / 2,722))
+        #Draw LaserGun Cooldown Bar
+        if isinstance(Player.weapon, LaserGun) and Player.coolDownBar > 0:
+            pygame.draw.rect(screen, (0,0,0), pygame.Rect(271,32,200,30))
+            if Player.onCoolDown:
+                pygame.draw.rect(screen, (200,10,10), pygame.Rect(271,32,Player.coolDownBar / Player.maxCoolDownBar * 200,30))
+            else:
+                pygame.draw.rect(screen, (10,200,10), pygame.Rect(271,32,Player.coolDownBar / Player.maxCoolDownBar * 200,30))
+            laserText = uiFont.render(f'{Player.coolDownBar:0.2f} / {Player.maxCoolDownBar}', True, (255, 255, 255))
+            screen.blit(laserText, (370 - laserText.get_width() / 2,37))
 
 
             
@@ -1014,6 +1033,7 @@ def boss_fight_loop():
             if titleTimer < 45:
                 titleInvis -= 1
             titleTimer -= 1
+        
 
         # print('TODO: Gameplay')
         pygame.display.flip()

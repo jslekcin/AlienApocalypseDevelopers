@@ -26,15 +26,15 @@ def mainMenuLoop():
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if 100 <= mouse[0] <= 400 and 200 <= mouse[1] <= 250:
+                if 200 <= mouse[0] <= 500 and 275 <= mouse[1] <= 325:
                     print("Start button was pressed")
                     return "level1"
-                elif 100 <= mouse[0] <= 240 and 265 <= mouse[1] <= 315:
+                elif 200 <= mouse[0] <= 340 and 340 <= mouse[1] <= 390:
                     print("Quit button was pressed")
                     pygame.quit()
                     #sys.exit
                     return "quit"
-                elif 260 <= mouse[0] <= 400 and 265 <= mouse[1] <= 315:
+                elif 360 <= mouse[0] <= 500 and 340 <= mouse[1] <= 390:
                     print("Instruction button was pressed")
                     return "instructions"
 

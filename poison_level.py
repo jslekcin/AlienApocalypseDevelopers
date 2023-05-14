@@ -319,6 +319,43 @@ def poisonLevelLoop():
                 Save.onCoolDown = Player.onCoolDown
                 return "poison_boss"
             
+    class healthItem:
+        def __init__(self, worldPos):
+            self.image = pygame.Surface((30,30))
+            self.image.fill((222, 75, 151))
+            self.rect = self.image.get_rect()
+            self.rect.x, self.rect.y = worldPos
+
+        def update(self):
+            #self.rect.center = Player.rect.center
+            #print(self.rect.x,self.rect.y,"updating")
+            
+            if self.rect.colliderect(Player.rect):
+                Player.health += 20
+                items.remove(self)
+                print("item collided")
+            
+            floorCheck = (self.rect.centerx,self.rect.bottom + 5)
+            floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
+            move5 = True
+            move1 = True
+            for wall in walls:
+                if wall.rect.collidepoint(floorCheck):
+                    move5 = False
+                if wall.rect.collidepoint(floorCheck2):
+                    move1 = False
+
+            if move5 == True:
+                self.rect = self.rect.move(0,5)
+            elif move1 == True:
+                self.rect = self.rect.move(0,1)
+        
+        def render(self):
+            #print("rendering")
+            adjustedRect = self.rect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
+            # Renders wall using modified rect
+            screen.blit(self.image, adjustedRect)
+
 
     class Weapon:
         def __init__(self):
@@ -508,7 +545,7 @@ def poisonLevelLoop():
             self.projectileSpeed = 20
         def attack(self):
             if Player.onCoolDown == False:
-                Player.coolDownBar += 8
+                Player.coolDownBar += 7
                 if Player.coolDownBar > 100:
                     Player.coolDownBar = 100
 
@@ -582,7 +619,7 @@ def poisonLevelLoop():
 
             for enemy in enemies:
                 if self.rect.colliderect(enemy.rect):
-                    enemy.health -= 1
+                    enemy.health -= 3
                     projectiles.remove(self)
                     return
                 
@@ -1433,6 +1470,7 @@ def poisonLevelLoop():
     projectiles = []
     foreground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
     midground = [Wall((200,-100), pygame.image.load('Images\Bush.png'), (100,100), -1), Wall((200,0), pygame.image.load('Images\Bird.png'), (100,100), -1), Wall((200,-100), pygame.image.load('Images\Tree.png'), (100,100), -1)]
+    items = [healthItem((-2455, 425)),healthItem((-4539, 410))]
 
     sword_item = SwordItem((126, 425),pygame.image.load("Images/Sword(right).png"),(102,119))
 
@@ -1577,6 +1615,9 @@ def poisonLevelLoop():
 
         for enemy in enemies:
             enemy.update()
+
+        for item in items:
+            item.update()
         
         # render
         for wall in walls:
@@ -1593,6 +1634,9 @@ def poisonLevelLoop():
 
         for enemy in enemies:
             enemy.render()
+        
+        for item in items:
+            item.render()
 
         Player.render()    
 

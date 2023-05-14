@@ -61,6 +61,10 @@ def poison_boss_loop():
             weapon = None
             #alien_gems = 5
             attackCooldown = 0
+            #LaserGun
+            maxCoolDownBar = Save.maxCoolDownBar
+            coolDownBar = Save.coolDownBar
+            onCoolDown = Save.onCoolDown
             
             
 
@@ -201,6 +205,13 @@ def poison_boss_loop():
                     Player.attackCooldown -= 1
                 elif pygame.mouse.get_pressed(3)[0]:
                     Player.weapon.attack()
+
+                if isinstance(Player.weapon, LaserGun):
+                    #print(Player.coolDownBar)
+                    Player.coolDownBar -= 0.2
+                    if Player.coolDownBar <= 0:
+                        Player.coolDownBar = 0
+                        Player.onCoolDown = False
 
                 if Player.isPoisoned == True:
                     #print(Player.poisonTimer, Player.isPoisoned)
@@ -425,7 +436,7 @@ def poison_boss_loop():
             
         def attack(self):
             if Player.onCoolDown == False:
-                Player.coolDownBar += 8
+                Player.coolDownBar += 7
                 if Player.coolDownBar > 100:
                     Player.coolDownBar = 100
 
@@ -499,7 +510,7 @@ def poison_boss_loop():
 
             for enemy in enemies:
                 if self.rect.colliderect(enemy.rect):
-                    enemy.health -= 1
+                    enemy.health -= 3
                     projectiles.remove(self)
                     return
                 
@@ -771,7 +782,7 @@ def poison_boss_loop():
 
             adjustedRect1 = attackRect.move(-Player.rect[0] + Player.renderRect[0], -Player.rect[1] + Player.renderRect[1])
             
-            pygame.draw.rect(screen,(255,255,255),adjustedRect1) #attackRect
+            #pygame.draw.rect(screen,(255,255,255),adjustedRect1) #attackRect
 
         def attack3(self):
             laserRect = self.rect.copy()
@@ -1122,11 +1133,20 @@ def poison_boss_loop():
         screen.blit(staminaText, (465 - staminaText.get_width() / 2,7))
         # Draw Boss Health
         if Save.boss_defeated[1] == False:
-            pygame.draw.rect(screen, (0,0,0), pygame.Rect(168,31,400,37))
-            pygame.draw.rect(screen, (200,50,200), pygame.Rect(168,34,boss.health / boss.maxHealth * 405,37))
+            pygame.draw.rect(screen, (0,0,0), pygame.Rect(168,713,400,37))
+            pygame.draw.rect(screen, (200,50,200), pygame.Rect(168,713,boss.health / boss.maxHealth * 405,37))
             bossHealthText = uiFont.render(f'{boss.health} / {boss.maxHealth}', True, (255, 255, 255))
-            screen.blit(bossHealthText, (370 - bossHealthText.get_width() / 2,40))
-
+            screen.blit(bossHealthText, (370 - bossHealthText.get_width() / 2,722))
+        #Draw LaserGun Cooldown Bar
+        if isinstance(Player.weapon, LaserGun) and Player.coolDownBar > 0:
+            pygame.draw.rect(screen, (0,0,0), pygame.Rect(271,32,200,30))
+            if Player.onCoolDown:
+                pygame.draw.rect(screen, (200,10,10), pygame.Rect(271,32,Player.coolDownBar / Player.maxCoolDownBar * 200,30))
+            else:
+                pygame.draw.rect(screen, (10,200,10), pygame.Rect(271,32,Player.coolDownBar / Player.maxCoolDownBar * 200,30))
+            laserText = uiFont.render(f'{Player.coolDownBar:0.2f} / {Player.maxCoolDownBar}', True, (255, 255, 255))
+            screen.blit(laserText, (370 - laserText.get_width() / 2,37))
+            
             
         weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
         mapText = levelFont.render("Alien Overlord's Lair", True, (255, 255, 255))
