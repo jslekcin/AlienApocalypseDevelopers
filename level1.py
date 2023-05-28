@@ -358,8 +358,10 @@ def level1():
 
     class healthItem:
         def __init__(self, worldPos):
-            self.image = pygame.Surface((30,30))
-            self.image.fill((222, 75, 151))
+            #self.image = pygame.Surface((30,30))
+            #self.image.fill((222, 75, 151))
+            self.image = pygame.image.load('Images/MedKit.png')
+            self.image = pygame.transform.scale(self.image, (30,30))
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = worldPos
 
@@ -786,7 +788,7 @@ def level1():
                     gems.append(Gem(self.rect.x,self.rect.bottom))
                     Save.enemyCounter = 0
                 if number == 2:
-                    items.append(healthItem((self.rect.x,self.rect.bottom)))
+                    items.append(healthItem((self.rect.x,self.rect.centery)))
                     
 
         def render(self):
@@ -891,7 +893,7 @@ def level1():
                     gems.append(Gem(self.rect.x,self.rect.bottom))
                     Save.enemyCounter = 0
                 if number == 2:
-                    items.append(healthItem((self.rect.x,self.rect.bottom)))
+                    items.append(healthItem((self.rect.x,self.rect.centery)))
 
         def render(self):
             # Modifys the position based on the centered player position
@@ -1031,7 +1033,7 @@ def level1():
                     gems.append(Gem(self.rect.x,self.rect.bottom))
                     Save.enemyCounter = 0
                 if number == 2:
-                    items.append(healthItem((self.rect.x,self.rect.bottom)))
+                    items.append(healthItem((self.rect.x,self.rect.centery)))
 
             if move5 == True:
                 self.rect = self.rect.move(0,5)
@@ -1141,7 +1143,7 @@ def level1():
                     gems.append(Gem(self.rect.x,self.rect.bottom))
                     Save.enemyCounter = 0
                 if number == 2:
-                    items.append(healthItem((self.rect.x,self.rect.bottom)))
+                    items.append(healthItem((self.rect.x,self.rect.centery)))
             floorCheck = (self.rect.centerx,self.rect.bottom + 5)
             floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
             move5 = True
@@ -1293,7 +1295,7 @@ def level1():
                     gems.append(Gem(self.rect.x,self.rect.bottom))
                     Save.enemyCounter = 0
                 if number == 2:
-                    items.append(healthItem((self.rect.x,self.rect.bottom)))
+                    items.append(healthItem((self.rect.x,self.rect.centery)))
             """floorCheck = (self.rect.centerx,self.rect.bottom + 5)
             floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
             move5 = True
@@ -1355,8 +1357,10 @@ def level1():
 
     class Gem:
         def __init__(self,x,bottom):
-            self.image = pygame.Surface((30,30))
-            self.image.fill((255,0,0))
+            #self.image = pygame.Surface((30,30))
+            #self.image.fill((255,0,0))
+            self.image = pygame.image.load("images/AlienGem.png")
+            self.image = pygame.transform.scale(self.image, (50,50))
             self.rect = self.image.get_rect()
             self.rect.x,self.rect.bottom = x,bottom
             self.collected = False
