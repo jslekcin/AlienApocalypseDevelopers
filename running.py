@@ -20,6 +20,16 @@ while level != "quit":
 
     if level == "level1":
         level = level1.level1()
+    
+    if level == "death_screen":
+        level = death_screen.deathScreenLoop(prev_level)
+
+    if level == "instructions":            
+        level = intructions.instructionsLoop()
+    
+    if level == "tutorial":
+        level = tutorial.tutorialLoop()
+    
     if level == "boss_fight":
         level = boss_fight.boss_fight_loop()
 

@@ -321,8 +321,10 @@ def poisonLevelLoop():
             
     class healthItem:
         def __init__(self, worldPos):
-            self.image = pygame.Surface((30,30))
-            self.image.fill((222, 75, 151))
+            #self.image = pygame.Surface((30,30))
+            #self.image.fill((222, 75, 151))
+            self.image = pygame.image.load('Images/MedKit.png')
+            self.image = pygame.transform.scale(self.image, (30,30))
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = worldPos
 
