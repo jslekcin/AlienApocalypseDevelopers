@@ -1665,7 +1665,7 @@ def level1():
             weaponText = uiFont.render(Player.weapon.name, True, (255, 255, 255))
             levelText = uiFont.render(str(level), True, (255,255,255))
             gemText = uiFont.render("Alien_Gems:"+str(Save.gems[0]), True, (255,255,255))
-            mapText = levelFont.render("Main Level", True, (255, 255, 255))
+            mapText = levelFont.render("Alien Outpost", True, (255, 255, 255))
             screen.blit(weaponText, (10, 10))
             #screen.blit(levelText, (720, 6))
             screen.blit(gemText, (0, 40))
