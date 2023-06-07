@@ -5,6 +5,7 @@ from event_system import Event_system
 
 from player_save import Save
 
+from audio_manager import sounds
 #Hello
 
 def tutorialLoop():
@@ -13,6 +14,10 @@ def tutorialLoop():
     pygame.init()
     pygame.font.init()
     pygame.mixer.init()
+    
+    pygame.mixer.music.load('GameMusic/tutorial.mp3')
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1)
 
     #from main_menu import mainMenuLoop
 
@@ -241,6 +246,7 @@ def tutorialLoop():
             self.image = pygame.image.load("Images\Bat3.PNG")
             self.image = pygame.transform.scale(self.image,(120,130))
         def attack(self):
+            sounds.playsound("batSwing")
             # Figure out which class Bat(Weapon):
             attackBox = pygame.Rect(0, 0, self.range, 64)
             if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:

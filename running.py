@@ -3,7 +3,7 @@ from event_system import Event_system
 import level1
 import main_menu
 import death_screen
-import intructions
+import instructions
 import tutorial
 import boss_fight
 import poison_level
@@ -11,7 +11,7 @@ import poison_boss
 import win_screen
 from player_save import Save
 
-level = "main_menu"
+level = "poison_level"
 prev_level = ""
 
 while level != "quit":
@@ -24,8 +24,8 @@ while level != "quit":
     if level == "death_screen":
         level = death_screen.deathScreenLoop(prev_level)
 
-    if level == "instructions":            
-        level = intructions.instructionsLoop()
+    #if level == "instructions":            
+        #level = intructions.instructionsLoop()
     
     if level == "tutorial":
         level = tutorial.tutorialLoop()

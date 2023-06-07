@@ -4,6 +4,7 @@ from pygame.constants import K_2
 from event_system import Event_system
 from player_save import Save
 from wall_save import WallSave
+from audio_manager import sounds
 
 def poison_boss_loop():
     loadFile = True
@@ -11,6 +12,10 @@ def poison_boss_loop():
     pygame.init()
     pygame.font.init()
     pygame.mixer.init()
+
+    pygame.mixer.music.load('GameMusic/final_boss.mp3')
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1)
 
     #from main_menu import mainMenuLoop
 
@@ -260,6 +265,7 @@ def poison_boss_loop():
             self.image = pygame.image.load("Images\Bat3.PNG")
             self.image = pygame.transform.scale(self.image,(120,130))
         def attack(self):
+            sounds.playsound("batSwing")
             # Figure out which class Bat(Weapon):
             attackBox = pygame.Rect(0, 0, self.range, 64)
             if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
@@ -298,9 +304,7 @@ def poison_boss_loop():
             self.projectileSpeed = 15
         def attack(self):
             #gunshot sound
-            pygame.mixer.music.load('sounds\gunshot.mp3')
-            pygame.mixer.music.set_volume(0.3)
-            pygame.mixer.music.play()
+            sounds.playsound("gunshot")
             #pygame.mixer.music.load('sounds\gunshot.mp3')
             #pygame.mixer.music.set_volume(0.3)
             #pygame.mixer.music.play()
@@ -379,6 +383,7 @@ def poison_boss_loop():
             self.image_right = pygame.image.load("Images/Sword(right).png")
             self.image_right = pygame.transform.scale(self.image_right, (110,140))
         def attack(self):
+            sounds.playsound("swordSwing")
             hitBox = pygame.Rect(0, 0, 45, 64)
             mousePos = pygame.mouse.get_pos()
             if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
@@ -388,8 +393,9 @@ def poison_boss_loop():
                 #do damage to enemies left of the player
             for enemy in enemies:
                 if hitBox.colliderect(enemy.rect):
+                    sounds.playsound("swordImpact")
                     enemy.health -= self.damage
-                    print("hit")
+                    #print("hit")
 
             Player.attackCooldown = self.attackSpeed * fps
         def render(self):
@@ -436,6 +442,7 @@ def poison_boss_loop():
             
         def attack(self):
             if Player.onCoolDown == False:
+                sounds.playsound("gatlingGun")
                 Player.coolDownBar += 7
                 if Player.coolDownBar > 100:
                     Player.coolDownBar = 100
@@ -625,6 +632,7 @@ def poison_boss_loop():
                 self.state = 3
             
             if self.laserTimer <= 0:
+                sounds.playsound("poisonBossLaser")
                 self.state = 2
                 self.laserTimer = fps * 7
 
@@ -641,6 +649,7 @@ def poison_boss_loop():
                     xSpeed = self.projectileSpeed * math.cos(angle)
                     ySpeed = self.projectileSpeed * math.sin(angle)
                     center = self.rect.center
+                    sounds.playsound("poisonProjectile")
                     projectiles.append(RangedPoisonProjectile(xSpeed,ySpeed,center))
 
                     self.attackCounter += 1
@@ -655,6 +664,7 @@ def poison_boss_loop():
 
                     print(xdist, angle, speed)
 
+                    sounds.playsound("poisonProjectile")
                     projectiles.append(PoisonPuddle(self.rect.center, 5, speed, angle))
 
                     self.attackCounter = 0
@@ -868,11 +878,15 @@ def poison_boss_loop():
             self.dy = -speed * math.sin(angle)
             self.timer = 10 * fps
             self.poisonTimer = fps * 2
+            self.splashed = False
         def update(self):
             # Check if it hits anything
             hit = False
             for wall in walls:
                 if self.rect.colliderect(wall.rect):
+                    if self.splashed == False:
+                        sounds.playsound("splash2")
+                        self.splashed = True
                     hit = True
                     break
             if hit:

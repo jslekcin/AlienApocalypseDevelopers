@@ -1,4 +1,5 @@
 import sys, pygame, math, random
+import instructions
 
 from pygame.constants import K_2
 
@@ -16,6 +17,10 @@ bg = pygame.transform.scale(bg, size)
 
 startButtonPressed = False
 def mainMenuLoop():
+    pygame.mixer.music.load('GameMusic/menu.mp3')
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1)
+
     while 1:
         for event in pygame.event.get(pygame.QUIT):
             pygame.quit()
@@ -28,7 +33,7 @@ def mainMenuLoop():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if 200 <= mouse[0] <= 500 and 275 <= mouse[1] <= 325:
                     print("Start button was pressed")
-                    return "level1"
+                    return "tutorial"
                 elif 200 <= mouse[0] <= 340 and 340 <= mouse[1] <= 390:
                     print("Quit button was pressed")
                     pygame.quit()
@@ -36,7 +41,7 @@ def mainMenuLoop():
                     return "quit"
                 elif 360 <= mouse[0] <= 500 and 340 <= mouse[1] <= 390:
                     print("Instruction button was pressed")
-                    return "instructions"
+                    instructions.instructionsLoop()
 
         screen.blit(bg,(0,0))
         
@@ -46,13 +51,13 @@ def mainMenuLoop():
 
         startText = uiFont.render("Start", True, (0,0,0))
         quitText = uiFont.render("Quit Game", True, (0,0,0))
-        instructionText = uiFont.render("How to Play", True, (0,0,0))
+        instructionText = uiFont.render("Credits", True, (0,0,0))
 
         TitleText = titleFont.render("Ailen Apocalypse",True,(255,0,0))
 
         screen.blit(startText, (325, 290))#225, 215
         screen.blit(quitText, (205, 355))#105, 280
-        screen.blit(instructionText, (360, 355))#260, 280
+        screen.blit(instructionText, (385, 355))#260, 280
 
         screen.blit(TitleText, (215, 55))#145, 150
 

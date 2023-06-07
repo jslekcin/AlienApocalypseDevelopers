@@ -5,6 +5,7 @@ from pygame.constants import K_2
 from event_system import Event_system
 from player_save import Save
 from wall_save import WallSave
+from audio_manager import sounds
 #from sympy import false
 
 def boss_fight_loop():
@@ -13,6 +14,10 @@ def boss_fight_loop():
     pygame.init()
     pygame.font.init()
     pygame.mixer.init()
+
+    pygame.mixer.music.load('GameMusic/ufo_boss.mp3')
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1)
 
     uiFont = pygame.font.Font(None, 32)
     levelFont = pygame.font.Font(None, 64)
@@ -242,6 +247,7 @@ def boss_fight_loop():
             self.image_right = pygame.image.load("Images/Sword(right).png")
             self.image_right = pygame.transform.scale(self.image_right, (110,140))
         def attack(self):
+            sounds.playsound("swordSwing")
             hitBox = pygame.Rect(0, 0, 45, 64)
             mousePos = pygame.mouse.get_pos()
             if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
@@ -251,8 +257,9 @@ def boss_fight_loop():
                 #do damage to enemies left of the player
             for enemy in enemies:
                 if hitBox.colliderect(enemy.rect):
+                    sounds.playsound("swordImpact")
                     enemy.health -= self.damage
-                    print("hit")
+                    #print("hit")
 
             Player.attackCooldown = self.attackSpeed * fps
         def render(self):
@@ -276,9 +283,7 @@ def boss_fight_loop():
             self.projectileSpeed = 15
         def attack(self):
             #gunshot sound
-            pygame.mixer.music.load('sounds\gunshot.mp3')
-            pygame.mixer.music.set_volume(0.3)
-            pygame.mixer.music.play()
+            sounds.playsound("gunshot")
             #pygame.mixer.music.load('sounds\gunshot.mp3')
             #pygame.mixer.music.set_volume(0.3)
             #pygame.mixer.music.play()
@@ -382,6 +387,7 @@ def boss_fight_loop():
             
         def attack(self):
             if Player.onCoolDown == False:
+                sounds.playsound("gatlingGun")
                 Player.coolDownBar += 7
                 if Player.coolDownBar > 100:
                     Player.coolDownBar = 100
@@ -481,6 +487,7 @@ def boss_fight_loop():
             self.image = pygame.image.load("Images\Bat3.PNG")
             self.image = pygame.transform.scale(self.image,(120,130))
         def attack(self):
+            sounds.playsound("batSwing")
             # Figure out which class Bat(Weapon):
             attackBox = pygame.Rect(0, 0, self.range, 64)
             if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
@@ -538,7 +545,7 @@ def boss_fight_loop():
             self.size = size
             self.image = pygame.transform.scale(image, self.size)
             self.rect = self.image.get_rect()
-            self.maxHealth = 50
+            self.maxHealth = 180
             self.health = self.maxHealth
             self.damage = 5
             #self.position = [Player.renderRect.center[0]-160, Player.renderRect.center[1]-215]
@@ -654,6 +661,7 @@ def boss_fight_loop():
 
             if self.laser_cooldown >= self.laser_randcooldown:
                 number = random.randint(1,3)
+                sounds.playsound("UFOLaser")
                 projectiles.append(UFO_laser((self.rect.x+165, self.rect.y+140), 5, 4, 90, "Images/beam.png"))
                 self.laser_cooldown = 0
                 self.laser_randcooldown = random.randint(40,55)
@@ -684,6 +692,7 @@ def boss_fight_loop():
                 for wall in walls:
                     if self.rect.colliderect(wall.rect) and not self.exploded:
                         self.exploded = True
+                        sounds.playsound("UFOBomb")
                         self.image = pygame.image.load("Images/explosion.png")
                         self.image = pygame.transform.scale(self.image, (100,100))
                         self.rect = self.rect.move(0,25)

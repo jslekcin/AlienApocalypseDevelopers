@@ -2,6 +2,9 @@ from re import L
 import sys, pygame, math, random
 from pygame.constants import K_2
 
+from pygame.locals import *
+from pygame import mixer
+
 from event_system import Event_system
 from player_save import Save
 from wall_save import WallSave
@@ -14,6 +17,10 @@ def level1():
     pygame.init()
     pygame.font.init()
     pygame.mixer.init()
+
+    pygame.mixer.music.load('GameMusic/main.mp3')
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1)
 
     #from main_menu import mainMenuLoop
 
@@ -416,6 +423,7 @@ def level1():
             self.image_right = pygame.image.load("Images/Sword(right).png")
             self.image_right = pygame.transform.scale(self.image_right, (110,140))
         def attack(self):
+            sounds.playsound("swordSwing")
             hitBox = pygame.Rect(0, 0, 45, 64)
             mousePos = pygame.mouse.get_pos()
             if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
@@ -425,8 +433,9 @@ def level1():
                 #do damage to enemies left of the player
             for enemy in enemies:
                 if hitBox.colliderect(enemy.rect):
+                    sounds.playsound("swordImpact")
                     enemy.health -= self.damage
-                    print("hit")
+                    #print("hit")
 
             Player.attackCooldown = self.attackSpeed * fps
         def render(self):
@@ -576,6 +585,7 @@ def level1():
             
         def attack(self):
             if Player.onCoolDown == False:
+                sounds.playsound("gatlingGun")
                 Player.coolDownBar += 7
                 if Player.coolDownBar > 100:
                     Player.coolDownBar = 100
@@ -678,6 +688,7 @@ def level1():
             self.image = pygame.image.load("Images\Bat3.PNG")
             self.image = pygame.transform.scale(self.image,(120,130))
         def attack(self):
+            sounds.playsound("batSwing")
             # Figure out which class Bat(Weapon):
             attackBox = pygame.Rect(0, 0, self.range, 64)
             if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
@@ -1010,6 +1021,7 @@ def level1():
                     # Add in inaccuracy
                     angle = angle + random.randint(-40,40)
                     angle = math.radians(angle)
+                    sounds.playsound("poisonProjectile")
                     projectiles.append(PoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
             floorCheck = (self.rect.centerx,self.rect.bottom + 5)
             floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
@@ -1062,11 +1074,15 @@ def level1():
             self.dy = speed * math.sin(angle)
             self.timer = 10 * fps
             self.poisonTimer = fps * 2
+            self.splashed = False
         def update(self):
             # Check if it hits anything
             hit = False
             for wall in walls:
                 if self.rect.colliderect(wall.rect):
+                    if self.splashed == False:
+                        sounds.playsound("splash1")
+                        self.splashed = True
                     hit = True
                     break
             if hit:

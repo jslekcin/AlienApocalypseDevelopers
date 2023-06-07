@@ -2,6 +2,7 @@ import sys, pygame, math, random
 from pygame.constants import K_2
 from player_save import Save
 from event_system import Event_system
+from audio_manager import sounds
 
 def poisonLevelLoop():
     loadFile = True
@@ -9,6 +10,10 @@ def poisonLevelLoop():
     pygame.init()
     pygame.font.init()
     pygame.mixer.init()
+
+    pygame.mixer.music.load('GameMusic/poison.mp3')
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1)
 
     #from main_menu import mainMenuLoop
 
@@ -378,6 +383,7 @@ def poisonLevelLoop():
             self.image_right = pygame.image.load("Images/Sword(right).png")
             self.image_right = pygame.transform.scale(self.image_right, (110,140))
         def attack(self):
+            sounds.playsound("swordSwing")
             hitBox = pygame.Rect(0, 0, 45, 64)
             mousePos = pygame.mouse.get_pos()
             if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
@@ -387,8 +393,9 @@ def poisonLevelLoop():
                 #do damage to enemies left of the player
             for enemy in enemies:
                 if hitBox.colliderect(enemy.rect):
+                    sounds.playsound("swordImpact")
                     enemy.health -= self.damage
-                    print("hit")
+                    #print("hit")
 
             Player.attackCooldown = self.attackSpeed * fps
         def render(self):
@@ -434,9 +441,7 @@ def poisonLevelLoop():
             self.projectileSpeed = 15
         def attack(self):
             #gunshot sound
-            pygame.mixer.music.load('sounds\gunshot.mp3')
-            pygame.mixer.music.set_volume(0.3)
-            pygame.mixer.music.play()
+            sounds.playsound("gunshot")
             #pygame.mixer.music.load('sounds\gunshot.mp3')
             #pygame.mixer.music.set_volume(0.3)
             #pygame.mixer.music.play()
@@ -547,6 +552,7 @@ def poisonLevelLoop():
             self.projectileSpeed = 20
         def attack(self):
             if Player.onCoolDown == False:
+                sounds.playsound("gatlingGun")
                 Player.coolDownBar += 7
                 if Player.coolDownBar > 100:
                     Player.coolDownBar = 100
@@ -649,6 +655,7 @@ def poisonLevelLoop():
             self.image = pygame.image.load("Images\Bat3.PNG")
             self.image = pygame.transform.scale(self.image,(120,130))
         def attack(self):
+            sounds.playsound("batSwing")
             # Figure out which class Bat(Weapon):
             attackBox = pygame.Rect(0, 0, self.range, 64)
             if pygame.mouse.get_pos()[0] - Player.renderRect.centerx < 0:
@@ -777,6 +784,7 @@ def poisonLevelLoop():
                     # Add in inaccuracy
                     angle = angle + random.randint(-40,40)
                     angle = math.radians(angle)
+                    sounds.playsound("poisonProjectile")
                     projectiles.append(PoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
             floorCheck = (self.rect.centerx,self.rect.bottom + 5)
             floorCheck2 = (self.rect.centerx,self.rect.bottom + 1)
@@ -819,11 +827,15 @@ def poisonLevelLoop():
             self.dy = speed * math.sin(angle)
             self.timer = 10 * fps
             self.poisonTimer = fps * 2
+            self.splashed = False
         def update(self):
             # Check if it hits anything
             hit = False
             for wall in walls:
                 if self.rect.colliderect(wall.rect):
+                    if self.splashed == False:
+                        sounds.playsound("splash1")
+                        self.splashed = True
                     hit = True
                     break
             if hit:
@@ -1040,6 +1052,7 @@ def poisonLevelLoop():
                         angle = math.degrees(math.atan2(ydist,xdist))
                         angle = angle + random.randint(-20,20)
                         angle = math.radians(angle)
+                        sounds.playsound("poisonProjectile")
                         projectiles.append(PoisonPuddleProjectile(self.rect.center, 5, 5, angle))
                     else:
                         # Aiming
@@ -1050,6 +1063,7 @@ def poisonLevelLoop():
                         # Add in inaccuracy
                         angle = angle + random.randint(-40,40)
                         angle = math.radians(angle)
+                        sounds.playsound("poisonProjectile")
                         projectiles.append(PoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
                         
                         # second shot
@@ -1058,6 +1072,7 @@ def poisonLevelLoop():
                         angle = math.degrees(math.atan2(ydist,xdist))
                         angle = angle + random.randint(-40,40)
                         angle = math.radians(angle)
+                        sounds.playsound("poisonProjectile")
                         projectiles.append(PoisonShooterEnemyProjectile(self.rect.center, 5, 5, angle))
                     
             
@@ -1104,12 +1119,16 @@ def poisonLevelLoop():
             self.dy = speed * math.sin(angle)
             self.timer = 10 * fps
             self.poisonTimer = fps * 2
+            self.splashed = False
         def update(self):
             # Check if it hits anything
             hit = False
             for wall in walls:
                 if self.rect.colliderect(wall.rect):
                     hit = True
+                    if self.splashed == False:
+                        sounds.playsound("splash1")
+                        self.splashed = True
                     break
             if hit:
                 # Change image if hit something
@@ -1156,11 +1175,15 @@ def poisonLevelLoop():
             self.dy = speed * math.sin(angle)
             self.timer = 10 * fps
             self.poisonTimer = fps * 2
+            self.splashed = False
         def update(self):
             # Check if it hits anything
             hit = False
             for wall in walls:
                 if self.rect.colliderect(wall.rect):
+                    if self.splashed == False:
+                        sounds.playsound("splash2")
+                        self.splashed = True
                     hit = True
                     break
             if hit:
@@ -1276,6 +1299,7 @@ def poisonLevelLoop():
                         angle = math.degrees(math.atan2(ydist,xdist))
                         angle = angle + random.randint(-20,20)
                         angle = math.radians(angle)
+                        sounds.playsound("poisonProjectile")
                         projectiles.append(NewPoisonPuddleProjectile(self.rect.center, 5, 5, angle))
                     else:
                         # Aiming
@@ -1286,6 +1310,7 @@ def poisonLevelLoop():
                         # Add in inaccuracy
                         angle = angle + random.randint(-40,40)
                         angle = math.radians(angle)
+                        sounds.playsound("poisonProjectile")
                         projectiles.append(NewPoisonShooterEnemyProjectile(self.rect.center, 5,5, angle))
                         
                         # second shot
@@ -1340,13 +1365,16 @@ def poisonLevelLoop():
             self.dy = speed * math.sin(angle)
             self.timer = 20 * fps
             self.poisonTimer = fps * 2
+            self.splashed = False
         def update(self):
             # Check if it hits anything
             #hit = False
             if self.hit == False:
-            
                 for wall in walls:
                     if self.rect.colliderect(wall.rect):
+                        if self.splashed == False:
+                            sounds.playsound("splash1")
+                            self.splashed = True
                         self.hit = True
                         self.rect = self.rect.move(0,55)
                         break
@@ -1396,11 +1424,15 @@ def poisonLevelLoop():
             self.dy = speed * math.sin(angle)
             self.timer = 10 * fps
             self.poisonTimer = fps * 2
+            self.splashed = False
         def update(self):
             # Check if it hits anything
             hit = False
             for wall in walls:
                 if self.rect.colliderect(wall.rect):
+                    if self.splashed == False:
+                        sounds.playsound("splash2")
+                        self.splashed = True
                     hit = True
                     break
             if hit:

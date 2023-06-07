@@ -8,6 +8,10 @@ def deathScreenLoop(prev_level):
     pygame.init()
     pygame.font.init()
 
+    pygame.mixer.music.load('GameMusic/death.mp3')
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1)
+
     size = width, height = 750, 750 
 
     uiFont = pygame.font.Font(None, 65)

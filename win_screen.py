@@ -6,6 +6,10 @@ def WinScreenLoop():
     pygame.init()
     pygame.font.init()
 
+    pygame.mixer.music.load('GameMusic/win.mp3')
+    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.play(-1)
+
     size = width, height = 750, 750 
 
     screen = pygame.display.set_mode(size)
