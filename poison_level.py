@@ -224,12 +224,12 @@ def poisonLevelLoop():
 
                 Player.prev_health = Player.health
 
-                if isinstance(Player.weapon, LaserGun):
-                    #print(Player.coolDownBar)
-                    Player.coolDownBar -= 0.2
-                    if Player.coolDownBar <= 0:
-                        Player.coolDownBar = 0
-                        Player.onCoolDown = False
+                #if isinstance(Player.weapon, LaserGun):
+                #print(Player.coolDownBar)
+                Player.coolDownBar -= 0.2
+                if Player.coolDownBar <= 0:
+                    Player.coolDownBar = 0
+                    Player.onCoolDown = False
 
                 if Player.isPoisoned == True:
                     #print(Player.poisonTimer, Player.isPoisoned)

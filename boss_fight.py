@@ -207,12 +207,12 @@ def boss_fight_loop():
             elif pygame.mouse.get_pressed(3)[0]:
                 Player.weapon.attack()
 
-            if isinstance(Player.weapon, LaserGun):
-                #print(Player.coolDownBar)
-                Player.coolDownBar -= 0.2
-                if Player.coolDownBar <= 0:
-                    Player.coolDownBar = 0
-                    Player.onCoolDown = False
+            #if isinstance(Player.weapon, LaserGun):
+            #print(Player.coolDownBar)
+            Player.coolDownBar -= 0.2
+            if Player.coolDownBar <= 0:
+                Player.coolDownBar = 0
+                Player.onCoolDown = False
 
             Player.renderRect.center = (width/2 - Player.xSpeed // 1, height/2 - Player.ySpeed // 1)
 
