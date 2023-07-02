@@ -214,9 +214,9 @@ def tutorialLoop():
                 if Player.health <= 0:
                     pygame.event.post(pygame.event.Event(Event_system.On_Death))
 
-                if pygame.key.get_pressed()[pygame.K_p] and Player.portalPlaced == False:
+                """if pygame.key.get_pressed()[pygame.K_p] and Player.portalPlaced == False:
                     Player.portalPlaced = True
-                    print("portal placed")
+                    print("portal placed")"""
 
 
             def render():
@@ -510,6 +510,7 @@ def tutorialLoop():
 
     titleTimer = fps * 3
     titleInvis = 45
+    paused = False
     
     while 1:
         clock.tick(fps) 
@@ -517,8 +518,11 @@ def tutorialLoop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit
+                sys.exit()
                 break
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    paused = not paused
             if event.type == Event_system.On_Blob_Death:
                 Player.portalPlaced = True
                 #portal text
@@ -526,7 +530,11 @@ def tutorialLoop():
             if event.type == Event_system.On_Portal_Collision:
                 return("level1")
 
-
+        if paused:
+            pauseText = levelFont.render("Paused", True, (255, 255, 255))
+            screen.blit(pauseText,(300,230))
+            pygame.display.flip()
+            continue
 
         screen.blit(background, (0,0))
 

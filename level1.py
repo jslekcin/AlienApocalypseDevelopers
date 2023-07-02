@@ -1503,18 +1503,21 @@ def level1():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit
+                sys.exit()
                 break
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     paused = not paused
-                if event.key == pygame.K_p:
-                    Player.rect.center = 0, 0
-                    Player.ySpeed, Player.xSpeed = 0, 0
+                #if event.key == pygame.K_p:
+                    #Player.rect.center = 0, 0
+                    #Player.ySpeed, Player.xSpeed = 0, 0
                 
 
         if paused:
+            pauseText = levelFont.render("Paused", True, (255, 255, 255))
+            screen.blit(pauseText,(300,230))
+            pygame.display.flip()
             continue
 
         # Main Menu

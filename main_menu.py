@@ -41,7 +41,9 @@ def mainMenuLoop():
                     return "quit"
                 elif 360 <= mouse[0] <= 500 and 340 <= mouse[1] <= 390:
                     print("Instruction button was pressed")
-                    instructions.instructionsLoop()
+                    credits = instructions.instructionsLoop()
+                    if credits == "quit":
+                        return "quit"
 
         screen.blit(bg,(0,0))
         

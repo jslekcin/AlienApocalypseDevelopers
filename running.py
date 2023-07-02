@@ -11,7 +11,7 @@ import poison_boss
 import win_screen
 from player_save import Save
 
-level = "poison_level"
+level = "main_menu"
 prev_level = ""
 
 while level != "quit":
@@ -49,3 +49,6 @@ while level != "quit":
                 Save.stamina = 120
                 prev_level = level
                 level = "death_screen"
+
+pygame.quit()
+sys.exit()
