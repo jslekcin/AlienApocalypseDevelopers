@@ -2,6 +2,27 @@ import sys
 import os
 from cx_Freeze import setup, Executable
 
+files = ["UFO.ico", "GameMusic/", "Images/", "sounds/", "chrisTutorial.txt", "map.txt", "bossMap.txt", "poisonBoss.txt", "poison.txt"]
+
+target = Executable(
+    script = "AlienApocalypse.py",
+    base = "Win32Gui",
+    icon = "UFO.ico"
+)
+
+build_exe_options = {
+    "excludes" : ["tkinter","unittest"],
+    "include_files" : files,
+    "packages" : ["pygame"]
+}
+
+setup(
+    name = "Alien Apocalypse",
+    version = "1.0",
+    description = "Alien Apocalypse Survival Game",
+    options = {"build_exe" : build_exe_options},
+    executables = [target]
+)
 res = []
 for (sounds,dir_name,file_names) in os.walk("./"):
     #print(file_names)
